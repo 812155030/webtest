@@ -1,0 +1,143 @@
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+    <input type="hidden" name="updatetime" value="{$row.updatetime}" />
+
+    <ul class="list-group">
+        <li class="list-group-item">
+            订单金额：￥{$row.order_price}
+        </li>
+        <li class="list-group-item">
+            实付金额：￥{$row.total_price}元 (包含优惠￥{$row.discount_price}，物流费用￥{$row.delivery_price})
+        </li>
+        {if $row.had_refund}
+        <li class="list-group-item">
+            退款时间：{:date('Y-m-d H:i:s', $row.had_refund)}
+        </li>
+        <li class="list-group-item">
+            已退款：{:__('Yes')}
+        </li>
+        {else/}
+        <li class="list-group-item">
+            已退款：{:__('No')}
+        </li>
+        {/if}
+        {if $refund.service_type > 0}
+        <li class="list-group-item">
+            客户退货物流单号：{$refund.express_number}
+        </li>
+        {/if}
+    </ul>
+
+    <style>
+        .media {
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .media-left img {
+            width: 100px;
+            height: 100px;
+        }
+
+        .total-price {
+            color: #ff5f17;
+        }
+    </style>
+    {foreach $product as $key => $item}
+    <div class="media">
+        <div class="media-left media-middle">
+            <a href="#">
+                <img class="media-object" src="{$config.upload.cdnurl . $item.image}" alt="...">
+            </a>
+        </div>
+        <div class="media-body">
+            <div>商品ID:{$item.product_id}</div>
+            <h4 class="media-heading">{$item.title}</h4>
+            <div>规格：{$item.spec}</div>
+            <div>{$item.number} ✖ {$item.price}</div>
+            <div class="total-price">总共：{$item.price * $item.number} 元</div>
+        </div>
+        <div class="media-body">
+            <h4 class="media-heading">{$item.choose == 1?'参与售后':'不参与售后'}</h4>
+        </div>
+    </div>
+    {/foreach}
+
+    <ul class="list-group" style="margin-top: 20px; margin-bottom: 50px">
+        <li class="list-group-item">
+            货物状态：{$refund.receiving_status_text[$refund.receiving_status]}
+        </li>
+        <li class="list-group-item">
+            服务类型：{$refund.service_type_text[$refund.service_type]}
+        </li>
+        <li class="list-group-item">
+            退款金额：￥{$refund.amount}
+        </li>
+        <li class="list-group-item">
+            换货原因：{$refund.reason_type}
+        </li>
+        <li class="list-group-item">
+            退货说明：{$refund.refund_explain}
+        </li>
+    </ul>
+
+    <style>
+        .footer{
+            background: #ecf0f1;
+            height: auto;
+            position: fixed;
+            bottom: 0;
+            padding: 10px !important;
+            overflow: hidden;
+            width: 100%;
+            margin-bottom: 0px;
+        }
+    </style>
+
+    <div class="form-group footer">
+        <div class="col-xs-12 col-sm-8">
+            <div class="radio">
+                {:__('Refund status')}:
+                {foreach name="refundStatusList" item="vo"}
+                {if $key > 0}
+                <label for="row[refund_status]-{$key}">
+                    <input id="row[refund_status]-{$key}" name="row[refund_status]" type="radio"
+                           value="{$key}" {in name="key" value="$row.refund_status" }checked{/in} /> {$vo}
+                </label>
+                {/if}
+                {/foreach}
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-4">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+
+    <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{:__('Choose')}</h4>
+                </div>
+                <div class="alert alert-warning" role="alert">如果是货到付款的，请联系用户</div>
+                <div class="alert alert-warning" role="alert">如果是在线支付的，请确认收到货再退钱</div>
+                <div class="modal-body">
+                    <label for="row[refund_action]-0">
+                        <input id="row[refund_action]-0" name="row[refund_action]" type="radio" value="0" checked />
+                        {:__('Not withdraw money')}
+                    </label>
+                    <label for="row[refund_action]-1">
+                        <input id="row[refund_action]-1" name="row[refund_action]" type="radio" value="1" />
+                        {:__('Withdraw money')}
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{:__('Close')}</button>
+                    <button type="submit" class="btn btn-success btn-embossed">{:__('OK')}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+

@@ -1,0 +1,221 @@
+<style>
+    /* 运费规则--区域弹窗*/
+    /* 地域选择样式*/
+    .regional-choice {
+        display: none; }
+
+    .layui-layer {
+        z-index: 2000; }
+
+    .layui-layer-content .regional-choice {
+        display: block !important; }
+
+    .checkbtn a {
+        font-size: 1.4rem;
+        color: #333;
+        text-decoration: none;
+        cursor: pointer; }
+
+    .fr {
+        float: right; }
+
+    .clearfloat {
+        zoom: 1; }
+    .clearfloat:after {
+        display: block;
+        clear: both;
+        content: "";
+        visibility: hidden;
+        height: 0; }
+
+    .place-div label {
+        font-weight: 400;
+        font-size: 1.4rem; }
+    .place-div input[type=checkbox] {
+        margin-right: .3rem; }
+    .place-div > div {
+        width: 100%;
+        padding: 10px 30px; }
+    .place-div .checkbtn {
+        background-color: #fbfbfb;
+        text-align: right; }
+    .place-div .checkbtn img {
+        height: 10px;
+        margin-left: 3px; }
+    .place-div .checkbtn .ri {
+        border-right: none; }
+    .place-div .checkbtn a {
+        height: 30px;
+        line-height: 30px;
+        display: inline-block;
+        width: 60px;
+        text-align: center; }
+    .place-div .smallplace .ratio {
+        color: red; }
+    .place-div .smallplace label {
+        padding-right: 10px;
+        text-align: left;
+        width: auto;
+        float: left;
+        cursor: pointer; }
+    .place-div .smallplace .citys {
+        width: auto;
+        background-color: #fff;
+        position: absolute;
+        top: 35px;
+        border: 1px solid #ccc;
+        z-index: 100;
+        visibility: hidden; }
+    .place-div .smallplace .citys > i.jt {
+        width: 0;
+        height: 0;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-bottom: 10px solid #ccc;
+        position: absolute;
+        top: -10px;
+        left: 20px; }
+    .place-div .smallplace .citys > i.jt i {
+        width: 0;
+        height: 0;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-bottom: 10px solid #fff;
+        position: absolute;
+        top: 2px;
+        left: -8px; }
+    .place-div .smallplace .citys .row-div {
+        min-width: 250px;
+        padding: 10px;
+        box-sizing: border-box; }
+    .place-div .smallplace .citys .row-div label span {
+        max-width: 175px;
+        white-space: nowrap;
+        vertical-align: middle;
+        font-size: 1.4rem; }
+    .place-div .smallplace .place-tooltips:hover .citys {
+        visibility: visible; }
+    .place-div .smallplace p {
+        float: left;
+        width: auto;
+        margin: 2px 0; }
+    .place-div .smallplace > div {
+        float: left;
+        width: 170px;
+        margin: 0;
+        padding-bottom: 10px;
+        padding-top: 5px;
+        position: relative; }
+
+    .show-place-div {
+        margin-left: 85px;
+        font-size: 15px; }
+    .show-place-div .smallplace label {
+        min-width: 105px;
+        width: auto; }
+    .show-place-div .smallplace input {
+        margin-left: 0; }
+    .show-place-div .smallplace .citys .row-div p {
+        margin: 5px 0 10px 0; }
+
+
+    table input{
+        width: 80px!important;
+    }
+</style>
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+    <div class="form-group">
+        <label for="c-title" class="control-label col-xs-12 col-sm-2">{:__('Name')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-title" class="form-control" name="row[name]" type="text" data-rule="required" value="{$row.name}" >
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-title" class="control-label col-xs-12 col-sm-2">{:__('Min buy')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-min" class="form-control" name="row[min]" type="number" data-rule="required" value="{$row.min}" min="1" >
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Type')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[type]', ['quantity'=>__('Quantity'), 'weight'=>__('Weight')],$row['type'])}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-title" class="control-label col-xs-12 col-sm-2">{:__('Delivery area')}</label>
+        <div class="col-xs-12 col-sm-8">
+            <table class="table table-hover regional-table">
+                <thead>
+                <tr>
+                    <th>{:__('Can delivery area')}</th>
+                    <th>{:__('First')}</th>
+                    <th>{:__('First fee')}</th>
+                    <th>{:__('Additional')}</th>
+                    <th>{:__('Additional fee')}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {foreach name='$row["rule"]' item='vo'}
+                <tr>
+                    <td class="text-left">
+                        <p class="selected-content am-margin-bottom-xs">
+                            {$vo['area_content']}
+                        </p>
+                        <p>
+                            <a class="edit" href="javascript:;">编辑</a>
+                            <a class="delete" href="javascript:;">删除</a>
+                        </p>
+                        <input type="hidden" name="row[area][]" value="{$vo['area']}">
+                    </td>
+                    <td>
+                        <input type="number" name="row[first][]" min="1" value="{$vo['first']}" required>
+                    </td>
+                    <td>
+                        <input type="number" name="row[first_fee][]" min="0" value="{$vo['first_fee']}" required>
+                    </td>
+                    <td>
+                        <input type="number" name="row[additional][]" min="1" value="{$vo['additional']}">
+                    </td>
+                    <td>
+                        <input type="number" name="row[additional_fee][]" min="0" value="{$vo['additional_fee']}">
+                    </td>
+                </tr>
+                {/foreach}
+                <tr>
+                    <td colspan="5">
+                        <a class="add-region am-btn am-btn-default am-btn-xs" href="javascript:;">
+                            <i class="iconfont icon-dingwei"></i>
+                            点击添加可配送区域和运费
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Weigh')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-weigh" data-rule="required" class="form-control" name="row[weigh]" type="number" value="{$row.weigh}">
+        </div>
+    </div>
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-success btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
+<div class="regional-choice"></div>
+<script>
+    // 初始化区域选择界面
+    datas = JSON.parse('{$areaData}');
+</script>

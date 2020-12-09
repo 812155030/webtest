@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="tests/autoload.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         beStrictAboutTestsThatDoNotTestAnything="false"
+         beStrictAboutOutputDuringTests="false"
+         timeoutForLargeTests="60"
+         timeoutForMediumTests="10"
+         timeoutForSmallTests="1"
+         forceCoversAnnotation="false"
+         beStrictAboutCoversAnnotation="false"
+>
+    <testsuites>
+        <testsuite name="unishop">
+            <directory>./tests/unishop/</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">./addons/unishop/</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-html" target="./tests/codeCoverage"></log>
+    </logging>
+</phpunit>

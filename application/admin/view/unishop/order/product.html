@@ -1,0 +1,63 @@
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+    <ul class="list-group">
+        <li class="list-group-item">
+            订单金额：￥{$order.order_price}
+        </li>
+        <li class="list-group-item">
+            实付金额：￥{$order.total_price}元 (包含优惠￥{$order.discount_price}，物流费用￥{$order.delivery_price})
+        </li>
+    </ul>
+
+    <style>
+        .media{
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .media-left img {
+            width: 100px;
+            height: 100px;
+        }
+
+        .total-price {
+            color: #ff5f17;
+        }
+    </style>
+    {foreach $product as $key => $item}
+    <div class="media">
+        <div class="media-left media-middle">
+            <a href="#">
+                <img class="media-object" src="{$config.upload.cdnurl . $item.image}" alt="...">
+            </a>
+        </div>
+        <div class="media-body">
+            <div>商品ID:{$item.product_id}</div>
+            <h4 class="media-heading">{$item.title}</h4>
+            <div>规格：{$item.spec}</div>
+            <div>{$item.number} ✖ {$item.price}</div>
+            <div class="total-price">总共：{$item.price * $item.number} 元</div>
+        </div>
+        {if empty($evaluate[$item.product_id])}
+        <div class="media-body">
+            <h4 class="media-heading">未评价</h4>
+        </div>
+        {else/}
+        <div class="media-body">
+            <h4 class="media-heading">评价：{$evaluate[$item.product_id]['rate']} 星</h4>
+            <div>评价内容: {$evaluate[$item.product_id]['comment']}</div>
+            <div>评价时间: {:date('Y-m-d H:i:s',$evaluate[$item.product_id]['createtime'])}</div>
+            <div>匿名: {$evaluate[$item.product_id]['anonymous'] ? '是' : '否'}</div>
+            <div>置顶: {$evaluate[$item.product_id]['toptime'] ? '是' : '否'}</div>
+        </div>
+        {/if}
+    </div>
+    {/foreach}
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-success btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
