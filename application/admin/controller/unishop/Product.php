@@ -92,6 +92,8 @@ class Product extends Backend
             }
             $this->error(__('Parameter %s can not be empty', ''));
         }
+
+        $this->view->assign('categoryList', $this->build_category_select('row[category_id]', 'product' , 0));
         return $this->view->fetch();
     }
 

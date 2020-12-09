@@ -34,8 +34,9 @@ class DeliveryRule extends Model
      */
     public function getDelivetyByArea($cityId)
     {
+        $prefix = \think\Config::get('database.prefix');
         $data = $this->alias('DR')
-            ->join(DeliveryModel::TABLE_NAME . ' D', 'DR.delivery_id = D.id')
+            ->join($prefix.DeliveryModel::TABLE_NAME . ' D', 'DR.delivery_id = D.id')
             //->where("D.switch = " . DeliveryModel::SWITCH_YES . " AND find_in_set($cityId,DR.area)")
             ->where("D.switch = " . DeliveryModel::SWITCH_YES)
             ->field('D.id,D.name,D.type,D.min,DR.first,DR.first_fee,DR.additional,DR.additional_fee,DR.area')
@@ -67,8 +68,9 @@ class DeliveryRule extends Model
      * @throws \think\Exception
      */
     public function cityInScopeOfDelivery($cityId, $deliveryId) {
+        $prefix = \think\Config::get('database.prefix');
         return $this->alias('DR')
-            ->join(DeliveryModel::TABLE_NAME . ' D', 'DR.delivery_id = D.id')
+            ->join($prefix.DeliveryModel::TABLE_NAME . ' D', 'DR.delivery_id = D.id')
             ->where("D.id = $deliveryId AND find_in_set($cityId,DR.area) AND D.switch = " . DeliveryModel::SWITCH_YES)
             ->field('D.id,D.name,D.type,D.min,DR.first,DR.first_fee,DR.additional,DR.additional_fee')
             ->find();

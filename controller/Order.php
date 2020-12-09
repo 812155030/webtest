@@ -150,12 +150,11 @@ class Order extends Base
 
             Db::commit();
 
-            $this->success('', $result);
-
         } catch (Exception $e) {
             Db::rollback();
             $this->error($e->getMessage(), false);
         }
+        $this->success('', $result);
     }
 
     /**
@@ -181,13 +180,11 @@ class Order extends Base
 
             $orderModel = new \addons\unishop\model\Order();
             $result = $orderModel->getOrdersByType($this->auth->id, $type, $page, $pagesize);
-            $this->success('', $result);
 
         } catch (Exception $e) {
-
             $this->error($e->getMessage());
-
         }
+        $this->success('', $result);
 
     }
 
@@ -450,11 +447,11 @@ class Order extends Base
                 unset($order['extend']);
             }
 
-            $this->success('', $order);
         } catch (Exception $e) {
             $this->error($e->getMessage());
         }
 
+        $this->success('', $order);
     }
 
     /**
@@ -575,11 +572,11 @@ class Order extends Base
             $order->save();
 
             Db::commit();
-            $this->success(__('Commit'), 1);
         } catch (Exception $e) {
             Db::rollback();
             $this->error($e->getMessage());
         }
+        $this->success('已申请', 1);
     }
 
     /**
@@ -612,7 +609,6 @@ class Order extends Base
 
             if ($order->refund->save() && $order->save()) {
                 Db::commit();
-                $this->success('', 1);
             } else {
                 throw new Exception(__('Operation failed'));
             }
@@ -621,8 +617,7 @@ class Order extends Base
             Db::rollback();
             $this->success($e->getMessage());
         }
-
-
+        $this->success('', 1);
     }
 
 }

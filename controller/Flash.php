@@ -201,11 +201,10 @@ class Flash extends Base
             // 购物车数量
             $data['cart_num'] = (new \addons\unishop\model\Cart)->where(['user_id' => $this->auth->id])->count();
 
-            $this->success('', $data);
         } catch (Exception $e) {
             $this->error($e->getMessage());
         }
-
+        $this->success('', $data);
     }
 
 
@@ -286,16 +285,17 @@ class Flash extends Base
             //$targetTime = $flash['starttime'] > time() ? $flash['starttime'] : $flash['endtime'];
             //$flash['countdown'] = FlashSale::countdown($targetTime);
 
-            $this->success($msg, [
-                'product' => $productData,
-                'address' => $address,
-                'delivery' => $delivery['list'],
-                'flash' => $flash
-            ]);
 
         } catch (Exception $e) {
             $this->error($e->getMessage(), false);
         }
+        $this->success($msg, [
+            'product' => $productData,
+            'address' => $address,
+            'delivery' => $delivery['list'],
+            'flash' => $flash
+        ]);
+
     }
 
 

@@ -79,11 +79,10 @@ class Product extends Base
                 $data->evaluate_list = collection($evaluate)->append(['createtime_text'])->toArray();
             }
             $data = $data->append(['images_text', 'spec_list', 'spec_table_list'])->toArray();
-            $this->success('', $data);
         } catch (Exception $e) {
             $this->error($e->getMessage());
         }
-
+        $this->success('', $data);
     }
 
     /**
@@ -121,10 +120,10 @@ class Product extends Base
 
         if ($result) {
             $result = collection($result)->toArray();
-            $this->success('', $result);
         } else {
             $this->error('没有更多数据');
         }
+        $this->success('', $result);
     }
 
     /**

@@ -22,7 +22,7 @@ class unishop extends Addons
             0 =>
                 [
                     'name' => 'unishop',
-                    'title' => '喂喂商城',
+                    'title' => 'uniShop移动商城',
                     'icon' => 'fa fa-font-awesome',
                     'remark' => '',
                     'sublist' =>

@@ -34,4 +34,5 @@ return [
     'No buy yet'     => '下单未支付量',
     'Evaluate'     => '评价',
     'Copy'     => '复制',
+    'Multi setting'     => '批量添加',
 ];

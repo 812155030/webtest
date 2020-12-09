@@ -84,13 +84,11 @@ class Address extends Base
             $addressModel = new AddressModel();
             if (!$addressModel->allowField(true)->save($data)) {
                 throw new Exception($addressModel->getError());
-            } else {
-                $this->success('添加成功', true);
             }
         } catch (Exception $e) {
             $this->error($e->getMessage(), false);
         }
-
+        $this->success('添加成功', true);
     }
 
     /**
@@ -114,12 +112,11 @@ class Address extends Base
             $data['updatetime'] = time();
             if (!$addressModel->allowField(true)->save($data,['id' => $data['id'], 'user_id' => $data['user_id']])) {
                 throw new Exception($addressModel->getError());
-            } else {
-                $this->success('修改成功', true);
             }
         } catch (Exception $e) {
             $this->error($e->getMessage(), false);
         }
+        $this->success('修改成功', true);
     }
 
     /**

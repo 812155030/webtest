@@ -76,7 +76,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form', 'upload', 'vue'], fun
             '                                    <div class="modal-content">\n' +
             '                                        <div class="modal-body">\n' +
             '                                            <label>批量设置 {{multiName_}} 的值</label>\n' +
-            '                                            <input type="text" class="form-control" v-model="multiValue">\n' +
+            '                                            <input type="number" class="form-control" v-model="multiValue">\n' +
             '                                        </div>\n' +
             '                                        <div class="modal-footer">\n' +
             '                                            <button type="button" class="btn btn-default" data-dismiss="modal">\n' +
@@ -254,7 +254,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form', 'upload', 'vue'], fun
                 stock: _stock ? _stock : 0,
                 sales: _sales ? _sales : 0,
                 multiType:'code', // 当前批量添加的类型
-                multiValue: 0, // 当前批量编辑的值
+                multiValue: '', // 当前批量编辑的值
                 multi: [{ // 批量类型数组
                     'type': 'code',
                     'name': __('Code')
@@ -325,6 +325,17 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form', 'upload', 'vue'], fun
                     }
                 }
                 return res;
+            }
+        },
+        watch: {
+            multiValue(val) {
+                switch (this.multiType) {
+                    case 'code':
+                    case 'stock':
+                    case 'sales':
+                        this.multiValue = parseInt(val);
+                        break;
+                }
             }
         },
         methods: {
@@ -506,15 +517,21 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form', 'upload', 'vue'], fun
             // 批量添加规格值
             addMultiType(type) {
                 this.multiType = type;
+                this.multiValue = '';
             },
             addMultiValue() {
                 this.multiType; // 当前批量添加的类型
                 this.multiValue; // 当前批量编辑的值
-                if (this.multiValue == '') {
+                if (this.multiValue === '') {
                     Toastr.error('不能为空');
                     return;
                 }
-                console.log(this.multiValue);
+                switch (this.multiType) {
+                    case 'market_price':
+                    case 'sales_price':
+                        this.multiValue = parseFloat(this.multiValue).toFixed(2);
+                        break;
+                }
                 for (let i in this.specTableList) {
                     this.specTableList[i][this.multiType] = this.multiValue;
                 }
@@ -535,7 +552,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form', 'upload', 'vue'], fun
                     multi_url: 'unishop/product/multi',
                     evaluate_url: 'unishop/evaluate/index',
                     copy_url: 'unishop/product/copy',
-                    table: 'product',
+                    table: 'unishop_product',
                 }
             });
 

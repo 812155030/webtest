@@ -145,7 +145,6 @@ class Pay extends Base
                     );
                 }
 
-                $this->success('', $result);
             } else {
                 $this->error($result['return_msg']);
             }
@@ -153,6 +152,7 @@ class Pay extends Base
         } catch (Exception $e) {
             $this->error($e->getMessage());
         }
+        $this->success('', $result);
     }
 
     /**

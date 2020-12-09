@@ -266,7 +266,7 @@ class User extends Base
             $this->success('', $userInfo);
 
         } else {
-            $this->error(__('Logged in failed'));
+            $this->error('登录失败');
         }
 
     }
