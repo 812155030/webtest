@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -9,23 +9,17 @@
 namespace Amasty\ElasticSearch\Model\Client;
 
 use Amasty\ElasticSearch\Api\Data\Indexer\Data\DataMapperResolverInterface;
-use Amasty\ElasticSearch\Model\Indexer\ExternalIndexerProvider;
+use Amasty\Xsearch\Model\Indexer\ExternalIndexerProvider;
 use Amasty\ElasticSearch\Model\Indexer\Structure\EntityBuilder\Product;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 use \Magento\Framework\Exception\LocalizedException;
 
-/**
- * Class Elasticsearch
- *
- * Client connection manager
- */
 class Elasticsearch
 {
     const BULK_ACTION_INDEX = 'index';
     const BULK_ACTION_DELETE = 'delete';
     const EXTERNAL_INDEX = 'external';
-    const EXTERNAL_INDEX_BATCH_COUNT = 100;
 
     /**
      * @var \Amasty\ElasticSearch\Model\Config
@@ -83,6 +77,11 @@ class Elasticsearch
     private $dynamicTemplateMapper;
 
     /**
+     * @var string
+     */
+    private $elasticEngineVersion;
+
+    /**
      * @var bool
      */
     private $pingResult = null;
@@ -101,7 +100,7 @@ class Elasticsearch
         if (!class_exists(\Elasticsearch\ClientBuilder::class)) {
             throw new LocalizedException(
                 __('Elasticsearch package is not installed. Please, run the following command '
-                . 'in the SSH: composer require elasticsearch/elasticsearch ~5.1')
+                    . 'in the SSH: composer require elasticsearch/elasticsearch ~5.1')
             );
         }
 
@@ -171,7 +170,7 @@ class Elasticsearch
                 $indexName = $this->getIndexName($indexerId, $storeId);
                 if ($this->indexExists($indexName)) {
                     $query = $this->prepareSaveQuery($documents, $indexName);
-                    $this->bulk($query);
+                    $this->bulkQuery($query);
                 }
             } catch (\Exception $e) {
                 $this->debug->debug($e);
@@ -189,24 +188,19 @@ class Elasticsearch
     public function saveExternal()
     {
         foreach ($this->storeManager->getStores() as $store) {
-            $batch = 0;
-            foreach ($this->externalIndexerProvider->getIndexTypes() as $indexType) {
+            $documents = $this->externalIndexerProvider->getDocuments($store->getId());
+            foreach (array_keys($documents) as $indexType) {
+                if (empty($documents[$indexType])) {
+                    continue;
+                }
+
                 $indexName = $this->getIndexName(self::EXTERNAL_INDEX . '_' . $indexType, $store->getId());
                 if ($this->indexExists($indexName)) {
                     $this->deleteIndex($indexName);
                 }
-                while (true) {
-                    $documents = $this->externalIndexerProvider->getDocuments(
-                        $store->getId(),
-                        ++$batch,
-                        self::EXTERNAL_INDEX_BATCH_COUNT
-                    );
-                    if (empty($documents[$indexType])) {
-                        break;
-                    }
-                    $query = $this->prepareSaveQuery($documents[$indexType], $indexName);
-                    $this->bulk($query);
-                }
+
+                $query = $this->prepareSaveQuery($documents[$indexType], $indexName);
+                $this->bulkQuery($query);
             }
         }
 
@@ -218,7 +212,7 @@ class Elasticsearch
      * @return array
      * @throws \Exception
      */
-    public function bulk($query)
+    public function bulkQuery($query)
     {
         $result = $this->getClient()->bulk($query);
         if (!empty($result['errors'])) {
@@ -297,13 +291,24 @@ class Elasticsearch
                 $indexName,
                 self::BULK_ACTION_DELETE
             );
-            $this->bulk($query);
+            $this->bulkQuery($query);
         } catch (\Exception $e) {
             $this->debug->debug($e);
             throw $e;
         }
 
         return $this;
+    }
+
+    /**
+     * Execute search by $query
+     *
+     * @param array $query
+     * @return array
+     */
+    public function query(array $query): array
+    {
+        return $this->getClient()->search($query);
     }
 
     /**
@@ -614,20 +619,23 @@ class Elasticsearch
                     'properties' => [],
                     'dynamic_templates' => [
                         $this->dynamicTemplateMapper->map($storeId)
-                    ]
+                    ],
+                    "numeric_detection" => false,
                 ],
             ],
         ];
 
+        $isAllowSpecialChars = $this->config->allowSpecialChars($storeId);
+        $hasStemming = $this->config->hasStemming($storeId);
         foreach ($fields as $field => $fieldInfo) {
             if ($fieldInfo['type'] === Product::ATTRIBUTE_TYPE_TEXT) {
                 $fieldInfo['fielddata'] = true;
 
-                if ($this->config->allowSpecialChars($storeId)) {
+                if ($isAllowSpecialChars) {
                     $fieldInfo['analyzer'] = 'allow_spec_chars';
                 }
 
-                if ($this->config->hasStemming($storeId)) {
+                if ($hasStemming) {
                     $fieldInfo['fields']['stemming'] = [
                         'type' => Product::ATTRIBUTE_TYPE_TEXT,
                         'fielddata' => true,
@@ -640,11 +648,7 @@ class Elasticsearch
             $params['body'][$entityType]['properties'][$field] = $fieldInfo;
         }
 
-        $info = $this->getClient()->info();
-
-        if (isset($info['version']['number'])
-            && version_compare($info['version']['number'], '7.0.0', '>=')
-        ) {
+        if (version_compare($this->getEngineVersion(), '7.0.0', '>=')) {
             $params['include_type_name'] = true;
         }
 
@@ -665,7 +669,7 @@ class Elasticsearch
     }
 
     /**
-     * @return mixed
+     * @return \Elasticsearch\Client
      * @throws LocalizedException
      */
     public function getClient()
@@ -758,6 +762,7 @@ class Elasticsearch
         if ($this->existsAlias($alias)) {
             $alias = $this->getAlias($alias);
             $indices = array_keys($alias);
+            natsort($indices);
             foreach ($indices as $index) {
                 if (strpos($index, $indexPattern) === 0) {
                     if (isset($this->indexNameByStore[$storeId]) && $this->indexNameByStore[$storeId] == $index) {
@@ -770,5 +775,19 @@ class Elasticsearch
         }
 
         return $storeIndex;
+    }
+
+    /**
+     * @return string|null
+     * @throws LocalizedException
+     */
+    public function getEngineVersion()
+    {
+        if (!$this->elasticEngineVersion) {
+            $elasticInfo = $this->getClient()->info();
+            $this->elasticEngineVersion = $elasticInfo['version']['number'] ?? null;
+        }
+
+        return $this->elasticEngineVersion;
     }
 }

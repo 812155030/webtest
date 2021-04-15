@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -9,7 +9,7 @@
 namespace Amasty\ElasticSearch\Model\Client;
 
 use Amasty\ElasticSearch\Model\Client\ElasticsearchFactory;
-use Amasty\ElasticSearch\Model\Config;
+use Amasty\Xsearch\Model\Config;
 
 class ClientRepository implements ClientRepositoryInterface
 {
@@ -42,7 +42,7 @@ class ClientRepository implements ClientRepositoryInterface
     public function get()
     {
         if ($this->client == null) {
-            $this->client = $this->elasticsearchFactory->create(['options' => $this->config->prepareConnectionData()]);
+            $this->client = $this->elasticsearchFactory->create(['options' => $this->config->getConnectionData()]);
         }
 
         return $this->client;

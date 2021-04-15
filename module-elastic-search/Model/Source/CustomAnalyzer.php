@@ -1,18 +1,16 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
 
 namespace Amasty\ElasticSearch\Model\Source;
 
-/**
- * Class CustomAnalyzer
- * @package Amasty\ElasticSearch\Model\Source
- */
-class CustomAnalyzer implements \Magento\Framework\Option\ArrayInterface
+use Amasty\ElasticSearch\Model\Indexer\Structure\CustomAnalyzersMetaInfoProvider;
+
+class CustomAnalyzer implements \Magento\Framework\Data\OptionSourceInterface
 {
     const DISABLED = 'disabled';
     const CHINESE = 'smartcn';
@@ -20,15 +18,29 @@ class CustomAnalyzer implements \Magento\Framework\Option\ArrayInterface
     const KOREAN = 'nori';
 
     /**
-     * @inheritdoc
+     * @var CustomAnalyzersMetaInfoProvider
      */
-    public function toOptionArray()
+    private $metaInfoProvider;
+
+    public function __construct(
+        CustomAnalyzersMetaInfoProvider $customAnalyzersMetaInfoProvider
+    ) {
+        $this->metaInfoProvider = $customAnalyzersMetaInfoProvider;
+    }
+
+    /**
+     * @return array[]
+     */
+    public function toOptionArray(): array
     {
-        return [
-            ['value' => self::DISABLED, 'label' => __('Disabled')],
-            ['value' => self::CHINESE, 'label' => __('Chinese')],
-            ['value' => self::JAPANESE, 'label' => __('Japanese')],
-            ['value' => self::KOREAN, 'label' => __('Korean')]
-        ];
+        $customAnalyzers = array_map(function ($alias) {
+            return [
+                'value' => $alias,
+                'label' => $this->metaInfoProvider->getAnalyzerLabel($alias)
+            ];
+        }, $this->metaInfoProvider->getAllAnalyzers());
+        array_unshift($customAnalyzers, ['value' => self::DISABLED, 'label' => __('Disabled')]);
+
+        return $customAnalyzers;
     }
 }

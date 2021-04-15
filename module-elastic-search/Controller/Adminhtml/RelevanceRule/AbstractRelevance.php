@@ -1,15 +1,21 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
 
 namespace Amasty\ElasticSearch\Controller\Adminhtml\RelevanceRule;
 
-use Magento\Backend\App\Action\Context;
+use Amasty\ElasticSearch\Model\RelevanceRuleFactory;
+use Amasty\ElasticSearch\Model\RelevanceRuleRepository;
 use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\ForwardFactory;
+use Magento\Framework\Registry;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 abstract class AbstractRelevance extends Action
 {
@@ -17,37 +23,51 @@ abstract class AbstractRelevance extends Action
     const CURRENT_RULE = 'amasty_elastic_relevance_rule';
 
     /**
-     * @var \Magento\Backend\Model\View\Result\ForwardFactory
+     * @var ForwardFactory
      */
     protected $resultForwardFactory;
 
     /**
-     * @var \Amasty\ElasticSearch\Model\RelevanceRuleRepository
+     * @var RelevanceRuleRepository
      */
     protected $ruleRepository;
 
     /**
-     * @var \Amasty\ElasticSearch\Model\RelevanceRuleFactory
+     * @var RelevanceRuleFactory
      */
     protected $ruleFactory;
 
     /**
-     * @var \Magento\Framework\Registry
+     * @var Registry
      */
     protected $registry;
 
+    /**
+     * @var TimezoneInterface
+     */
+    protected $timezone;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
     public function __construct(
         Context $context,
-        \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory,
-        \Amasty\ElasticSearch\Model\RelevanceRuleRepository $ruleRepository,
-        \Amasty\ElasticSearch\Model\RelevanceRuleFactory $ruleFactory,
-        \Magento\Framework\Registry $registry
+        ForwardFactory $resultForwardFactory,
+        RelevanceRuleRepository $ruleRepository,
+        RelevanceRuleFactory $ruleFactory,
+        Registry $registry,
+        TimezoneInterface $timezone,
+        StoreManagerInterface $storeManager
     ) {
         parent::__construct($context);
         $this->resultForwardFactory = $resultForwardFactory;
         $this->ruleRepository = $ruleRepository;
         $this->ruleFactory = $ruleFactory;
         $this->registry = $registry;
+        $this->timezone = $timezone;
+        $this->storeManager = $storeManager;
     }
 
     /**

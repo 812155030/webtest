@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -9,8 +9,16 @@
 namespace Amasty\ElasticSearch\Model\Indexer\RelevanceRule;
 
 use Amasty\ElasticSearch\Api\Data\RelevanceRuleInterface;
+use Amasty\ElasticSearch\Api\RelevanceRuleRepositoryInterface;
+use Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule\CollectionFactory as RelevanceRuleCollectionFactory;
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -19,36 +27,36 @@ class IndexBuilder
 {
     const SECONDS_IN_DAY = 86400;
     const PRODUCT_ID = 'product_id';
-    const TABLE_NAME = 'amasty_elastic_relevance_rule_index';
+    const TABLE_NAME = 'amasty_elastic_relevance_rule_index_tmp';
     const MAX_INT_MYSQL = 4294967294;
 
     /**
-     * @var \Magento\Framework\App\ResourceConnection
+     * @var ResourceConnection
      */
     private $resource;
 
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
+     * @var StoreManagerInterface
      */
     private $storeManager;
 
     /**
-     * @var \Amasty\ElasticSearch\Api\RelevanceRuleRepositoryInterface
+     * @var RelevanceRuleRepositoryInterface
      */
     private $ruleRepository;
 
     /**
-     * @var \Magento\Catalog\Api\ProductRepositoryInterface
+     * @var ProductRepositoryInterface
      */
     private $productRepository;
 
     /**
-     * @var \Magento\Framework\Api\SearchCriteriaBuilder
+     * @var SearchCriteriaBuilder
      */
     private $searchCriteriaBuilder;
 
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -57,13 +65,19 @@ class IndexBuilder
      */
     private $batchCount;
 
+    /**
+     * @var RelevanceRuleCollectionFactory
+     */
+    private $relevanceRuleCollectionFactory;
+
     public function __construct(
-        \Magento\Framework\App\ResourceConnection $resource,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Amasty\ElasticSearch\Api\RelevanceRuleRepositoryInterface $ruleRepository,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
-        \Psr\Log\LoggerInterface $logger,
+        ResourceConnection $resource,
+        StoreManagerInterface $storeManager,
+        RelevanceRuleRepositoryInterface $ruleRepository,
+        ProductRepositoryInterface $productRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        LoggerInterface $logger,
+        RelevanceRuleCollectionFactory $relevanceRuleCollectionFactory,
         $batchCount = 1000
     ) {
         $this->resource = $resource;
@@ -73,16 +87,21 @@ class IndexBuilder
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->logger = $logger;
         $this->batchCount = $batchCount;
+        $this->relevanceRuleCollectionFactory = $relevanceRuleCollectionFactory;
     }
 
     /**
+     * Reindex by product Ids
+     *
      * @param array $ids
+     * @throws LocalizedException
      */
-    public function reindexByIds(array $ids)
+    public function reindexByIds(array $ids): void
     {
         try {
             $this->cleanByIds($ids);
             $products = $this->getProducts($ids);
+
             foreach ($this->getActiveRules() as $rule) {
                 foreach ($products as $product) {
                     $this->applyRule($rule, $product);
@@ -90,79 +109,69 @@ class IndexBuilder
             }
         } catch (\Exception $e) {
             $this->critical($e);
-            throw new \Magento\Framework\Exception\LocalizedException(
+
+            throw new LocalizedException(
                 __("Amasty ElasticSearch Relevance rule indexing failed. See details in exception log.")
             );
         }
     }
 
-    /**
-     * @param array $productIds
-     * @return ProductInterface[]
-     */
-    public function getProducts(array $productIds)
+    public function getProducts(array $productIds): iterable
     {
         $this->searchCriteriaBuilder->addFilter('entity_id', $productIds, 'in');
         $searchCriteria = $this->searchCriteriaBuilder->create();
-        $products = $this->productRepository->getList($searchCriteria)->getItems();
-        return $products;
+
+        return $this->productRepository->getList($searchCriteria)->getItems();
     }
 
-    /**
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @return void
-     */
-    public function reindexFull()
+    public function reindexFull(): void
     {
         try {
             $this->resource->getConnection()->truncateTable($this->getIndexTable());
+
             foreach ($this->getActiveRules() as $rule) {
                 $this->doReindex($rule);
             }
         } catch (\Exception $e) {
             $this->critical($e);
-            throw new \Magento\Framework\Exception\LocalizedException(
+
+            throw new LocalizedException(
                 __("Relevance rule indexing failed. See details in exception log.")
             );
         }
     }
 
-    /**
-     * @param array $ids
-     */
-    public function reindexByRuleIds(array $ids)
+    public function reindexByRuleIds(array $ids): void
     {
         $table = $this->getIndexTable();
-        $this->resource->getConnection()->delete(
+        $relevanceRuleCollection = $this->relevanceRuleCollectionFactory->create();
+        $relevanceRuleCollection->addFieldToFilter(RelevanceRuleInterface::RULE_ID, $ids);
+        $connection = $this->resource->getConnection();
+        $connection->delete(
             $table,
             [
-                $this->resource->getConnection()->quoteInto(RelevanceRuleInterface::RULE_ID . ' IN(?)', $ids)
+                $connection->prepareSqlCondition(RelevanceRuleInterface::RULE_ID, ['in' => $ids])
             ]
         );
 
         try {
-            foreach ($ids as $id) {
+            foreach ($relevanceRuleCollection as $relevanceRule) {
                 try {
-                    $rule = $this->ruleRepository->get($id);
-                    $this->doReindex($rule);
+                    $this->doReindex($relevanceRule);
                 } catch (NoSuchEntityException $e) {
-                    // do nothing
+                    null;// do nothing
                 }
             }
         } catch (\Exception $e) {
             $this->critical($e);
-            throw new \Magento\Framework\Exception\LocalizedException(
+
+            throw new LocalizedException(
                 __("Relevance rule indexing failed. See details in exception log.")
             );
         }
-
     }
 
-    /**
-     * @param RelevanceRuleInterface $rule
-     * @param string $indexTable
-     */
-    private function doReindex(RelevanceRuleInterface $rule)
+    private function doReindex(RelevanceRuleInterface $rule): void
     {
         if ($rule->isConditionEmpty()) {
             return;
@@ -171,6 +180,7 @@ class IndexBuilder
         $rows = [];
         $size = 0;
         $productIds = $rule->getCatalogRule()->getMatchingProductIds();
+
         foreach ($productIds as $productId => $validationByWebsite) {
             if (empty($validationByWebsite[$rule->getWebsiteId()])) {
                 continue;
@@ -178,6 +188,7 @@ class IndexBuilder
 
             $rows[] = $this->generateIndexData($rule, $productId);
             $size++;
+
             if ($size == $this->batchCount) {
                 $this->resource->getConnection()->insertMultiple($this->getIndexTable(), $rows);
                 $rows = [];
@@ -190,24 +201,19 @@ class IndexBuilder
         }
     }
 
-    /**
-     * @param RelevanceRuleInterface $rule
-     * @param ProductInterface $product
-     * @return $this
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     */
-    private function applyRule(RelevanceRuleInterface $rule, ProductInterface $product)
+    private function applyRule(RelevanceRuleInterface $rule, ProductInterface $product): IndexBuilder
     {
         $table = $this->getIndexTable();
-        $this->resource->getConnection()->delete(
+        $connection = $this->resource->getConnection();
+        $connection->delete(
             $table,
             [
-                $this->resource->getConnection()->quoteInto(RelevanceRuleInterface::RULE_ID . ' = ?', $rule->getId()),
-                $this->resource->getConnection()->quoteInto(self::PRODUCT_ID . ' = ?', $product->getId())
+                $connection->prepareSqlCondition(RelevanceRuleInterface::RULE_ID, ['eq' => $rule->getId()]),
+                $connection->prepareSqlCondition(self::PRODUCT_ID, ['eq' => $product->getId()])
             ]
         );
 
-        if (!$rule->getCatalogRule()->validate($product) || $rule->isConditionEmpty()) {
+        if ($rule->isConditionEmpty() || !$rule->getCatalogRule()->validate($product)) {
             return $this;
         }
 
@@ -221,67 +227,39 @@ class IndexBuilder
         return $this;
     }
 
-    /**
-     * @param RelevanceRuleInterface $rule
-     * @param int $productId
-     * @return array
-     */
-    private function generateIndexData(RelevanceRuleInterface $rule, $productId)
+    private function generateIndexData(RelevanceRuleInterface $rule, int $productId): array
     {
-        $toTime = strtotime($rule->getToDate());
-        $toTime = $toTime ? $toTime + self::SECONDS_IN_DAY - 1 : self::MAX_INT_MYSQL;
-
-        $row = [
+        return [
             RelevanceRuleInterface::RULE_ID => $rule->getId(),
             RelevanceRuleInterface::WEBSITE_ID => $rule->getWebsiteId(),
-            RelevanceRuleInterface::FROM_DATE =>  strtotime($rule->getFromDate()),
-            RelevanceRuleInterface::TO_DATE => $toTime,
             RelevanceRuleInterface::MULTIPLIER => $rule->getMultiplier(),
             self::PRODUCT_ID => $productId
         ];
-
-        return $row;
     }
 
-    /**
-     * @param array $productIds
-     * @return void
-     */
-    private function cleanByIds($productIds)
+    private function cleanByIds(array $productIds): void
     {
-        $query = $this->resource->getConnection()->deleteFromSelect(
-            $this->resource->getConnection()
-                ->select()
-                ->from($this->getIndexTable(), self::PRODUCT_ID)
-                ->distinct()
-                ->where(self::PRODUCT_ID . ' IN (?)', $productIds),
-            $this->getIndexTable()
-        );
+        $select = $this->resource->getConnection()
+            ->select()
+            ->from($this->getIndexTable(), self::PRODUCT_ID)
+            ->distinct()
+            ->where(self::PRODUCT_ID . ' IN (?)', $productIds);
+        $query = $this->resource->getConnection()->deleteFromSelect($select, $this->getIndexTable());
 
         $this->resource->getConnection()->query($query);
     }
 
-    /**
-     * @return string
-     */
-    private function getIndexTable()
+    private function getIndexTable(): string
     {
         return $this->resource->getTableName(self::TABLE_NAME);
     }
 
-    /**
-     * @return \Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule\Collection
-     */
-    private function getActiveRules()
+    private function getActiveRules(): iterable
     {
         return $this->ruleRepository->getActiveRules();
     }
 
-    /**
-     * @param \Exception $exception
-     * @return void
-     */
-    private function critical(\Exception $exception)
+    private function critical(\Exception $exception): void
     {
         $this->logger->critical($exception);
     }

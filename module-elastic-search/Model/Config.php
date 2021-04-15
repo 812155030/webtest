@@ -1,10 +1,12 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
+
+declare(strict_types=1);
 
 namespace Amasty\ElasticSearch\Model;
 
@@ -207,7 +209,9 @@ class Config
      */
     public function getUsePredefinedStemming($storeId = null)
     {
-        return $this->getAnalyzerType($storeId) == CustomAnalyzer::DISABLED
+        $analyzerType = $this->getAnalyzerType($storeId);
+
+        return ($analyzerType == CustomAnalyzer::DISABLED || $analyzerType == CustomAnalyzer::JAPANESE)
             && (bool)$this->getModuleConfig('index/use_language_stemmed_words', $storeId);
     }
 
@@ -263,5 +267,21 @@ class Config
     public function getKoromojiTokenMode($storeId)
     {
         return $this->getModuleConfig('index/kuromoji_token_mode', $storeId);
+    }
+
+    /**
+     * @param int $storeId
+     * @return array
+     */
+    public function getCharMappings(int $storeId): array
+    {
+        $mappings = $this->getModuleConfig('index/char_mapping', $storeId);
+        if ($mappings) {
+            $mappings = str_replace("\r\n", "\n", $mappings);
+            $mappings = str_replace("\r", "\n", $mappings);
+            $mappings = preg_replace("/\n{2,}/", "\n", $mappings);
+            return explode("\n", $mappings);
+        }
+        return [];
     }
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -40,7 +40,7 @@ class Kuromoji implements AnalyzerBuilderInterface
     public function build($storeId)
     {
         $filters = $this->getFilters($storeId);
-        $analyzerFilters = array_merge(['lowercase'], array_keys($filters));
+        $analyzerFilters = array_merge(array_keys($filters), ['lowercase']);
         $tokenizer = $this->getTokenizer($storeId);
 
         $analyser = [
@@ -49,6 +49,14 @@ class Kuromoji implements AnalyzerBuilderInterface
                     'type'      => 'custom',
                     'tokenizer' => key($tokenizer),
                     'filter'    => $analyzerFilters
+                ],
+                'stem' => [
+                    'type'      => 'custom',
+                    'tokenizer' => 'whitespace',
+                    'filter'    => [
+                        'stop_filter',
+                        'lowercase'
+                    ]
                 ]
             ],
             'tokenizer' => $tokenizer,
@@ -126,9 +134,11 @@ class Kuromoji implements AnalyzerBuilderInterface
             $stopWords = [];
             $collection = $this->entityCollectionProvider->getStopWordCollectionFactory()->create();
             $collection->addStoreFilter($storeId);
+
             foreach ($collection as $stopWord) {
-                $stopWords[] = preg_replace('/\s*/', '-', $stopWord->getTerm());
+                $stopWords[] = preg_replace('/\s*/u', '-', $stopWord->getTerm());
             }
+
             if (!count($stopWords)) {
                 $stopWords = '_none_';
             }

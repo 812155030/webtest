@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -36,9 +36,9 @@ class Smartcn implements AnalyzerBuilderInterface
                     'type'      => 'custom',
                     'tokenizer' => 'smartcn_tokenizer',
                     'filter'    => [
-                        'lowercase',
                         'stop_filter',
-                        "synonym"
+                        "synonym",
+                        'lowercase'
                     ],
                 ]
             ],
@@ -67,9 +67,11 @@ class Smartcn implements AnalyzerBuilderInterface
         $stopWords = [];
         $collection = $this->entityCollectionProvider->getStopWordCollectionFactory()->create();
         $collection->addStoreFilter($storeId);
+
         foreach ($collection as $stopWord) {
-            $stopWords[] = preg_replace('/\s*/', '-', $stopWord->getTerm());
+            $stopWords[] = preg_replace('/\s*/u', '-', $stopWord->getTerm());
         }
+
         if (!count($stopWords)) {
             $stopWords = '_none_';
         }

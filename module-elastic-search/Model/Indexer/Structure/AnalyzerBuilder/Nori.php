@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -40,11 +40,12 @@ class Nori implements AnalyzerBuilderInterface
     public function build($storeId)
     {
         $filters = $this->getFilters($storeId);
-        $defaultFilters = ['lowercase'];
+        $defaultFilters = [];
         if ($readingForm = $this->config->getUseNoriReadingForm($storeId)) {
             $defaultFilters[] = 'nori_readingform';
         }
-        $analyzerFilters = array_merge($defaultFilters, array_keys($filters));
+
+        $analyzerFilters = array_merge($defaultFilters, array_keys($filters), ['lowercase']);
         $tokenizer = $this->getTokenizer($storeId);
 
         $analyser = [
@@ -102,9 +103,11 @@ class Nori implements AnalyzerBuilderInterface
         $stopWords = [];
         $collection = $this->entityCollectionProvider->getStopWordCollectionFactory()->create();
         $collection->addStoreFilter($storeId);
+
         foreach ($collection as $stopWord) {
-            $stopWords[] = preg_replace('/\s*/', '-', $stopWord->getTerm());
+            $stopWords[] = preg_replace('/\s*/u', '-', $stopWord->getTerm());
         }
+
         if (!count($stopWords)) {
             $stopWords = '_none_';
         }

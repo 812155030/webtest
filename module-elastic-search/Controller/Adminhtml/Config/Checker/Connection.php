@@ -1,22 +1,25 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
 
 namespace Amasty\ElasticSearch\Controller\Adminhtml\Config\Checker;
 
+use Amasty\ElasticSearch\Model\Client\Elasticsearch;
 use Amasty\ElasticSearch\Model\Client\ElasticsearchFactory;
+use Amasty\ElasticSearch\Model\Config;
 use Amasty\ElasticSearch\Model\Source\CustomAnalyzer;
+use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filter\StripTags;
-use Magento\Backend\App\Action;
-use Amasty\ElasticSearch\Model\Config;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
 
 class Connection extends Action
 {
@@ -25,6 +28,8 @@ class Connection extends Action
     const EXCEPTION_PATTERN = '/unknown analyzer/i';
 
     const IS_READ_ONLY_INDEX = 'amasty_is_read_only_flag';
+
+    const CUSTOM_ANALYZER_TEST_INDEX_NAME = 'amasty_custom_analyzer_test_index';
 
     /**
      * @var ElasticsearchFactory
@@ -61,7 +66,7 @@ class Connection extends Action
     }
 
     /**
-     * @return $this|\Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface
+     * @return $this|ResponseInterface|ResultInterface
      */
     public function execute()
     {
@@ -77,24 +82,21 @@ class Connection extends Action
                     __('Test connection can be applied only for Amasty Elastic Search engine.')
                 );
             }
+
             $connectionData = $this->config->prepareConnectionData($options);
             $client = $this->elasticsearchFactory->create(['options' => $connectionData]);
             $pingResult = $client->ping();
 
             if ($pingResult) {
-                $this->checkIsReadOnly($client);
+                $indexPrefix = $connectionData['index'] ?? $this->config->getIndexPrefix();
+                $this->checkIsReadOnly($client, $indexPrefix);
+
                 if (isset($options['customAnalyzer'])
                     && $options['customAnalyzer'] != CustomAnalyzer::DISABLED
                 ) {
-                    //@codingStandardsIgnoreStart
-                    try {
-                        $client->deleteIndex('custom_analyzer_test_index');
-                    } catch (Missing404Exception $e) {
-                        // do nothing
-                    }
-
+                    $customAnalyzerIndexName = $indexPrefix . '_' . self::CUSTOM_ANALYZER_TEST_INDEX_NAME;
                     $client->createIndex(
-                        'custom_analyzer_test_index',
+                        $customAnalyzerIndexName,
                         [
                             'settings' => [
                                 'analysis' => [
@@ -105,7 +107,12 @@ class Connection extends Action
                             ]
                         ]
                     );
-                    //@codingStandardsIgnoreEnd
+
+                    try {
+                        $client->deleteIndex($customAnalyzerIndexName);
+                    } catch (Missing404Exception $e) {
+                        ;// do nothing
+                    }
                 }
                 $result['success'] = $pingResult;
             } else {
@@ -130,14 +137,17 @@ class Connection extends Action
     }
 
     /**
-     * @param \Amasty\ElasticSearch\Model\Client\Elasticsearch $client
+     * @param Elasticsearch $client
+     * @param string $indexPrefix
      */
-    private function checkIsReadOnly(\Amasty\ElasticSearch\Model\Client\Elasticsearch $client)
+    private function checkIsReadOnly(Elasticsearch $client, string $indexPrefix)
     {
+        $testIndexName = $indexPrefix . '_' . self::IS_READ_ONLY_INDEX;
+
         try {
-            $client->createIndex(self::IS_READ_ONLY_INDEX, []);
-            $client->deleteIndex(self::IS_READ_ONLY_INDEX);
-        } catch (LocalizedException $e) {
+            $client->createIndex($testIndexName, []);
+            $client->deleteIndex($testIndexName);
+        } catch (\Exception $e) {
             $this->messageManager->addErrorMessage(
                 __('Please check the state of read_only_allow_delete setting in Elasticsearch server configuration.')
             );

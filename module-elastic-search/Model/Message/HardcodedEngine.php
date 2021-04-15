@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -9,25 +9,26 @@
 namespace Amasty\ElasticSearch\Model\Message;
 
 use Amasty\ElasticSearch\Model\Config;
-use Magento\CatalogSearch\Model\ResourceModel\EngineProvider;
-use Magento\Framework\App\Config\ConfigSourceInterface;
-use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\App\DeploymentConfig;
+use Magento\Framework\Notification\MessageInterface;
 
-class HardcodedEngine implements \Magento\Framework\Notification\MessageInterface
+class HardcodedEngine implements MessageInterface
 {
+    const INITIAL_CONFIG_ENGINE_PATH = 'system/default/catalog/search/engine';
+
     /**
-     * @var ObjectManagerInterface
+     * @var string
      */
-    private $objectManager;
+    private $initialSearchEngineConfig;
 
     public function __construct(
-        ObjectManagerInterface $objectManager
+        DeploymentConfig $initialConfigSource
     ) {
-        $this->objectManager = $objectManager;
+        $this->initialSearchEngineConfig = (string)$initialConfigSource->get(self::INITIAL_CONFIG_ENGINE_PATH);
     }
 
     /**
-     * @inheritdoc
+     * @return string
      */
     public function getIdentity()
     {
@@ -35,18 +36,11 @@ class HardcodedEngine implements \Magento\Framework\Notification\MessageInterfac
     }
 
     /**
-     * @inheritdoc
+     * @return bool
      */
     public function isDisplayed()
     {
-        $result = false;
-        if (class_exists(ConfigSourceInterface::class)) {
-            $configSource = $this->objectManager->get(ConfigSourceInterface::class);
-            $hardcodedEngine = $configSource->get('default/' . EngineProvider::CONFIG_ENGINE_PATH);
-            $result = !!$hardcodedEngine && $hardcodedEngine !== Config::ELASTIC_SEARCH_ENGINE;
-        }
-
-        return $result;
+        return $this->initialSearchEngineConfig && $this->initialSearchEngineConfig !== Config::ELASTIC_SEARCH_ENGINE;
     }
 
     /**
@@ -56,22 +50,8 @@ class HardcodedEngine implements \Magento\Framework\Notification\MessageInterfac
     {
         return __(
             'Amasty Elastic is not working because "%1" search engine is set in app/etc/env.php file.',
-            $this->getHardcodedEngine()
+            $this->initialSearchEngineConfig
         );
-    }
-
-    /**
-     * @return string
-     */
-    private function getHardcodedEngine()
-    {
-        $hardcodedEngine = __('Default')->render();
-        if (class_exists(ConfigSourceInterface::class)) {
-            $configSource = $this->objectManager->get(ConfigSourceInterface::class);
-            $hardcodedEngine = $configSource->get('default/' . EngineProvider::CONFIG_ENGINE_PATH);
-        }
-
-        return $hardcodedEngine;
     }
 
     /**

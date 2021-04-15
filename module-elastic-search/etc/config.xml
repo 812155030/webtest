@@ -2,7 +2,7 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 -->
@@ -17,6 +17,7 @@
                 <index_prefix>magento2</index_prefix>
                 <enable_auth>0</enable_auth>
                 <server_timeout>15</server_timeout>
+                <custom_analyzer>disabled</custom_analyzer>
             </connection>
             <catalog>
                 <wildcard>1</wildcard>

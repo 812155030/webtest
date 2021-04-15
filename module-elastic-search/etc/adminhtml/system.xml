@@ -2,7 +2,7 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 -->
@@ -78,7 +78,7 @@
                         <field id="engine">amasty_elastic</field>
                     </depends>
                 </field>
-                <field id="test_connect" translate="button_label" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="test_connect" translate="button_label" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label/>
                     <button_label>Test Connection</button_label>
                     <frontend_model>Amasty\ElasticSearch\Block\Adminhtml\System\Config\ConnectionChecker</frontend_model>
@@ -146,6 +146,14 @@
                     <field id="*/connection/custom_analyzer" separator=",">disabled,kuromoji,nori</field>
                 </depends>
                 <label>Indexation Settings</label>
+                <field id="char_mapping" translate="label tooltip" type="textarea" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Char Mapping</label>
+                    <comment><![CDATA[Mappings are used to convert a specified string of characters to specified value.]]></comment>
+                    <tooltip><![CDATA[<div>The format of mapping: {key} => {value}</div><div>Enter one mapping per line. Note: the longest match is of higher priority.</div>E.g.:<ul style="margin-left: 5px; list-style-type: none;"><li>& => and</li><li>é => eh</li><li>oé => oe</li></ul>(in this case Chloé and Dolce & Gabbana search queries will be replaced with Chloe and Dolce and Gabbana upon searching).]]></tooltip>
+                    <depends>
+                        <field id="*/connection/custom_analyzer" separator=",">disabled</field>
+                    </depends>
+                </field>
                 <field id="use_language_stopwords" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Use Inbox Stopwords</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

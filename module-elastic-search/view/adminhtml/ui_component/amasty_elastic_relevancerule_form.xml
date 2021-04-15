@@ -2,7 +2,7 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 -->
@@ -213,10 +213,94 @@
                 <item name="label" xsi:type="string" translate="true">Conditions</item>
             </item>
         </argument>
-        <container name="conditions" >
+
+        <container name="conditions" sortOrder="10">
             <htmlContent name="html_content">
                 <argument name="block" xsi:type="object">Amasty\ElasticSearch\Block\Adminhtml\RelevanceRule\Conditions</argument>
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="component" xsi:type="string">Amasty_ElasticSearch/js/relevance_rule/conditions/html</item>
+                        <item name="template" xsi:type="string">Amasty_ElasticSearch/form/element/rule/conditions</item>
+                    </item>
+                </argument>
             </htmlContent>
         </container>
+
+        <container name="preview_button" sortOrder="20">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="boolean">false</item>
+                    <item name="formElement" xsi:type="string">container</item>
+                    <item name="componentType" xsi:type="string">container</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/form/components/button</item>
+                    <item name="title" xsi:type="string" translate="true">Preview Products</item>
+                    <item name="actions" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="targetName" xsi:type="string">${ $.parentName + ".products_grid" }</item>
+                            <item name="actionName" xsi:type="string">visible</item>
+                            <item name="params" xsi:type="array">
+                                <item name="0" xsi:type="boolean">true</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="targetName" xsi:type="string">amasty_elastic_relevance_rule_product_preview_listing.amasty_elastic_relevance_rule_product_preview_listing_data_source</item>
+                            <item name="actionName" xsi:type="string">reload</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </container>
+
+        <container name="hide_preview" sortOrder="30">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="boolean">false</item>
+                    <item name="formElement" xsi:type="string">container</item>
+                    <item name="componentType" xsi:type="string">container</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/form/components/button</item>
+                    <item name="title" xsi:type="string" translate="true">Hide Products</item>
+                    <item name="actions" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="targetName" xsi:type="string">${ $.parentName + ".products_grid" }</item>
+                            <item name="actionName" xsi:type="string">visible</item>
+                            <item name="params" xsi:type="array">
+                                <item name="0" xsi:type="boolean">false</item>
+                            </item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </container>
+
+        <field name="preview_comment">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="content" xsi:type="string" translate="true">Please click here to preview the product list.</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="formElement" xsi:type="string">container</item>
+                    <item name="componentType" xsi:type="string">container</item>
+                    <item name="template" xsi:type="string">Amasty_ElasticSearch/form/element/comment</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/form/components/html</item>
+                </item>
+            </argument>
+        </field>
+
+        <insertListing name="products_grid" sortOrder="40">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="visible" xsi:type="boolean">false</item>
+                </item>
+            </argument>
+            <settings>
+                <dataLinks>
+                    <exports>true</exports>
+                    <imports>true</imports>
+                </dataLinks>
+                <autoRender>true</autoRender>
+                <externalFilterMode>true</externalFilterMode>
+                <dataScope>amasty_elastic_relevance_rule_product_preview_listing</dataScope>
+                <ns>amasty_elastic_relevance_rule_product_preview_listing</ns>
+            </settings>
+        </insertListing>
     </fieldset>
 </form>

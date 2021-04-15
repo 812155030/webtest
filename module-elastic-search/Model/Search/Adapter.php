@@ -1,19 +1,19 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
 
 namespace Amasty\ElasticSearch\Model\Search;
 
-use Amasty\ElasticSearch\Api\RelevanceRuleRepositoryInterface;
 use Amasty\ElasticSearch\Model\Client\ClientRepositoryInterface;
+use Amasty\ElasticSearch\Model\Search\GetResponse\GetAggregations;
+use Elasticsearch\Common\Exceptions\BadRequest400Exception;
+use Magento\Framework\Registry as CoreRegistry;
 use Magento\Framework\Search\AdapterInterface;
 use Magento\Framework\Search\RequestInterface;
-use Amasty\ElasticSearch\Model\Search\GetResponse\GetAggregations;
-use \Elasticsearch\Common\Exceptions\BadRequest400Exception;
 
 class Adapter implements AdapterInterface
 {
@@ -42,12 +42,7 @@ class Adapter implements AdapterInterface
     private $clientRepository;
 
     /**
-     * @var RelevanceRuleRepositoryInterface
-     */
-    private $relevanceRuleRepository;
-
-    /**
-     * @var \Magento\Framework\Registry
+     * @var CoreRegistry
      */
     private $registry;
 
@@ -61,15 +56,13 @@ class Adapter implements AdapterInterface
         GetAggregations $getAggregations,
         GetRequestQuery $getRequestQuery,
         GetResponse $getElasticResponse,
-        RelevanceRuleRepositoryInterface $relevanceRuleRepository,
-        \Magento\Framework\Registry $registry,
-        \Amasty\ElasticSearch\Model\Search\Logger $logger
+        CoreRegistry $registry,
+        Logger $logger
     ) {
         $this->getAggregations = $getAggregations;
         $this->getRequestQuery = $getRequestQuery;
         $this->getElasticResponse = $getElasticResponse;
         $this->clientRepository = $clientRepository;
-        $this->relevanceRuleRepository = $relevanceRuleRepository;
         $this->registry = $registry;
         $this->logger = $logger;
     }
@@ -83,6 +76,7 @@ class Adapter implements AdapterInterface
     public function query(RequestInterface $request)
     {
         $client = $this->clientRepository->get();
+
         if (!$client->getClient()->ping()) {
             return $this->getElasticResponse->execute([], [], 0);
         }
@@ -99,18 +93,13 @@ class Adapter implements AdapterInterface
 
         $elasticDocuments = $elasticResponse['hits']['hits'] ?? [];
         $elasticTotal = $elasticResponse['hits']['total']['value'] ?? $elasticResponse['hits']['total'] ?? 0;
-        if (in_array($request->getName(), ['quick_search_container', 'catalogsearch_fulltext'], true)) {
-            $productIds = array_map(function ($item) {
-                return (int)$item['_id'];
-            }, $elasticResponse['hits']['hits']);
-            $elasticDocuments = $this->applyRelevanceRules($elasticDocuments, $productIds);
-        }
         $this->registry->unregister(self::REQUEST_QUERY);
         $this->registry->register(self::REQUEST_QUERY, $requestQuery['body']['query']);
         $aggregations = $this->getAggregations->execute($request, $elasticResponse);
         $this->registry->unregister(self::REQUEST_QUERY);
         $responseQuery = $this->getElasticResponse->execute($elasticDocuments, $aggregations, $elasticTotal);
         $this->logger->log($request, $responseQuery, $requestQuery, $elasticResponse);
+
         return $responseQuery;
     }
 
@@ -139,35 +128,5 @@ class Adapter implements AdapterInterface
 
         $hits = $elasticResponse['hits']['total']['value'] ?? $elasticResponse['hits']['total'] ?? 0;
         return [self::HITS => $hits, self::PRODUCTS => $products];
-    }
-
-    /**
-     * @param array $elasticDocuments
-     * @param int[] $productIds
-     * @return array
-     */
-    private function applyRelevanceRules($elasticDocuments, $productIds)
-    {
-        if ($elasticDocuments) {
-            $boostMultipliers = $this->relevanceRuleRepository->getProductBoostMultipliers($productIds);
-            foreach ($elasticDocuments as &$document) {
-                if (isset($boostMultipliers[$document['_id']])) {
-                    $document['_score'] = $boostMultipliers[$document['_id']] * $document['_score'];
-                }
-            }
-            usort($elasticDocuments, function ($doc, $compareDoc) {
-                if (!isset($doc['_score']) || !isset($compareDoc['_score'])) {
-                    return 0;
-                }
-
-                if ($doc['_score'] == $compareDoc['_score']) {
-                    return 0;
-                }
-
-                return ($doc['_score'] > $compareDoc['_score']) ? -1 : 1;
-            });
-        }
-
-        return $elasticDocuments;
     }
 }

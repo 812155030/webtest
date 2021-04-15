@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="amasty_elastic_synonym" resource="default" engine="innodb" comment="Terms and Synonyms Data">
+        <column xsi:type="int" name="synonym_id" padding="10" unsigned="true" nullable="false" identity="true"
+                comment="Synonym Id"/>
+        <column xsi:type="int" name="store_id" padding="11" unsigned="false" nullable="false" identity="false"
+                comment="Store Id"/>
+        <column xsi:type="varchar" name="term" nullable="false" length="255" comment="Term"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="synonym_id"/>
+        </constraint>
+
+        <constraint xsi:type="unique" referenceId="AMASTY_ELASTIC_SYNONYM_TERM_STORE_ID">
+            <column name="term"/>
+            <column name="store_id"/>
+        </constraint>
+        <index referenceId="AMASTY_ELASTIC_SYNONYM_TERM" indexType="btree">
+            <column name="term"/>
+        </index>
+    </table>
+
+    <table name="amasty_elastic_stop_word" resource="default" engine="innodb" comment="Stop Words Data">
+        <column xsi:type="int" name="stop_word_id" padding="10" unsigned="true" nullable="false" identity="true"
+                comment="Stop Word Id"/>
+        <column xsi:type="varchar" name="term" nullable="false" length="255" comment="Stop Word"/>
+        <column xsi:type="int" name="store_id" padding="11" unsigned="false" nullable="false" identity="false"
+                comment="Store Id"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="stop_word_id"/>
+        </constraint>
+
+        <constraint xsi:type="unique" referenceId="AMASTY_ELASTIC_STOP_WORD_TERM_STORE_ID">
+            <column name="term"/>
+            <column name="store_id"/>
+        </constraint>
+        <index referenceId="AMASTY_ELASTIC_STOP_WORD_TERM" indexType="btree">
+            <column name="term"/>
+        </index>
+    </table>
+
+    <table name="amasty_elastic_relevance_rule" resource="default" engine="innodb" comment="Relevance Rules">
+        <column xsi:type="smallint" name="rule_id" padding="5" unsigned="true" nullable="false" identity="true"
+                comment="Relevance Rule Id"/>
+        <column xsi:type="boolean" name="is_enabled" nullable="false" default="true" comment="Is Rule Enabled"/>
+        <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Rule Title"/>
+        <column xsi:type="smallint" name="website_id" padding="5" unsigned="true" nullable="false" identity="false"
+                comment="Website Id"/>
+        <column xsi:type="date" name="from_date" comment="Is Enabled From Date"/>
+        <column xsi:type="date" name="to_date" comment="Is Enabled to Date"/>
+        <column xsi:type="smallint" name="multiplier" padding="6" unsigned="false" nullable="false" identity="false"
+                default="1" comment="Relevance Multiplier"/>
+        <column xsi:type="text" name="conditions_serialized" nullable="true" comment="Relevance Rule Conditions"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rule_id"/>
+        </constraint>
+
+        <constraint
+            xsi:type="foreign"
+            referenceId="AMASTY_ELASTIC_RELEVANCE_RULE_WS_ID_STORE_WS_WS_ID"
+            table="amasty_elastic_relevance_rule"
+            column="website_id"
+            referenceTable="store_website"
+            referenceColumn="website_id"
+            onDelete="CASCADE"
+        />
+
+        <index referenceId="AMASTY_ELASTIC_RELEVANCE_RULE_IS_ENABLED" indexType="btree">
+            <column name="is_enabled"/>
+        </index>
+        <index referenceId="AMASTY_ELASTIC_RELEVANCE_RULE_WEBSITE_ID" indexType="btree">
+            <column name="website_id"/>
+        </index>
+    </table>
+
+    <table name="amasty_elastic_relevance_rule_index_tmp" resource="default" engine="innodb"
+           comment="Relevance Rule Product">
+        <column xsi:type="int" name="rule_id" padding="10" unsigned="true" nullable="false" identity="false" default="0"
+                comment="Rule Id"/>
+        <column xsi:type="int" name="product_id" padding="10" unsigned="true" nullable="false" identity="false"
+                comment="Product Id"/>
+        <column xsi:type="smallint" name="website_id" padding="5" unsigned="true" nullable="false" identity="false"
+                comment="Website Id"/>
+        <column xsi:type="smallint" name="multiplier" padding="6" unsigned="false" nullable="false" identity="false"
+                comment="Relevance Multiplier"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rule_id"/>
+            <column name="product_id"/>
+            <column name="website_id"/>
+        </constraint>
+
+        <constraint
+            xsi:type="foreign"
+            referenceId="AMASTY_ELASTIC_RELEVANCE_RULE_INDEX_WS_ID_STORE_WS_WS_ID"
+            table="amasty_elastic_relevance_rule_index_tmp"
+            column="website_id"
+            referenceTable="store_website"
+            referenceColumn="website_id"
+            onDelete="CASCADE"
+        />
+
+        <constraint
+            xsi:type="foreign"
+            referenceId="AMASTY_ELASTIC_RELEVANCE_RULE_INDEX_PRD_ID"
+            table="amasty_elastic_relevance_rule_index_tmp"
+            column="product_id"
+            referenceTable="catalog_product_entity"
+            referenceColumn="entity_id"
+            onDelete="CASCADE"
+        />
+
+        <index referenceId="AMASTY_ELASTIC_RELEVANCE_RULE_INDEX_TMP_PR_ID_WS_ID" indexType="btree">
+            <column name="product_id"/>
+            <column name="website_id"/>
+        </index>
+
+        <index referenceId="AMASTY_ELASTIC_RELEVANCE_RULE_INDEX_TMP_WS_ID" indexType="btree">
+            <column name="website_id"/>
+        </index>
+    </table>
+</schema>

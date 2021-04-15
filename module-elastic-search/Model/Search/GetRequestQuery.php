@@ -1,23 +1,25 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
+
+declare(strict_types=1);
 
 namespace Amasty\ElasticSearch\Model\Search;
 
 use Amasty\ElasticSearch\Model\Client\ClientRepository;
 use Amasty\ElasticSearch\Model\Client\Elasticsearch;
 use Amasty\ElasticSearch\Model\Search\GetRequestQuery\InjectSubqueryInterface;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Search\Request\QueryInterface;
-use Magento\Framework\Search\RequestInterface;
 use Amasty\ElasticSearch\Model\Search\GetRequestQuery\SortingProvider;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Search\Request\Query\BoolExpression as BoolQuery;
 use Magento\Framework\Search\Request\Query\Filter as FilterQuery;
 use Magento\Framework\Search\Request\Query\Match as MatchQuery;
+use Magento\Framework\Search\Request\QueryInterface;
+use Magento\Framework\Search\RequestInterface;
 
 class GetRequestQuery
 {
@@ -76,9 +78,9 @@ class GetRequestQuery
      * @return array
      * @throws LocalizedException
      */
-    public function execute(RequestInterface $request)
+    public function execute(RequestInterface $request): array
     {
-        $storeId = current($request->getDimensions())->getValue();
+        $storeId = (int) current($request->getDimensions())->getValue();
         $size = $this->config->getModuleConfig('catalog/max_items') ?: $request->getSize();
         $query = [
             'index' => $this->clientRepository->get()->getIndexName('product', $storeId),
@@ -104,34 +106,6 @@ class GetRequestQuery
     }
 
     /**
-     * @param string $term
-     * @param int $storeId
-     * @param string $fulltextField
-     * @param string $entityType
-     * @return array
-     */
-    public function executeExternalByFulltext($term, $storeId, $fulltextField, $entityType)
-    {
-        $filterQuery = ['must' => [['query_string' => [
-            'default_field' => $fulltextField,
-            'query' => $term
-        ]]]];
-        $index = Elasticsearch::EXTERNAL_INDEX . '_' . $entityType;
-        $query = [
-            'index' => $this->clientRepository->get()->getIndexName($index, $storeId),
-            'type'  => $this->config->getEntityType(),
-            'body'  => [
-                'from'      => 0,
-                'size'      => 10000,
-                '_source'   => [],
-                'query'     => ['bool' => $filterQuery]
-            ],
-        ];
-
-        return $query;
-    }
-
-    /**
      * @param QueryInterface $request
      * @param array $elasticQuery
      * @param $conditionType
@@ -148,7 +122,6 @@ class GetRequestQuery
                         $elasticQuery = $this->processQuery($subQuery, $elasticQuery, $conditionType);
                     }
                 }
-
                 break;
             case QueryInterface::TYPE_MATCH:
                 /** @var MatchQuery $request */

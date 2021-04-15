@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -10,11 +10,15 @@ namespace Amasty\ElasticSearch\Model;
 
 use Amasty\ElasticSearch\Api\Data\RelevanceRuleInterface;
 use Amasty\ElasticSearch\Api\RelevanceRuleRepositoryInterface;
-use Magento\Framework\Exception\AlreadyExistsException;
-use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Exception\CouldNotDeleteException;
+use Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule\BoostMultipliersProvider;
 use Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule\CollectionFactory;
+use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class RelevanceRuleRepository implements RelevanceRuleRepositoryInterface
 {
@@ -34,27 +38,34 @@ class RelevanceRuleRepository implements RelevanceRuleRepositoryInterface
     private $collectionFactory;
 
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
+     * @var StoreManagerInterface
      */
     private $storeManager;
 
     /**
-     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
+     * @var TimezoneInterface
      */
     private $localeDate;
+
+    /**
+     * @var BoostMultipliersProvider
+     */
+    private $boostMultipliersProvider;
 
     public function __construct(
         RelevanceRuleFactory $ruleFactory,
         ResourceModel\RelevanceRule $ruleResource,
         CollectionFactory $collectionFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
+        StoreManagerInterface $storeManager,
+        TimezoneInterface $localeDate,
+        BoostMultipliersProvider $boostMultipliersProvider
     ) {
         $this->ruleFactory = $ruleFactory;
         $this->ruleResource = $ruleResource;
         $this->collectionFactory = $collectionFactory;
         $this->storeManager = $storeManager;
         $this->localeDate = $localeDate;
+        $this->boostMultipliersProvider = $boostMultipliersProvider;
     }
 
     /**
@@ -139,12 +150,15 @@ class RelevanceRuleRepository implements RelevanceRuleRepositoryInterface
     }
 
     /**
-     * @inheritdoc
+     * @param int[] $productIds
+     * @param int|null $websiteId
+     * @return float[]
+     * @throws LocalizedException
      */
-    public function getProductBoostMultipliers($productIds)
+    public function getProductBoostMultipliers(?array $productIds = null, ?int $websiteId = null): array
     {
-        $website = $this->storeManager->getWebsite();
-        $date = $this->localeDate->scopeTimeStamp($website->getDefaultStore()->getId());
-        return $this->collectionFactory->create()->getProductBoostMultipliers($productIds, $date, $website->getId());
+        $websiteId = $websiteId === null ? (int) $this->storeManager->getWebsite()->getId() : $websiteId;
+
+        return $this->boostMultipliersProvider->getBoostMultipliers($websiteId, $productIds);
     }
 }

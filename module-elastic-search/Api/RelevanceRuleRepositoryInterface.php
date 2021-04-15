@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -43,8 +43,9 @@ interface RelevanceRuleRepositoryInterface
     public function getActiveRules();
 
     /**
-     * @param int[] $productIds
+     * @param int[]|null $productIds
+     * @param int|null $websiteId
      * @return array
      */
-    public function getProductBoostMultipliers($productIds);
+    public function getProductBoostMultipliers(?array $productIds = null, ?int $websiteId = null): array;
 }

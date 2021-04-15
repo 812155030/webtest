@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -9,11 +9,13 @@
 namespace Amasty\ElasticSearch\Model\Indexer\Structure\AnalyzerBuilder;
 
 use Amasty\ElasticSearch\Api\Data\Indexer\Structure\AnalyzerBuilderInterface;
-use Amasty\ElasticSearch\Model\Indexer\Structure\AnalyzerBuilder\EntityCollectionProvider;
-use Magento\Framework\App\Config\ScopeConfigInterface;
+use Amasty\ElasticSearch\Model\Client\Elasticsearch as ElasticSearchClient;
 
 class DefaultBuilder implements AnalyzerBuilderInterface
 {
+    const WORD_DELIMITER_VERSION_5 = 'word_delimiter';
+    const WORD_DELIMITER_VERSION_6 = 'word_delimiter_graph';
+
     /**
      * @var EntityCollectionProvider
      */
@@ -24,12 +26,19 @@ class DefaultBuilder implements AnalyzerBuilderInterface
      */
     private $config;
 
+    /**
+     * @var ElasticSearchClient
+     */
+    private $elasticClient;
+
     public function __construct(
         EntityCollectionProvider $entityCollectionProvider,
-        \Amasty\ElasticSearch\Model\Config $config
+        \Amasty\ElasticSearch\Model\Config $config,
+        ElasticSearchClient $elasticClient
     ) {
         $this->entityCollectionProvider = $entityCollectionProvider;
         $this->config = $config;
+        $this->elasticClient = $elasticClient;
     }
 
     /**
@@ -46,10 +55,10 @@ class DefaultBuilder implements AnalyzerBuilderInterface
                     'type'      => 'custom',
                     'tokenizer' => 'whitespace',
                     'filter'    => [
-                        'lowercase',
                         'stop_filter',
                         "synonym",
-                        'word_delimiter'
+                        'lowercase',
+                        $this->getWordDelimiterFilter()
                     ],
                 ],
                 //"the A*b-1^2 O'Neil's" => ["a*b-1^2", "o'neil's"]
@@ -57,24 +66,24 @@ class DefaultBuilder implements AnalyzerBuilderInterface
                     'type'      => 'custom',
                     'tokenizer' => 'whitespace',
                     'filter'    => [
-                        'lowercase',
                         'stop_filter',
-                        'synonym'
+                        'synonym',
+                        'lowercase'
                     ],
                 ],
                 'stem' => [
                     'type'      => 'custom',
                     'tokenizer' => 'whitespace',
                     'filter'    => [
-                        'lowercase',
-                        'stop_filter'
+                        'stop_filter',
+                        'lowercase'
                     ]
                 ]
             ],
             'filter'   => [
-                'word_delimiter' => [
-                    // https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-word-delimiter-tokenfilter.html
-                    'type'                    => 'word_delimiter',
+                $this->getWordDelimiterFilter() => [
+                    // https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-word-delimiter-graph-tokenfilter.html
+                    'type'                    => $this->getWordDelimiterFilter(),
                     'catenate_all'            => true,
                     'catenate_words'          => false,
                     'catenate_numbers'        => false,
@@ -94,7 +103,7 @@ class DefaultBuilder implements AnalyzerBuilderInterface
                     "lenient" => true,
                     "synonyms" => $this->getSynonyms($storeId)
                 ]
-            ],
+            ]
         ];
 
         if ($stemmingData = $this->getStemmingData($storeId)) {
@@ -104,6 +113,16 @@ class DefaultBuilder implements AnalyzerBuilderInterface
             ];
 
             $analyser['analyzer']['stem']['filter'][] = 'stemming';
+        }
+
+        $charMappings = $this->config->getCharMappings($storeId);
+        if ($charMappings) {
+            $analyser['char_filter']['mapped_char_filter'] = [
+                'type' => 'mapping',
+                'mappings' => $charMappings
+            ];
+            $analyser['analyzer']['default']['char_filter'] = 'mapped_char_filter';
+            $analyser['analyzer']['allow_spec_chars']['char_filter'] = 'mapped_char_filter';
         }
 
         return $analyser;
@@ -164,5 +183,21 @@ class DefaultBuilder implements AnalyzerBuilderInterface
         }
 
         return $synonyms ?: ['']; //can't pass empty array to elastic 5.x
+    }
+
+    /**
+     * @return string
+     */
+    private function getWordDelimiterFilter()
+    {
+        $elasticVersion = $this->elasticClient->getEngineVersion();
+
+        if (version_compare($elasticVersion, '5.0.0', '>=')
+            && version_compare($elasticVersion, '6.0.0', '<=')
+        ) {
+            return self::WORD_DELIMITER_VERSION_5;
+        }
+
+        return self::WORD_DELIMITER_VERSION_6;
     }
 }

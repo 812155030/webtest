@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -261,7 +261,7 @@ class DataProvider implements \Magento\Framework\Search\Dynamic\DataProviderInte
             $lastIndex = $lastIndex[count($lastIndex) - 1];
             foreach ($ranges as $index => $count) {
                 $fromPrice = $index == 1 ? '' : ($index - 1) * $range;
-                $toPrice = $index == $lastIndex ? '' : $index * $range;
+                $toPrice = $index * $range;
 
                 $result[] = [
                     'from' => $fromPrice,

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -118,11 +118,12 @@ class GetAggregations
     {
         $result = [];
         foreach ($data as $value) {
-            $from = is_numeric($value['from']) ? $value['from'] : '*';
-            $to = is_numeric($value['to']) ? $value['to'] : '*';
+            $from = is_numeric($value['from']) ? $value['from'] : '';
+            $to = is_numeric($value['to']) ? $value['to'] : '';
             unset($value['from'], $value['to']);
             $fromToValue = "{$from}_{$to}";
 
+            // phpcs:ignore
             $result[$fromToValue] = array_merge(['value' => $fromToValue], $value);
         }
 

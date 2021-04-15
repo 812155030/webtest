@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -142,6 +142,7 @@ class InjectMatchQuery implements InjectSubqueryInterface
     private function getConditionsByMatches(QueryInterface $request, $requestValue)
     {
         $conditions = [];
+
         foreach ($request->getMatches() as $match) {
             if (in_array($match['field'], $this->excludedAttributes, true)) {
                 continue;
@@ -149,6 +150,10 @@ class InjectMatchQuery implements InjectSubqueryInterface
 
             $field = $this->getFieldName($match['field']);
             $value = $this->getValue($match['field'], $requestValue['value']);
+
+            if ($value === null) {
+                continue;
+            }
 
             $conditions[]  = [
                 'body' => [
@@ -196,43 +201,42 @@ class InjectMatchQuery implements InjectSubqueryInterface
      * @param string $name
      * @param string $value
      * @param bool $skipWildCardModification = false
-     * @return string
+     * @return string|null
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function getValue($name, $value, $skipWildCardModification = false)
     {
         $queryConfig = $this->config->getQuerySettingByAttributeCode($name);
-        $wildcardType = $this->config->getModuleConfig('catalog/wildcard_mode');
-        $wildMinChars = $this->config->getModuleConfig('catalog/wildcard_symbols');
-        $wildcard = $queryConfig[QuerySettings::WILDCARD];
-        $spellMinChars = $this->config->getModuleConfig('catalog/spellcorrection_symbols');
-        $spellCorrection = $queryConfig[QuerySettings::SPELLING];
-        $combination = $queryConfig[QuerySettings::COMBINING] ? ' AND ' : ' OR ';
+        $result = null;
 
-        $value = array_filter(explode(' ', $value));
-        $stopWords = $this->getStopWords($value);
-        $queryWords = array_udiff($value, $stopWords, 'strcasecmp');
-        if (!$this->config->useCustomAnalyzer($this->storeManager->getStore()->getId()) && !$skipWildCardModification) {
-            foreach ($queryWords as &$term) {
-                if ($wildcard && (mb_strlen($term) >= $wildMinChars)) {
-                    switch ($wildcardType) {
-                        case WildcardMode::BOTH:
-                            $term = '*' . $term . '*';
-                            break;
-                        case WildcardMode::PREFIX:
-                            $term = '*' . $term;
-                            break;
-                        case WildcardMode::SUFFIX:
-                            $term .= '*';
-                            break;
-                    }
-                } elseif ($spellCorrection && (mb_strlen($term) >= $spellMinChars)) {
-                    $term .= '~1';
-                }
+        if (!empty($queryConfig)) {
+            $wildcardType = $this->config->getModuleConfig('catalog/wildcard_mode');
+            $wildMinChars = $this->config->getModuleConfig('catalog/wildcard_symbols');
+            $wildcard = $queryConfig[QuerySettings::WILDCARD];
+            $spellMinChars = $this->config->getModuleConfig('catalog/spellcorrection_symbols');
+            $spellCorrection = $queryConfig[QuerySettings::SPELLING];
+            $combination = $queryConfig[QuerySettings::COMBINING] ? ' AND ' : ' OR ';
+            $value = array_filter(explode(' ', $value));
+            $stopWords = $this->getStopWords($value);
+            $queryWords = array_udiff($value, $stopWords, 'strcasecmp');
+
+            if (!$this->config->useCustomAnalyzer($this->storeManager->getStore()->getId())
+                && !$skipWildCardModification
+            ) {
+                $queryWords = $this->processQueryWords(
+                    $queryWords,
+                    $wildcard,
+                    $wildMinChars,
+                    $wildcardType,
+                    $spellCorrection,
+                    $spellMinChars
+                );
             }
+
+            $result = implode($combination, $queryWords);
         }
 
-        return implode($combination, $queryWords);
+        return $result;
     }
 
     /**
@@ -242,8 +246,9 @@ class InjectMatchQuery implements InjectSubqueryInterface
      */
     public function removeStopWords($words = [])
     {
+        $stopWords = $this->getStopWords($words);
         foreach ($words as $key => $word) {
-            if (trim($word) !== '' && $this->insensitiveInArray($word, $this->getStopWords($words), true)) {
+            if (trim($word) !== '' && $this->insensitiveInArray($word, $stopWords, true)) {
                 unset($words[$key]);
             }
         }
@@ -263,6 +268,7 @@ class InjectMatchQuery implements InjectSubqueryInterface
             && !$this->config->getUsePredefinedStopwords($storeId)
         ) {
             $this->stopWords = [];
+            $words = array_diff($words, [';']);//fix multiple query error
             $collection = $this->stopWordCollectionFactory->create()
                 ->addStoreFilter($storeId)
                 ->addTermsFilter($words);
@@ -283,5 +289,43 @@ class InjectMatchQuery implements InjectSubqueryInterface
     private function insensitiveInArray($needle, $haystack, $strict)
     {
         return in_array(strtolower($needle), array_map('strtolower', $haystack), $strict);
+    }
+
+    /**
+     * @param array $queryWords
+     * @param bool $wildcard
+     * @param int $wildMinChars
+     * @param string $wildcardType
+     * @param bool $spellCorrection
+     * @param int $spellMinChars
+     * @return string[]
+     */
+    private function processQueryWords(
+        array $queryWords,
+        $wildcard,
+        $wildMinChars,
+        $wildcardType,
+        $spellCorrection,
+        $spellMinChars
+    ) {
+        foreach ($queryWords as &$term) {
+            if ($wildcard && (mb_strlen($term) >= $wildMinChars)) {
+                switch ($wildcardType) {
+                    case WildcardMode::BOTH:
+                        $term = '*' . $term . '*';
+                        break;
+                    case WildcardMode::PREFIX:
+                        $term = '*' . $term;
+                        break;
+                    case WildcardMode::SUFFIX:
+                        $term .= '*';
+                        break;
+                }
+            } elseif ($spellCorrection && (mb_strlen($term) >= $spellMinChars)) {
+                $term .= '~1';
+            }
+        }
+
+        return $queryWords;
     }
 }

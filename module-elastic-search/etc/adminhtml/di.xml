@@ -2,7 +2,7 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 -->
@@ -46,4 +46,12 @@
             </argument>
         </arguments>
     </type>
+
+    <virtualType name="Amasty\ElasticSearch\Ui\DataProvider\Product\Listing\DataProvider" type="Magento\Catalog\Ui\DataProvider\Product\ProductDataProvider">
+        <arguments>
+            <argument name="addFilterStrategies" xsi:type="array">
+                <item name="elastic_rule_condition" xsi:type="object">Amasty\ElasticSearch\Ui\RelevanceRule\DataProvider\Product\Filter\RuleConditionFilter</item>
+            </argument>
+        </arguments>
+    </virtualType>
 </config>

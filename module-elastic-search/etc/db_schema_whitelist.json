@@ -1,0 +1,90 @@
+{
+    "amasty_elastic_synonym": {
+        "column": {
+            "synonym_id": true,
+            "store_id": true,
+            "term": true
+        },
+        "index": {
+            "AMASTY_ELASTIC_SYNONYM_TERM": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "AMASTY_ELASTIC_SYNONYM_TERM_STORE_ID": true
+        }
+    },
+    "amasty_elastic_stop_word": {
+        "column": {
+            "stop_word_id": true,
+            "term": true,
+            "store_id": true
+        },
+        "index": {
+            "AMASTY_ELASTIC_STOP_WORD_TERM": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "AMASTY_ELASTIC_STOP_WORD_TERM_STORE_ID": true
+        }
+    },
+    "amasty_elastic_relevance_rule": {
+        "column": {
+            "rule_id": true,
+            "is_enabled": true,
+            "title": true,
+            "website_id": true,
+            "from_date": true,
+            "to_date": true,
+            "multiplier": true,
+            "conditions_serialized": true
+        },
+        "index": {
+            "AMASTY_ELASTIC_RELEVANCE_RULE_IS_ENABLED": true,
+            "AMASTY_ELASTIC_RELEVANCE_RULE_WEBSITE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "AMASTY_ELASTIC_RELEVANCE_RULE_WS_ID_STORE_STORE_ID": true,
+            "AMASTY_ELASTIC_RELEVANCE_RULE_WS_ID_STORE_WS_WS_ID": true,
+            "AMASTY_ELASTIC_RELEVANCE_RULE_WEBSITE_ID_STORE_STORE_ID": true
+        }
+    },
+    "amasty_elastic_relevance_rule_index": {
+        "column": {
+            "id": true,
+            "rule_id": true,
+            "product_id": true,
+            "website_id": true,
+            "from_date": true,
+            "to_date": true,
+            "multiplier": true
+        },
+        "index": {
+            "AMASTY_ELASTIC_RELEVANCE_RULE_INDEX_PRODUCT_ID": true,
+            "AMASTY_ELASTIC_RELEVANCE_RULE_INDEX_WEBSITE_ID": true,
+            "AMASTY_ELASTIC_RELEVANCE_RULE_INDEX_FROM_DATE": true,
+            "AMASTY_ELASTIC_RELEVANCE_RULE_INDEX_TO_DATE": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "UNQ_3FBF5323E7E96A23317D09C6790FEF91": true
+        }
+    },
+    "amasty_elastic_relevance_rule_index_tmp": {
+        "column": {
+            "rule_id": true,
+            "product_id": true,
+            "website_id": true,
+            "multiplier": true
+        },
+        "index": {
+            "AMASTY_ELASTIC_RELEVANCE_RULE_INDEX_TMP_PR_ID_WS_ID": true,
+            "AMASTY_ELASTIC_RELEVANCE_RULE_INDEX_TMP_WS_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "AMASTY_ELASTIC_RELEVANCE_RULE_INDEX_WS_ID_STORE_WS_WS_ID": true,
+            "AMASTY_ELASTIC_RELEVANCE_RULE_INDEX_PRD_ID": true
+        }
+    }
+}

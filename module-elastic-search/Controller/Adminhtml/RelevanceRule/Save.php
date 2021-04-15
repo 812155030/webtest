@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -10,6 +10,7 @@ namespace Amasty\ElasticSearch\Controller\Adminhtml\RelevanceRule;
 
 use Amasty\ElasticSearch\Api\Data\RelevanceRuleInterface;
 use Amasty\ElasticSearch\Model\Source\RelevanceRuleModificationType;
+use Magento\Framework\Exception\LocalizedException;
 
 class Save extends AbstractRelevance
 {
@@ -58,7 +59,11 @@ class Save extends AbstractRelevance
             $data[RelevanceRuleInterface::RULE_ID] = null;
         }
 
-        $data[RelevanceRuleInterface::MULTIPLIER] = max(min($data[RelevanceRuleInterface::MULTIPLIER], 100), 1);
+        $data[RelevanceRuleInterface::MULTIPLIER] = max(
+            min($data[RelevanceRuleInterface::MULTIPLIER], 100),
+            1
+        );
+
         if ($data['modification_type'] === RelevanceRuleModificationType::DECREASE) {
             $data[RelevanceRuleInterface::MULTIPLIER] *= -1;
         }
@@ -67,6 +72,34 @@ class Save extends AbstractRelevance
             $conditions = $data['rule']['conditions'];
             unset($data['rule']);
             $data[RelevanceRuleInterface::CONDITIONS] = $rule->getConditionsSerialized($conditions);
+        }
+
+        $data = $this->prepareRuleStatus($data);
+
+        return $data;
+    }
+
+    private function prepareRuleStatus(array $data): array
+    {
+        $websiteId = $data[RelevanceRuleInterface::WEBSITE_ID] ?? false;
+
+        if ($websiteId) {
+            try {
+                $website = $this->storeManager->getWebsite($websiteId);
+
+                if (!empty($data[RelevanceRuleInterface::FROM_DATE])
+                    && !empty($data[RelevanceRuleInterface::TO_DATE])
+                    && !$this->timezone->isScopeDateInInterval(
+                        $website,
+                        $data[RelevanceRuleInterface::FROM_DATE],
+                        $data[RelevanceRuleInterface::TO_DATE]
+                    )
+                ) {
+                    $data[RelevanceRuleInterface::IS_ENABLED] = false;
+                }
+            } catch (LocalizedException $e) {
+                ;// do nothing
+            }
         }
 
         return $data;

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -10,11 +10,8 @@ namespace Amasty\ElasticSearch\Plugin\Search\Request;
 
 use Amasty\ElasticSearch\Model\Config;
 use Magento\Catalog\Block\Product\ProductList\Toolbar;
+use Magento\Framework\View\LayoutInterface;
 
-/**
- * Class Binder
- * @package Amasty\ElasticSearch\Plugin\Search\Request
- */
 class Binder
 {
     const ALL_TOOLBAR_OPTION = 'all';

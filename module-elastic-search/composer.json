@@ -2,14 +2,19 @@
     "name": "amasty/module-elastic-search",
     "description": "Elastic Search Module by Amasty",
     "require": {
-        "php": "7.0.2|7.0.4|~7.0.6|^7.1.0",
+        "php": "^7.1.0",
         "elasticsearch/elasticsearch": ">=5.1",
-        "amasty/base": ">=1.9.10",
-        "amasty/xsearch": ">=1.14.1",
+        "amasty/base": ">=1.12.5",
+        "amasty/xsearch": ">=1.17.3",
         "amasty/cron-schedule-list": ">=1.0.5"
     },
+    "suggest": {
+        "amasty/module-elastic-search-graphql": "Install module-elastic-search-graphql module to activate Graphql and Elastic Search",
+        "amasty/module-elastic-search-mftf-2": "Install elastic-search-mftf-2 module to be able to run ElasticSearch MFTF tests for Magento 2.3.5+ version",
+        "amasty/module-elastic-search-mftf-3": "Install elastic-search-mftf-3 module to be able to run ElasticSearch MFTF tests for Magento 2.4.0+ version"
+    },
     "type": "magento2-module",
-    "version": "1.8.1",
+    "version": "1.13.0",
     "license": [
         "Commercial"
     ],

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -36,6 +36,11 @@ class Data
         $query
     ) {
         if ($query) {
+            /**
+             * Quick fix magento bug in \Magento\Framework\DB\Adapter\Pdo::_splitMultiQuery(sql)
+             * This algorithm does not work properly
+             */
+            $query = str_replace(';', '', $query);
             $words = $this->injectMatchQuery->removeStopWords(explode(' ', $query));
             $query = implode(' ', $words);
         }

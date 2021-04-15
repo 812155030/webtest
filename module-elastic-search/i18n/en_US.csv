@@ -55,8 +55,9 @@ button_label,button_label
 "Could not rebuild index for empty products array","Could not rebuild index for empty products array"
 "Amasty ElasticSearch Relevance rule indexing failed. See details in exception log.","Amasty ElasticSearch Relevance rule indexing failed. See details in exception log."
 "Relevance rule indexing failed. See details in exception log.","Relevance rule indexing failed. See details in exception log."
+"Mapping not found for custom analyzer alias %1","Mapping not found for custom analyzer alias %1"
+"Invalid mapping for custom analyzer %1. Label not found.","Invalid mapping for custom analyzer %1. Label not found."
 "Amasty Elastic is not working because ""%1"" search engine is set in app/etc/env.php file.","Amasty Elastic is not working because ""%1"" search engine is set in app/etc/env.php file."
-Default,Default
 "Unable to save stopWord with ID %1. Error: %2","Unable to save stopWord with ID %1. Error: %2"
 "Unable to save new Relevance Rule. Error: %1","Unable to save new Relevance Rule. Error: %1"
 "Relevance Rule with specified ID ""%1"" not found.","Relevance Rule with specified ID ""%1"" not found."
@@ -69,9 +70,6 @@ Default,Default
 OR,OR
 AND,AND
 Disabled,Disabled
-Chinese,Chinese
-Japanese,Japanese
-Korean,Korean
 None,None
 Romaji,Romaji
 Katakana,Katakana
@@ -97,8 +95,10 @@ word*,word*
 "You disabled %1 ElasticSearch Relevance Rules based on ""%2"" attribute.","You disabled %1 ElasticSearch Relevance Rules based on ""%2"" attribute."
 "Sorry, search engine is currently unavailable","Sorry, search engine is currently unavailable"
 "Invalid method %1::%2","Invalid method %1::%2"
+"Invalid directory provided","Invalid directory provided"
+"Module data file doesn't exists.","Module data file doesn't exists."
 "%1 StopWords were imported for store %2","%1 StopWords were imported for store %2"
-"There are no file for import: %1","There are no file for import: %1"
+"There are no file for locale: %1","There are no file for locale: %1"
 Edit,Edit
 Delete,Delete
 "Are you sure you want to delete the rule?","Are you sure you want to delete the rule?"
@@ -130,6 +130,8 @@ Catalog,Catalog
 "Search Query Settings","Search Query Settings"
 "Specify the search type preferences for each product attribute. Please consult the <a href=""https://amasty.com/docs/doku.php?id=magento_2:elastic_search#advanced_query_settings"">user guide</a>.","Specify the search type preferences for each product attribute. Please consult the <a href=""https://amasty.com/docs/doku.php?id=magento_2:elastic_search#advanced_query_settings"">user guide</a>."
 "Indexation Settings","Indexation Settings"
+"Char Mapping","Char Mapping"
+"<div>The format of mapping: {key} => {value}</div><div>Enter one mapping per line. Note: the longest match is of higher priority.</div>E.g.:<ul style=""margin-left: 5px; list-style-type: none;""><li>& => and</li><li>é => eh</li><li>oé => oe</li></ul>(in this case Chloé and Dolce & Gabbana search queries will be replaced with Chloe and Dolce and Gabbana upon searching).","<div>The format of mapping: {key} => {value}</div><div>Enter one mapping per line. Note: the longest match is of higher priority.</div>E.g.:<ul style=""margin-left: 5px; list-style-type: none;""><li>& => and</li><li>é => eh</li><li>oé => oe</li></ul>(in this case Chloé and Dolce & Gabbana search queries will be replaced with Chloe and Dolce and Gabbana upon searching)."
 "Use Inbox Stopwords","Use Inbox Stopwords"
 Language,Language
 "Use Inbox Stemming","Use Inbox Stemming"
@@ -145,12 +147,23 @@ Language,Language
 "Log Raw Request","Log Raw Request"
 "Log Raw Response","Log Raw Response"
 "Log Response Object","Log Response Object"
+Chinese,Chinese
+Japanese,Japanese
+Korean,Korean
 "Amasty: ElasticSearch - Relevance Rules (Rules)","Amasty: ElasticSearch - Relevance Rules (Rules)"
 "Indexed rule/product association","Indexed rule/product association"
 "Amasty: ElasticSearch - Relevance Rules (Products)","Amasty: ElasticSearch - Relevance Rules (Products)"
 "Indexed product/rule association","Indexed product/rule association"
-"Amasty: ElasticSearch - Popup Data","Amasty: ElasticSearch - Popup Data"
-"Indexed data for popup","Indexed data for popup"
+ID,ID
+Thumbnail,Thumbnail
+Name,Name
+Type,Type
+"Attribute Set","Attribute Set"
+SKU,SKU
+Price,Price
+Visibility,Visibility
+Status,Status
+Qty,Qty
 "Relevance Rule Information","Relevance Rule Information"
 Back,Back
 Save,Save
@@ -165,12 +178,14 @@ to,to
 "Product Relevance","Product Relevance"
 times,times
 "Specify a number from 1 to 100. Please click to consult the user guide.","Specify a number from 1 to 100. Please click to consult the user guide."
+"Preview Products","Preview Products"
+"Hide Products","Hide Products"
+"Please click here to preview the product list.","Please click here to preview the product list."
 "Add New Rule","Add New Rule"
 "Delete terms","Delete terms"
 "Are you sure you want to delete selected rules?","Are you sure you want to delete selected rules?"
 Id,Id
 Rule,Rule
-Status,Status
 "Stop Word Information","Stop Word Information"
 "Stop Word","Stop Word"
 "Store View","Store View"
@@ -179,6 +194,7 @@ Import,Import
 "File Upload","File Upload"
 "Please upload the CSV file","Please upload the CSV file"
 "Add New Stop Word","Add New Stop Word"
+"All Store Views","All Store Views"
 "Are you sure you want to delete selected terms?","Are you sure you want to delete selected terms?"
 "Synonym Information","Synonym Information"
 "Synonym Enumeration","Synonym Enumeration"

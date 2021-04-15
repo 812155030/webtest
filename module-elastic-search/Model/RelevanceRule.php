@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -23,18 +23,12 @@ class RelevanceRule extends \Magento\Framework\Model\AbstractModel implements Re
     private $catalogRule;
 
     /**
-     * @var Indexer\RelevanceRule\RuleProductProcessor
-     */
-    private $ruleProductProcessor;
-
-    /**
      * @inheritdoc
      */
     protected function _construct()
     {
         parent::_construct();
         $this->catalogRuleFactory = $this->getData('catalogrule_factory');
-        $this->ruleProductProcessor = $this->getData('rule_product_processor');
         $this->_init(ResourceModel\RelevanceRule::class);
     }
 
@@ -69,7 +63,6 @@ class RelevanceRule extends \Magento\Framework\Model\AbstractModel implements Re
     {
         return $this->getData(self::TITLE);
     }
-
 
     /**
      * @inheritdoc
@@ -196,40 +189,5 @@ class RelevanceRule extends \Magento\Framework\Model\AbstractModel implements Re
     {
         $conditions = $this->getCatalogRule()->getConditions()->asArray();
         return !isset($conditions['conditions']);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function afterSave()
-    {
-        if ($this->isObjectNew() || !$this->ruleProductProcessor->isIndexerScheduled()) {
-            $this->_getResource()->addCommitCallback([$this, 'reindex']);
-        } else {
-            $this->ruleProductProcessor->getIndexer()->invalidate();
-        }
-        return parent::afterSave();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function reindex()
-    {
-        $this->ruleProductProcessor->reindexRow($this->getId());
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function afterDelete()
-    {
-        if ($this->ruleProductProcessor->isIndexerScheduled()) {
-            $this->ruleProductProcessor->getIndexer()->invalidate();
-        } else {
-            $this->ruleProductProcessor->reindexRow($this->getId());
-        }
-
-        return parent::afterDelete();
     }
 }

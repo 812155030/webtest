@@ -2,7 +2,7 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 -->
@@ -57,7 +57,6 @@
         <arguments>
             <argument name="data" xsi:type="array">
                 <item name="catalogrule_factory" xsi:type="object">Magento\CatalogRule\Model\RuleFactory</item>
-                <item name="rule_product_processor" xsi:type="object">Amasty\ElasticSearch\Model\Indexer\RelevanceRule\RuleProductProcessor</item>
             </argument>
         </arguments>
     </type>
@@ -113,7 +112,6 @@
             <argument name="entityBuilders" xsi:type="array">
                 <item name="catalogsearch_fulltext" xsi:type="array">
                     <item name="catalog_product" xsi:type="object">Amasty\ElasticSearch\Model\Indexer\Structure\EntityBuilder\Product</item>
-                    <item name="catalog_product_stock_status" xsi:type="object">Amasty\ElasticSearch\Model\Indexer\Structure\EntityBuilder\Product\StockStatus</item>
                     <item name="catalog_product_category_data" xsi:type="object">Amasty\ElasticSearch\Model\Indexer\Structure\EntityBuilder\Product\CategoryData</item>
                     <item name="external_finder" xsi:type="object">Amasty\ElasticSearch\Model\Indexer\Structure\EntityBuilder\External\Finder</item>
                 </item>
@@ -128,8 +126,8 @@
                     <item name="catalog_product" xsi:type="object">Amasty\ElasticSearch\Model\Indexer\Data\Product\ProductDataMapper</item>
                     <item name="catalog_product_category" xsi:type="object">Amasty\ElasticSearch\Model\Indexer\Data\Product\ProductCategoryDataMapper</item>
                     <item name="catalog_product_price" xsi:type="object">Amasty\ElasticSearch\Model\Indexer\Data\Product\ProductPriceDataMapper</item>
-                    <item name="catalog_product_stock_status" xsi:type="object">Amasty\ElasticSearch\Model\Indexer\Data\Product\ProductStockStatusDataMapper</item>
                     <item name="external_finder" xsi:type="object">Amasty\ElasticSearch\Model\Indexer\Data\External\FinderDataMapper</item>
+                    <item name="external_relevance_boost" xsi:type="object">Amasty\ElasticSearch\Model\Indexer\Data\External\RelevanceBoostDataMapper</item>
                 </item>
             </argument>
         </arguments>
@@ -240,11 +238,11 @@
             </argument>
         </arguments>
     </virtualType>
-    
+
     <type name="Magento\CatalogSearch\Model\Search\ItemCollectionProvider">
         <arguments>
             <argument name="factories" xsi:type="array">
-                <item name="amasty_elastic" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Advanced\CollectionFactory</item>
+                <item name="amasty_elastic" xsi:type="object">Amasty\ElasticSearch\Model\ResourceModel\Advanced\CollectionFactory</item>
             </argument>
         </arguments>
     </type>
@@ -253,6 +251,89 @@
         <arguments>
             <argument name="pageSizeBySearchEngine" xsi:type="array">
                 <item name="amasty_elastic" xsi:type="number">10000</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Amasty\ElasticSearch\Model\Indexer\Structure\CustomAnalyzersMetaInfoProvider">
+        <arguments>
+            <argument name="customAnalyzersMetaInfo" xsi:type="array">
+                <item name="smartcn" xsi:type="array">
+                    <item name="class" xsi:type="string">Amasty\ElasticSearch\Model\Indexer\Structure\AnalyzerBuilder\Smartcn</item>
+                    <item name="label" xsi:type="string" translatable="true">Chinese</item>
+                </item>
+                <item name="kuromoji" xsi:type="array">
+                    <item name="class" xsi:type="string">Amasty\ElasticSearch\Model\Indexer\Structure\AnalyzerBuilder\Kuromoji</item>
+                    <item name="label" xsi:type="string" translatable="true">Japanese</item>
+                </item>
+                <item name="nori" xsi:type="array">
+                    <item name="class" xsi:type="string">Amasty\ElasticSearch\Model\Indexer\Structure\AnalyzerBuilder\Nori</item>
+                    <item name="label" xsi:type="string" translatable="true">Korean</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Config\Model\Config\TypePool">
+        <arguments>
+            <argument name="environment" xsi:type="array">
+                <item name="amasty_elastic/connection/server_hostname" xsi:type="string">1</item>
+                <item name="amasty_elastic/connection/server_port" xsi:type="string">1</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Amasty\ElasticSearch\Model\Search\GetRequestQuery\SortingProvider">
+        <arguments>
+            <argument name="requestNamesForApplyRelevanceRules" xsi:type="array">
+                <item name="catalog_search" xsi:type="string">catalogsearch_fulltext</item>
+                <item name="quick_search" xsi:type="string">quick_search_container</item>
+                <item name="graphql_search" xsi:type="string">graphql_product_search</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule\OnDeleteCallbackPull"
+                 type="Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule\CRUDCallbackPull">
+        <arguments>
+            <argument name="crudCallbacks" xsi:type="array">
+                <item name="0" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">10</item>
+                    <item name="action" xsi:type="object">
+                        Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule\AdditionalSaveActions\InvalidateFulltextIndex
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule\OnSaveCallbackPull"
+                 type="Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule\CRUDCallbackPull">
+        <arguments>
+            <argument name="crudCallbacks" xsi:type="array">
+                <item name="0" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">10</item>
+                    <item name="action" xsi:type="object">
+                        Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule\AdditionalSaveActions\ReindexRules
+                    </item>
+                </item>
+                <item name="1" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">20</item>
+                    <item name="action" xsi:type="object">
+                        Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule\AdditionalSaveActions\InvalidateFulltextIndex
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule">
+        <arguments>
+           <argument name="onDeleteCallbackPull" xsi:type="object">
+               Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule\OnDeleteCallbackPull
+           </argument>
+            <argument name="onSaveCallbackPull" xsi:type="object">
+                Amasty\ElasticSearch\Model\ResourceModel\RelevanceRule\OnSaveCallbackPull
             </argument>
         </arguments>
     </type>

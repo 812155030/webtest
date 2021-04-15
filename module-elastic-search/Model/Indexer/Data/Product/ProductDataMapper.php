@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_ElasticSearch
  */
 
@@ -178,10 +178,6 @@ class ProductDataMapper implements DataMapperInterface
             ) {
                 $attributeValue = $attributeValue[$productId];
             } else {
-                if (in_array($attribute->getFrontendInput(), ['text', 'textarea'], true)) {
-                    $attributeValue = [array_shift($attributeValue)];
-                }
-
                 $attributeValue = array_values(array_unique($attributeValue));
             }
         }
@@ -189,11 +185,7 @@ class ProductDataMapper implements DataMapperInterface
         return $attributeValue;
     }
 
-    /**
-     * @param \Magento\Eav\Model\Entity\Attribute $attribute
-     * @return bool
-     */
-    private function isAttributeExcludedFromMerge(\Magento\Eav\Model\Entity\Attribute $attribute)
+    public function isAttributeExcludedFromMerge(\Magento\Eav\Model\Entity\Attribute $attribute)
     {
         $result = false;
 
