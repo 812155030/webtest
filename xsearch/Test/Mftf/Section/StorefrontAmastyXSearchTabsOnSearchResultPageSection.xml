@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="StorefrontXSearchTabsOnSearchResultsPageSection">
+        <!-- Tabs buttons -->
+        <element name="allTubsOnSearchResultsPage" type="block" selector="//div[@class='product data items']"/>
+        <element name="productsTabButton" type="button" selector="div[class='product data items'] div[aria-controls='tabs-amasty_search_products_tab']"/>
+        <element name="cmsPageTabButton" type="button" selector="div[class='product data items'] div[aria-controls='tabs-amsearch-cms-pages-tab']"/>
+        <element name="categoryTabButton" type="button" selector="div[class='product data items'] div[aria-controls='tabs-amsearch-category-tab']"/>
+        <!--Tabs items -->
+        <element name="categoryItemInTab" type="button" selector="div[class='data item content amsearch-category-tab']  div[class='amsearch-item']"/>
+        <element name="cmsPageItemInTab" type="button" selector="div[class='data item content amsearch-cms-pages-tab']  div[class='amsearch-item']"/>
+        <element name="productItemsInTab" type="block" selector="//ol[@class='products list items product-items']"/>
+        <!--Tabs links -->
+        <element name="categoryItemLinkInTab" type="button" selector="div[class='data item content amsearch-category-tab']  div[class='amsearch-item'] a[class='am-item-link']"/>
+        <element name="cmsPageItemLinkInTab" type="button" selector="div[class='data item content amsearch-cms-pages-tab']  div[class='amsearch-item'] a[class='item-name']"/>
+    </section>
+</sections>

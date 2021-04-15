@@ -1,0 +1,61 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+?>
+<?php if ($block->isTabsEnabled()): ?>
+    <?php
+    /** @var \Amasty\Xsearch\Block\Search\Tab $block */
+    $collection = $block->getTabs();
+    ?>
+    <?php if ($collection): ?>
+        <div id="amsearch-result-tabs"
+             class="product data items"
+             data-mage-init='{"tabs":{"openedState":"active"}}'>
+            <div class="data item title"
+                 data-role="collapsible">
+                <a class="data switch"
+                   tabindex="-1"
+                   data-toggle="switch"
+                   href="#tabs-amasty_search_products_tab"
+                   title="<?= /* @noEscape */ __('Products'); ?>">
+                    <?= /* @noEscape */ __('Products'); ?>
+                    <span class="amsearch-results-count">(<?= /* @noEscape */ $block->getProductCount()?>)</span>
+                </a>
+            </div>
+            <?php $itemsCount = count($collection); ?>
+            <?php foreach ($collection as $key => $item): ?>
+                <div class="data item title <?php if ($key == $itemsCount - 1): ?>last<?php endif;?>"
+                     data-role="collapsible">
+                    <a class="data switch"
+                       tabindex="-1"
+                       data-toggle="switch"
+                       href="#tabs-<?= /* @noEscape */ $item['block_name'];?>"
+                       title="<?= /* @noEscape */ $item['name'] ?>">
+                        <?= /* @noEscape */ $item['name']; ?>
+                        <span class="amsearch-results-count">(<?= /* @noEscape */ $item['items_count']?>)</span>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+
+            <div class="data item content"
+                 id="tabs-amasty_search_products_tab"
+                 data-role="content">
+                <?= $block->getChildHtml('search.result'); ?>
+            </div>
+            <?php foreach ($collection as $item): ?>
+                <div class="data item content <?= /* @noEscape */ $item['block_name'];?>"
+                     id="tabs-<?= /* @noEscape */ $item['block_name'];?>"
+                     data-role="content">
+                    <?= /* @noEscape */ $item['html'];?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+        <?= $block->getChildHtml('search.result'); ?>
+    <?php endif; ?>
+<?php else: ?>
+    <?= $block->getChildHtml('search.result'); ?>
+<?php endif; ?>

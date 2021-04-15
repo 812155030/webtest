@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminAmastyElasticSearchWorksWith5thElasticTest" extends="AdminAmastyElasticSearchWorksWith7thElasticTest">
+        <annotations>
+            <title value="Check Amasty Elastic search can search a product with 5th elastic"/>
+            <description value="Set up elastic 5 settings and search a product"/>
+            <testCaseId value="AES-3"/>
+            <severity value="MAJOR"/>
+            <group value="Amasty"/>
+            <group value="ElasticSearch"/>
+        </annotations>
+        <before>
+            <remove keyForRemoval="loginAsAdmin"/>
+        </before>
+        <after>
+            <remove keyForRemoval="logout"/>
+        </after>
+        <actionGroup ref="AdminElasticSearchSetConnectionSettingsWithCLIActionGroup" stepKey="setEsConnectionSettings">
+            <argument name="AmastyEsSettingsCLI" value="AmastyElasticSearch5ConnectionConfigEntityCLI"/>
+        </actionGroup>
+
+        <actionGroup ref="AdminElasticSearchSetCatalogSettingsWithCLIActionGroup" stepKey="setCatalogSettings">
+            <argument name="AmastyEsCatalogSettingsCLI" value="AmastyElasticSearchCardPlusOREntity"/>
+        </actionGroup>
+    </test>
+</tests>

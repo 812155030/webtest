@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminAmastyElasticSearchStopWordsTest">
+        <annotations>
+            <title value="Check Amasty Elastic search Stop Word creation"/>
+            <description value="Create a stopword and perform search using it, than delete the stopword"/>
+            <testCaseId value="AES-SW-1"/>
+            <severity value="CRITICAL"/>
+            <group value="Amasty"/>
+            <group value="ElasticSearch"/>
+            <group value="Amasty_Smoke"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <createData entity="productToSearchWithSpecialCharacters" stepKey="productCreation" />
+        </before>
+
+        <after>
+            <actionGroup ref="logout" stepKey="logout"/>
+            <deleteData createDataKey="productCreation" stepKey="productDelition"/>
+        </after>
+
+        <actionGroup ref="AdminElasticSearchSetConnectionSettingsWithCLIActionGroup" stepKey="setEsConnectionSettings">
+            <argument name="AmastyEsSettingsCLI" value="AmastyElasticSearch7ConnectionConfigEntityCLI"/>
+        </actionGroup>
+        <actionGroup ref="AdminElasticSearchSetCatalogSettingsWithCLIActionGroup" stepKey="setCatalogSettings">
+            <argument name="AmastyEsCatalogSettingsCLI" value="AmastyElasticSearchMatchModeANDlongTailEntity"/>
+        </actionGroup>
+
+        <actionGroup ref="AdminAmastyElasticSearchStopWordCreationActionGroup" stepKey="stopWordCreation">
+            <argument name="stopWord" value="simpleStopWord"/>
+        </actionGroup>
+
+        <actionGroup ref="StorefrontAmastySimpleSearchActionGroup" stepKey="checkWithoutTheStopWord">
+            <argument name="searchTerm" value="searchWithoutStopWord"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAmastySimpleSearchActionGroup" stepKey="checkWithTheStopWord">
+            <argument name="searchTerm" value="searchWithStopWord"/>
+        </actionGroup>
+        <actionGroup ref="AdminAmastyElasticSearchStopWordDeletionActionGroup" stepKey="stopWordDeletion">
+            <argument name="stopWord" value="simpleStopWord"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAmastySimpleSearchActionGroup" stepKey="checkWithoutTheStopWordAfterDeletion">
+            <argument name="searchTerm" value="searchWithoutStopWord"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAmastySimpleSearchActionGroup" stepKey="checkWithTheStopWordAfterDeletion">
+            <argument name="searchTerm" value="searchWithStopWordFail"/>
+        </actionGroup>
+    </test>
+</tests>

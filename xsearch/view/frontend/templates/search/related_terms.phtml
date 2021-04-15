@@ -1,0 +1,35 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+?>
+<?php
+/**
+ * @var \Amasty\Xsearch\Block\RelatedSearchTerms $block
+ */
+?>
+<?php
+/** @var \Magento\Search\Model\Query[] $data */
+$data = $block->getItems();
+if (count($data)):?>
+    <div class="amsearch-related-terms">
+        <p class="amsearch-title"><?= $block->escapeHtml(__($block->getTitle())) ?></p>
+
+        <?php foreach ($data as $additionalInfo): ?>
+
+            <a class="amsearch-item" href="<?= $block->escapeHtml($block->getLink($additionalInfo->getQueryText())) ?>">
+                <?= $block->escapeHtml($additionalInfo->getQueryText()) ?>
+
+                <?php if ($block->isShowResultsCount()): ?>
+                    <?php $resultsCount = ($block->getNameInLayout() != 'search_recommendations')
+                        ? $additionalInfo->getNumResults() : $additionalInfo->getResultsCount() ?>
+                    <span class="amsearch-count">(<?= $block->escapeHtml($resultsCount) ?>)</span>
+                <?php endif; ?>
+            </a>
+
+        <?php endforeach; ?>
+
+    </div>
+<?php endif; ?>

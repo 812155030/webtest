@@ -1,0 +1,28 @@
+In order to run ElasticSearch tests some changes, given below, are required.
+
+At first, set the following setting to "No": Advanced Search - Products - Redirect to Product Page
+
+There are tests designed to perform the same checks for different ElasticSearch Engine versions.
+In AmastyElasticSearchEngineSettingsValueData.xml file the "hostname" and "port" values should be changed according to your Elastic Search server settings.
+These values are stored in the following entities:
+	AmastyElasticSearch7ConnectionConfigEntity
+	AmastyElasticSearch6ConnectionConfigEntity
+	AmastyElasticSearch5ConnectionConfigEntity
+	AmastyElasticSearch7ConnectionConfigEntityCLI
+	AmastyElasticSearch6ConnectionConfigEntityCLI
+	AmastyElasticSearch5ConnectionConfigEntityCLI
+for 7th,6th and 5th version respectively.
+If you don't need to test Amasty ElasticSearch functionality with different versions of ElasticSearch Engine, you can change only some of the values, but in that case other tests will fail because of wrong data.
+For example - if you change values only for:
+	AmastyElasticSearch7ConnectionConfigEntity
+	AmastyElasticSearch7ConnectionConfigEntityCLI
+you will be able to run these tests:
+	AdminAmastyElasticSearch7MatchmodeANDTest
+	AdminAmastyElasticSearch7thSpellCorrectionTest
+	AdminAmastyElasticSearch7UTF8Test
+	AdminAmastyElasticSearchStopWordsTest
+	AdminAmastyElasticSearchSynonymTest
+
+By default, the search is performed by product_name attribute in these tests, so if you need to change that, more drastic modifications are required.
+If you need to alter generated sample data - please refer to Magento MFTF guide.
+Search attribute name is stored in "searchAttributeName" entity inside AmastyElasticSearchProductsData.xml file.

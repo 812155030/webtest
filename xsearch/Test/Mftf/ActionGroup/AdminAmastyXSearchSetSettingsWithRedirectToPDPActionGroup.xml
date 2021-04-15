@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminAmastyXSearchSetSettingsWithRedirectToPDPActionGroup">
+        <magentoCLI command="config:set {{productsSettings.RedirectToProductPage}} {{basicSettingsValues.yes}}" stepKey="enableRedirectToPDP"/>
+        <magentoCLI command="config:set {{productsSettings.ShowOutOfStockProductsLast}} {{basicSettingsValues.yes}}" stepKey="enableShowOutOfStockProductsLast"/>
+        <magentoCLI command="config:set {{CatalogInventoryOptionsShowOutOfStockEnable.path}} {{CatalogInventoryOptionsShowOutOfStockEnable.value}}" stepKey="setConfigShowOutOfStockTrue"/>
+        <magentoCLI command="config:set {{generalSettings.minCharacters}} {{uniqueSettingsValues.minimumNumberOfCharacters}} " stepKey="setMaxResultsForPopup"/>
+        <magentoCLI command="indexer:reindex" stepKey="reindex"/>
+        <magentoCLI command="cache:clean" stepKey="cacheClean"/>
+    </actionGroup>
+</actionGroups>

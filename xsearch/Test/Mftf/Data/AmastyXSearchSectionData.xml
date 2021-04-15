@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <entity name="searchesSectionInPopup" type="block">
+        <data key="popularSearches">POPULAR SEARCHES</data>
+         <data key="recentSearches">RECENT SEARCHES</data>
+         <data key="pages">PAGES</data>
+         <data key="categories">CATEGORIES</data>
+    </entity>
+    
+    <entity name="urlParameter" type="parametr">
+        <data key="nameParameter">amasty</data>
+    </entity>
+
+   <entity name="adedUrlParameter" type="parametr">
+        <data key="nameParameter">&#38;amnoroute</data>
+    </entity>
+
+</entities>

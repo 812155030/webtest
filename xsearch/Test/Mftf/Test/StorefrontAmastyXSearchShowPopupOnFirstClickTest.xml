@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontAmastyXSearchShowPopupOnFirstClickTest">
+        <annotations>
+            <title value="Check displaying sections in popup on First Click"/>
+            <description value="Check displaying Popular Search and Recent Search sections in popup on First Click"/>
+            <testCaseId value=""/>
+            <severity value="CRITICAL"/>
+            <group value="Amasty"/>
+            <group value="AdvancedSearch"/>
+            <group value="AmastySmoke"/>
+        </annotations>
+        <!-- Create sample data -->
+        <before>
+            <createData entity="productToSearchWithSameNameAsCategory" stepKey="productCreation" />
+            <createData entity="_defaultCategory" stepKey="subcategory"/>
+            <createData entity="simpleCmsPage" stepKey="createCmsPage"/>
+        </before>
+        <!-- Delete sample data -->
+        <after>
+            <deleteData createDataKey="subcategory" stepKey="deleteCategory"/>
+            <deleteData createDataKey="productCreation" stepKey="productDelition"/>
+            <deleteData createDataKey="createCmsPage" stepKey="deleteCmsPage" />
+        </after>
+        <!-- Set settings -->
+        <actionGroup ref="AdminAmastyXSearchSetSettingsForPopupSectionsActionGroup" stepKey="setSettings"/>
+        <!-- Open "Home page"-->
+        <actionGroup ref="StorefrontOpenHomePageActionGroup" stepKey="gotToFirstCmsPage"/>
+        <!-- Enter first query into "search" field -> Wait for Loading Pop-up -> Wait for Loading Popup -->
+        <actionGroup ref="StorefrontAmastyOpenSearchPopupActionGroup" stepKey="fillInFirstSearchTerm">
+            <argument name="searchTerm" value="simpleRequest6"/>
+        </actionGroup>
+        <wait time="2" stepKey="waitTwoSeconds2"/>
+        <!-- Enter second query into "search" field -> Wait for Loading Popup -->
+        <click selector="{{StorefrontSearchPopupSection.amsearchClose}}" stepKey="clearFieldAfterSecondQuery"/>
+        <magentoCLI command="cache:clean" stepKey="cacheClean"/>
+        <!-- Open "Home page"-->
+        <actionGroup ref="StorefrontOpenHomePageActionGroup" stepKey="gotToFirstCmsPage2"/>
+        <!-- Check displaying popup on click -->
+        <click selector="{{StorefrontQuickSearchSection.searchPhrase}}" stepKey="clickOnSearchField"/>
+        <waitForElement selector="{{StorefrontSearchPopupSection.smallSearchPopup}}" stepKey="waitForPopupDisplay"/>
+        <seeElement selector="{{StorefrontSearchPopupSection.smallSearchPopup}}" stepKey="seePopupOnFirstClick"/>
+        <!-- Check popular, recent search sections -->
+        <see selector="{{StorefrontSearchPopupSection.popularSearchesHeaderInLeftSide}}" userInput="{{searchesSectionInPopup.popularSearches}}" stepKey="seePopularSearchSection"/>
+        <seeElement selector="{{StorefrontSearchPopupSection.allPopularSearchItemsInLeftSide}}" stepKey="seeOnePopularSearchQuery"/>
+        <see selector="{{StorefrontSearchPopupSection.resentSearchesHeaderInLeftSide}}" userInput="{{searchesSectionInPopup.recentSearches}}" stepKey="seeRecentSearchSection"/>
+        <see selector="{{StorefrontSearchPopupSection.recentSearchItemsInLeftSide}}" userInput="{{simpleRequest6.term}}" stepKey="seeRecentSearchQuire"/>
+        <!-- Click on Recent Searches Link  -->
+        <click selector="{{StorefrontSearchPopupSection.resentSearchesLinkInLeftSide}}" stepKey="clickOnRecentSearchLink"/>
+        <waitForPageLoad stepKey="waitForSearchResultsPageLoad2"/>
+        <seeInTitle userInput="Search results for: '{{simpleRequest6.term}}'" stepKey="seeRecentSearchQuery"/>
+    </test>
+</tests>

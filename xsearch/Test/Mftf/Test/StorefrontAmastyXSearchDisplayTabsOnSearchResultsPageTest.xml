@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontAmastyXSearchDisplayTabsOnSearchResultsPageTest">
+        <annotations>
+            <title value="Display tabs on Search Result Page"/>
+            <description value="Display tabs that sort search results by Category, CMS, and Landing on search results page "/>
+            <testCaseId value="AS-4"/>
+            <severity value="CRITICAL"/>
+            <group value="Amasty"/>
+            <group value="AdvancedSearch"/>
+            <group value="AmastySmoke"/>
+        </annotations>
+        <!-- Create sample data -->
+        <before>
+            <createData entity="productToSearchWithSameNameAsCategory" stepKey="createProduct" />
+            <createData entity="_defaultCategory" stepKey="createSubCategory"/>
+            <createData entity="simpleCmsPage" stepKey="createCmsPage"/>
+        </before>
+        <!-- Delete sample data -->
+        <after>
+            <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+            <deleteData createDataKey="createSubCategory" stepKey="deleteCategory"/>
+            <deleteData createDataKey="createCmsPage" stepKey="deleteCmsPage" />
+        </after>
+        <!-- Set settings -->
+        <actionGroup ref="AdminAmastyXSearchSetSettingsForPopupSectionsActionGroup" stepKey="setSettings"/>
+        <!-- Open "Home page" -->
+        <actionGroup ref="StorefrontOpenHomePageActionGroup" stepKey="gotToFirstCmsPage"/>
+        <!-- Enter a query into "search" field -> Wait for Loading Pop-up -->
+        <actionGroup ref="StorefrontAmastyOpenSearchPopupActionGroup" stepKey="fillInSearchTerm1">
+            <argument name="searchTerm" value="simpleRequest6"/>
+        </actionGroup>
+        <!-- Verify Categories and Cms pages sections in Popup -->
+        <actionGroup ref="StorefrontAmastyCategoryCmsPagesSearchesActionGroup" stepKey="checkRecentSearchesPopularSearchesSections">
+            <argument name="category" value="$$createSubCategory$$"/>
+            <argument name="cms_page" value="$$createCmsPage$$"/>
+        </actionGroup>
+        <!-- Go to Search Results Page -->
+        <click selector="{{StorefrontSearchPopupSection.amsearchLoupe}}" stepKey="clickLupka1"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <!-- Verify displaying Tabs on Search Results Page -->
+        <seeElement selector="{{StorefrontXSearchTabsOnSearchResultsPageSection.allTubsOnSearchResultsPage}}" stepKey="seeTabs"/>
+        <seeElement selector="{{StorefrontXSearchTabsOnSearchResultsPageSection.productsTabButton}}" stepKey="seeProductTab"/>
+        <seeElement selector="{{StorefrontXSearchTabsOnSearchResultsPageSection.categoryTabButton}}" stepKey="seeCategoryTab"/>
+        <seeElement selector="{{StorefrontXSearchTabsOnSearchResultsPageSection.cmsPageTabButton}}" stepKey="seeCmsPageTab"/>
+        <!-- Check displaying product in Products tab -->
+        <see selector="{{StorefrontXSearchTabsOnSearchResultsPageSection.productItemsInTab}}" userInput="$createProduct.name$" stepKey="seeProduct"/>
+        <!-- Check displaying category in Categories tab -->
+        <click selector="{{StorefrontXSearchTabsOnSearchResultsPageSection.categoryTabButton}}" stepKey="clickOnCategoryTub"/>
+        <waitForElementVisible selector="{{StorefrontXSearchTabsOnSearchResultsPageSection.categoryItemInTab}}" stepKey="waitForCategoryTabVisible"/>
+        <see selector="{{StorefrontXSearchTabsOnSearchResultsPageSection.categoryItemInTab}}" userInput="$createSubCategory.name$" stepKey="seeCategory"/>
+        <click selector="{{StorefrontXSearchTabsOnSearchResultsPageSection.categoryItemLinkInTab}}" stepKey="clickOnCategoryLink"/>
+        <waitForPageLoad stepKey="waitForCategoryPageLoad"/>
+        <see userInput="$createSubCategory.name$" stepKey="seeCategoryTitle"/>
+        <!-- Check displaying cms pages in Cms Pages tab -->
+        <actionGroup ref="StorefrontXSearchNavigateToSearcResultsPageActionGroup" stepKey="navigateToSearchResultPage">
+            <argument name="searchTerm" value="simpleRequest6"/>
+        </actionGroup>
+        <click selector="{{StorefrontXSearchTabsOnSearchResultsPageSection.cmsPageTabButton}}" stepKey="clickOnCmsTub"/>
+        <waitForElementVisible selector="{{StorefrontXSearchTabsOnSearchResultsPageSection.cmsPageItemInTab}}" stepKey="waitForCmsTabVisible"/>
+        <see selector="{{StorefrontXSearchTabsOnSearchResultsPageSection.cmsPageItemInTab}}" userInput="$createCmsPage.title$" stepKey="seeCmsProduct"/>
+        <click selector=" {{StorefrontXSearchTabsOnSearchResultsPageSection.cmsPageItemLinkInTab}} " stepKey="clickOnCmsPageLink"/>
+        <waitForPageLoad stepKey="waitForCmsPageLoad"/>
+        <see userInput="$createCmsPage.title$" stepKey="seeCmsPageTitle"/>
+    </test>
+</tests>

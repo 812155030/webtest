@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminAmastyXSearchSetSettingsWithoutRedirectToPDPActionGroup">
+        <magentoCLI command="config:set {{productsSettings.RedirectToProductPage}} {{basicSettingsValues.no}}" stepKey="disableRedirectToPDP"/>
+        <magentoCLI command="config:set {{generalSettings.enable302Redirect}} {{basicSettingsValues.yes}}" stepKey="enableRedirectFrom404"/>
+        <magentoCLI command="config:set {{generalSettings.enableCustomURLKeyForSearchResultsPage}} {{basicSettingsValues.no}}" stepKey="disableCustomURL"/>
+        <magentoCLI command="config:set {{generalSettings.enableIndexationForPopup}} {{basicSettingsValues.yes}}" stepKey="enableIndexation"/>
+        <magentoCLI command="config:set {{productsSettings.enabledProductsSection}} {{basicSettingsValues.yes}}" stepKey="enableProductSection"/>
+        <magentoCLI command="config:set {{productsSettings.enableAddToCartButton}} {{basicSettingsValues.yes}}" stepKey="enableAddToCart"/>
+        <magentoCLI command="indexer:reindex" stepKey="reindex"/>
+        <magentoCLI command="cache:clean" stepKey="cacheClean"/>
+    </actionGroup>
+</actionGroups>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontXSearcOutOfStockProductsDontDisplayInPopupTest">
+        <annotations>
+            <title value="Don't display out-of-stock items in search results popup"/>
+            <description value="Don't display out-of-stock items in search results popup if products qty exceeds the min value of the result "/>
+            <testCaseId value="AS-9"/>
+            <severity value="MAJOR"/>
+            <group value="Amasty"/>
+            <group value="AdvancedSearch"/>
+            <group value="AmastySmoke"/>
+        </annotations>
+        <!-- Create sample data -->
+        <before>
+            <createData entity="simpleProductToSearchWithUniqueNameSku" stepKey="productCreation1" />
+            <createData entity="simpleProductToSearchWithUniqueNameSku1" stepKey="productCreation2" />
+            <createData entity="simpleProductToSearchWithUniqueNameSku2" stepKey="productCreation3" />
+            <createData entity="simpleProductToSearchWithUniqueNameSku3" stepKey="productCreation4" />
+        </before>
+        <!-- Delete sample data -->
+      <after>
+            <deleteData createDataKey="productCreation1" stepKey="productDelition1"/>
+            <deleteData createDataKey="productCreation2" stepKey="productDelition2"/>
+            <deleteData createDataKey="productCreation3" stepKey="productDelition3"/>
+            <deleteData createDataKey="productCreation4" stepKey="productDelition4"/>
+        </after>
+        <!-- Set settings -->
+        <actionGroup ref="AdminAmastyXSearchSetSettingsWithRedirectToPDPActionGroup" stepKey="setSettings"/>
+        <!-- Open "Home page" -->
+        <actionGroup ref="StorefrontOpenHomePageActionGroup" stepKey="gotToFirstCmsPage"/>
+        <!-- Enter a query into "search" field -> Wait for Loading Pop-up -->
+        <actionGroup ref="StorefrontAmastyOpenSearchPopupActionGroup" stepKey="fillInSearchTerm1">
+            <argument name="searchTerm" value="simpleRequest8"/>
+        </actionGroup>
+        <!-- Check 'In stock' product in popup -->
+        <see selector="{{StorefrontSearchPopupSection.productItemLinkByName}}" userInput="$productCreation3.name$" stepKey="seeProductInPopup"/>
+        <!-- Check 'In stock' product on Search Results Page -->
+        <click selector="{{StorefrontSearchPopupSection.amsearchLoupe}}" stepKey="clickLupka1"/>
+        <waitForPageLoad stepKey="waitForPageLoad1"/>
+        <see selector="{{StorefrontQuickSearchResultsSection.productLink}}" userInput="$productCreation3.name$" stepKey="seeProductOnSearchResultsPage"/>
+        <!--Change stock status for 1 product -->
+        <actionGroup ref="LoginAsAdmin" stepKey="logInAsAdmin"/>
+        <actionGroup ref="AdminXSearcSetOutOfStockStatusActionGroup" stepKey="changeProductStatus">
+        <argument name="product" value="$$productCreation3$$"/>
+        </actionGroup>
+        <!-- Open "Home page" -->
+        <actionGroup ref="StorefrontOpenHomePageActionGroup" stepKey="goToCmsPage"/>
+        <!-- Enter a query into "search" field -> Wait for Loading Pop-up -->
+        <actionGroup ref="StorefrontAmastyOpenSearchPopupActionGroup" stepKey="fillInSearchTerm2">
+            <argument name="searchTerm" value="simpleRequest8"/>
+        </actionGroup>
+        <!--Check for Out-of-stock product doesn't display in popup  -->
+        <dontSee selector="{{StorefrontSearchPopupSection.productItemLinkByName}}" userInput="$productCreation3.name$" stepKey="dontSeeOutOfStockProduct"/>
+        <!--Check position Out-of-stock product on Search Results Page -->
+        <click selector="{{StorefrontSearchPopupSection.amsearchLoupe}}" stepKey="clickLupka2"/>
+        <waitForPageLoad stepKey="waitForPageLoad2"/>
+        <seeElement
+                selector="{{StorefrontXSearchSearchResultsPageFourElementsSection.ProductsSequence('$productCreation4.name$','$productCreation2.name$','$productCreation1.name$','$productCreation3.name$')}}"
+                stepKey="seeProductsSequenceOnSearchResultsPage2"/>
+    </test>
+</tests>

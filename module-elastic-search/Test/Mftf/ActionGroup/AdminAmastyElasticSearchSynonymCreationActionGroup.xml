@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminAmastyElasticSearchSynonymCreationActionGroup">
+        <arguments>
+            <argument name="synonym"/>
+        </arguments>
+        <amOnPage url="{{AdminElasticSearchManageSynonymPage.url}}"
+                  stepKey="goToManageSynonymPage"/>
+        <waitForElementVisible selector="{{AdminElasticSearchSynonymAdditionSection.elasticSearchNewSynonymButton}}"
+                               stepKey="waitForSynonymButton"/>
+        <click selector="{{AdminElasticSearchSynonymAdditionSection.elasticSearchNewSynonymButton}}"
+               stepKey="createNewSynonym"/>
+
+        <waitForElementVisible selector="{{AdminElasticSearchSynonymInformationSection.elasticSearchSynonymFieldset}}"
+                               stepKey="waitForFieldSet"/>
+        <fillField userInput="$$productCreation.name$$,{{synonym.word}}"
+                   selector="{{AdminElasticSearchSynonymInformationSection.elasticSearchSynonymField}}"
+                   stepKey="fillFieldSynonym"/>
+        <selectOption userInput="{{synonym.scope}}"
+                      selector="{{AdminElasticSearchSynonymInformationSection.elasticSearchSynonymStoreViewSelect}}"
+                      stepKey="selectStoreView"/>
+        <click selector="#save" stepKey="saveNewSynonym"/>
+        <see selector="{{AdminElasticSearchSynonymInformationSection.elasticSearchSynonymSaveSuccessMessage}}"
+             userInput="You have saved the Synonym."
+             stepKey="seeConfigurationSuccessMessage"/>
+
+        <magentoCLI command="cache:clean" stepKey="cleanCache"/>
+        <magentoCLI command="indexer:reindex" stepKey="reindex"/>
+    </actionGroup>
+</actionGroups>

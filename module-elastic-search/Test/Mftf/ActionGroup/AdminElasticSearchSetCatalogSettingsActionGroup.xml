@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminElasticSearchSetCatalogSettingsActionGroup">
+
+        <magentoCLI command="config:set {{ElasticSearchCatalogCLISettingsPaths.query_settings}} {{AmastyElasticSearchDefaultValueEntity.searchQuerySettings}}"
+                    stepKey="configureSettings"/>
+
+        <amOnPage url="{{AdminAmastyElasticSearchConfigurationPage.url}}"
+                  stepKey="navigateToConfigurationPage"/>
+        <waitForPageLoad stepKey="waitForSearchConfigurationPage"/>
+        <scrollTo selector="{{AdminAmastyElasticSearchCatalogConfigurationSection.elasticSearchCatalogTab}}"
+                  stepKey="scrollToElasticSearchCatalogTab"/>
+        <conditionalClick selector="{{AdminAmastyElasticSearchCatalogConfigurationSection.elasticSearchCatalogTab}}"
+                          dependentSelector="{{AdminAmastyElasticSearchCatalogConfigurationSection.checkIfElasticSearchCatalogTabExpand}}"
+                          visible="true"
+                          stepKey="expandElasticSearchCatalogTab"/>
+        <waitForElementVisible selector="{{AdminAmastyElasticSearchCatalogConfigurationSection.wildcardType}}"
+                               stepKey="waitForWildcardDropdownToBeVisible"/>
+        <conditionalClick selector="{{AdminAmastyElasticSearchCatalogConfigurationSection.searchQuerrySettingProductNameWildcard(searchAttributeName.productName)}}"
+                          dependentSelector="{{AdminAmastyElasticSearchCatalogConfigurationSection.nameAttributeWildcardClickableArea(searchAttributeName.productName)}}"
+                          visible="false"
+                          stepKey="checkNameWildcard"/>
+        <conditionalClick selector="{{AdminAmastyElasticSearchCatalogConfigurationSection.searchQuerrySettingProductNameSpellCorrection(searchAttributeName.productName)}}"
+                          dependentSelector="{{AdminAmastyElasticSearchCatalogConfigurationSection.nameAttributeNameSpellCorrectionClickableArea(searchAttributeName.productName)}}"
+                          visible="true"
+                          stepKey="checkNameSpelling"/>
+        <selectOption selector="{{AdminAmastyElasticSearchCatalogConfigurationSection.nameMatchModeSelect(searchAttributeName.productName)}}"
+                      userInput="0"
+                      stepKey="selectMatchModeOnForProductName"/>
+
+        <click selector="{{ContentManagementSection.Save}}"
+               stepKey="saveConfiguration"/>
+        <see selector="{{AdminMessagesSection.success}}"
+             userInput="You saved the configuration."
+             stepKey="seeConfigurationSuccessMessage"/>
+    </actionGroup>
+    <actionGroup name="AdminElasticSearchSetCatalogSettingsWithCLIActionGroup">
+        <arguments>
+            <argument name="AmastyEsCatalogSettingsCLI"/>
+        </arguments>
+        <magentoCLI command="config:set {{ElasticSearchCatalogCLISettingsPaths.query_settings}} {{AmastyEsCatalogSettingsCLI.searchQuerySettings}}"
+                    stepKey="configureNameAttributeSettings"/>
+        <magentoCLI command="config:set {{ElasticSearchCatalogCLISettingsPaths.long_tail}} {{AmastyEsCatalogSettingsCLI.longTail}}"
+                    stepKey="configureSpecialCharactersSettings"/>
+    </actionGroup>
+</actionGroups>

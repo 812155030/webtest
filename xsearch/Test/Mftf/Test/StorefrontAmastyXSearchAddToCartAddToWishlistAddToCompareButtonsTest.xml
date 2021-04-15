@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontAmastyXSearchAddToCartAddToWishlistAddToCompareButtonsTest">
+        <annotations>
+            <title value="Check Add To Cart, Add To Wish list, Add To Compare buttons "/>
+            <description value="Check buttons work on search pop-up"/>
+            <testCaseId value="AS-2"/>
+            <severity value="CRITICAL"/>
+            <group value="Amasty"/>
+            <group value="AdvancedSearch"/>
+            <group value="AmastySmoke"/>
+        </annotations>
+        <!-- Create sample data -->
+        <before>
+            <createData entity="productToSearchWithoutSpecialCharacters" stepKey="productCreation" />
+            <createData entity="Simple_US_Customer" stepKey="createUSCustomer"/>
+        </before>
+        <!-- Delete sample data -->
+        <after>
+            <deleteData createDataKey="productCreation" stepKey="deleteProduct"/>
+            <deleteData createDataKey="createUSCustomer" stepKey="deleteCustomer"/>
+        </after>
+        <!-- Set settings -->
+        <actionGroup ref="AdminAmastyXSearchSetSettingsWithoutRedirectToPDPActionGroup" stepKey="setSettings"/>
+        <!-- Sign in as user -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="signInAsUser">
+                    <argument name="Customer" value="$$createUSCustomer$$" />
+        </actionGroup>
+        <!-- Open "Home page" -->
+        <actionGroup ref="StorefrontOpenHomePageActionGroup" stepKey="gotToFirstCmsPage"/>
+        <!-- Enter first query into "search" field -> Wait for Loading Pop-up -->
+        <actionGroup ref="StorefrontAmastyOpenSearchPopupActionGroup" stepKey="fillInSearchTerm">
+            <argument name="searchTerm" value="simpleRequest1"/>
+        </actionGroup>
+        <seeElement selector="{{StorefrontSearchPopupSection.productItemLinkByName}}" stepKey="seeProductInSearchPopup"/>
+        <!-- Check"Add to cart" button -->
+        <click selector="{{StorefrontSearchPopupSection.addToCartButtonFromSearchPopup}}" stepKey="clickAddToCartButton"/>
+        <!-- Verify updating shopping cart -->
+        <scrollTo selector="{{StorefrontMinicartSection.showCart}}" stepKey="scrollToMiniCart"/>
+        <conditionalClick selector="{{StorefrontMinicartSection.showCart}}" dependentSelector="{{StorefrontMinicartSection.miniCartOpened}}" visible="false" stepKey="openMiniCart"/>
+        <waitForElementVisible selector="{{StorefrontMinicartSection.viewAndEditCart}}" stepKey="waitForViewAndEditCartVisible"/>
+        <see selector="{{StorefrontMinicartSection.miniCartItemsText}}" userInput="$productCreation.name$" stepKey="seeInMiniCart"/>
+        <!-- Check "Add to Compare"-->
+        <click selector="{{StorefrontSearchPopupSection.addToCompareButtonFromSearchPopup}}" stepKey="clickAddToCompareButton"/>
+        <!-- See success message-->
+        <waitForElement selector="{{StorefrontMessagesSection.success}}" time="30" stepKey="waitCompareSuccessMessage"/>
+        <see selector="{{StorefrontMessagesSection.success}}" userInput="You added product $productCreation.name$ to the comparison list." stepKey="assertAddProductToCompareSuccessMessage"/>
+        <!-- Check that the product is added to "Compare list" -->
+        <amOnPage url="{{StorefrontProductComparePage.url}}" stepKey="navigateToComparePage"/>
+        <waitForPageLoad stepKey="waitForStorefrontProductComparePageLoad"/>
+        <see userInput="$productCreation.name$" stepKey="seeProductInCompareList"/>
+        <actionGroup ref="StorefrontAmastyOpenSearchPopupActionGroup" stepKey="fillInSearchTermForAddingProductInWishList">
+                <argument name="searchTerm" value="simpleRequest1"/>
+        </actionGroup>
+        <!-- Click "Add to Wish List" button -->
+        <click selector="{{StorefrontSearchPopupSection.addToWishListButtonFromSearchPopup}}" stepKey="clickAddTokWishListButton"/>
+        <!-- Check that the product is added to "Wish list" -> See success message-->
+        <waitForElement selector="{{StorefrontCustomerWishlistSection.successMsg}}" time="30" stepKey="WaitForWishlistSuccessMessage"/>
+        <see selector="{{StorefrontCustomerWishlistSection.successMsg}}" userInput="$productCreation.name$ has been added to your Wish List." stepKey="addCategoryProductToWishlistSeeProductNameAddedToWishlist"/>
+        <see selector="{{StorefrontCustomerWishlistSection.productItemNameText}}" userInput="$productCreation.name$" stepKey="seeProductInWishList"/>
+    </test>
+</tests>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="AdminElasticSearchSynonymInformationSection">
+        <element name="elasticSearchSynonymField" type="text" selector="(//input[@type='text' and @class='admin__control-text'])[last()]"/>
+        <element name="elasticSearchSynonymFieldset" type="block" selector=".admin__fieldset"/>
+        <element name="elasticSearchSynonymSaveSuccessMessage" type="text" selector="//div[@data-ui-id='messages-message-success']"/>
+        <element name="elasticSearchSynonymStoreViewSelect" type="select" selector=".admin__control-select"/>
+    </section>
+</sections>

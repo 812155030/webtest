@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="StorefrontSearchPopupSection">
+        <!--Search results pop up-->
+        <element name="searchPopupOpened" type="button" selector=".amsearch-results"/>
+        <element name="amsearchLoupe" type="button" selector=".amsearch-loupe"/>
+        <element name="amsearchClose" type="button" selector=".amsearch-close"/>
+        <element name="smallSearchPopup" type="button" selector="//div[@id='search_autocomplete']//div[@class='amsearch-results']"/>
+        <element name="amsearchViewAllLink" type="button" selector="//a[@class='amsearch-link']"/>
+
+        <!--Product item content-->
+        <element name="productItemLinkByName" type="button" selector=".product-item-link"/>
+        <element name="addToCartButtonFromSearchPopup" type="button" selector=".actions-primary"/>
+        <element name="addToCompareButtonFromSearchPopup" type="button" selector="//a[contains(@class, 'tocompare')]"/>
+        <element name="addToWishListButtonFromSearchPopup" type="button" selector="//a[contains(@class, 'towishlist')]"/>
+        <!--Left section in pop up -> headers-->
+        <element name="popularSearchesHeaderInLeftSide" type="text" selector="//div[@id='search_autocomplete']//div[@class='amsearch-item-container popular_searches']//div[@class='amasty-xsearch-block-header']"/>
+        <element name="resentSearchesHeaderInLeftSide" type="text" selector="//div[@id='search_autocomplete']//div[@class='amsearch-item-container recent_searches']"/>
+        <element name="categoryHeaderInLeftSide" type="text" selector="//div[@id='search_autocomplete']//div[@class='amsearch-item-container category']//div[@class='amasty-xsearch-block-header']"/>
+        <element name="cmsPageHeaderInLeftSide" type="text" selector="//div[@id='search_autocomplete']//div[@class='amsearch-item-container page']//div[@class='amasty-xsearch-block-header']"/>
+        <!--Left section in pop up -> items-->
+        <element name="popularSearchItemsInLeftSide" type="button" selector="//div[@id='search_autocomplete']//div[@class='amsearch-item-container popular_searches']//div[@class='amsearch-item']"/>
+        <element name="recentSearchItemsInLeftSide" type="button" selector="//div[@id='search_autocomplete']//div[@class='amsearch-item-container recent_searches']//div[@class='amsearch-item']"/>
+        <element name="categoryItemsInLeftSide" type="button" selector="//div[@id='search_autocomplete']//div[@class='amsearch-item-container category']//div[@class='amsearch-item']"/>
+        <element name="cmsPagesItemsInLeftSide" type="button" selector="//div[@id='search_autocomplete']//div[@class='amsearch-item-container page']//div[@class='amsearch-item']"/>
+        <element name="allPopularSearchItemsInLeftSide" type="button" selector="//div[@id='search_autocomplete']//div[@class='amsearch-item-container popular_searches']//div[@class='amsearch-item']"/>
+        <!--Left section in pop up -> links -->
+        <element name="popularSearchesLinkInLeftSide" type="button" selector="//div[@id='search_autocomplete']//div[@class='amsearch-item-container popular_searches']//div[@class='amsearch-item']//a[@class='item-name']"/>
+        <element name="resentSearchesLinkInLeftSide" type="button" selector="//div[@id='search_autocomplete']//div[@class='amsearch-item-container recent_searches']//div[@class='amsearch-item']//a[@class='item-name']"/>
+        <element name="categoryLinkInLeftSide" type="button" selector=" //div[@class='amsearch-item-container category']//div[@class='amsearch-item']//a[@class='item-name']"/>
+        <element name="cmsPageLinkInLeftSide" type="button" selector="//div[@id='search_autocomplete']//div[@class='amsearch-item-container page']//div[@class='amsearch-item']//a[@class='item-name']"/>
+        <element name="popularSearchesLinkForOneQuery" type="button" selector="//div[@id='search_autocomplete']//div[@class='amsearch-item-container popular_searches']//div[@class='amsearch-item']//a[contains(.,'{{var1}}')]" parameterized="true"/>
+    </section>
+</sections>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminAmastyElasticSearch7UTF8Test">
+        <annotations>
+            <title value="Check Spell Correction with Special Character and match mode = AND"/>
+            <description value="Set up elastic 7 settings and search a product"/>
+            <testCaseId value="AES-10"/>
+            <severity value="CRITICAL"/>
+            <group value="Amasty"/>
+            <group value="ElasticSearch"/>
+        </annotations>
+
+        <before>
+            <createData entity="productToSearchWithUTF8" stepKey="productCreation" />
+        </before>
+        <after>
+            <deleteData createDataKey="productCreation" stepKey="productDelition"/>
+        </after>
+
+        <actionGroup ref="AdminElasticSearchSetConnectionSettingsWithCLIActionGroup" stepKey="setEsConnectionSettingsViaCLI">
+            <argument name="AmastyEsSettingsCLI" value="AmastyElasticSearch7ConnectionConfigEntityCLI"/>
+        </actionGroup>
+
+        <actionGroup ref="AdminElasticSearchSetCatalogSettingsWithCLIActionGroup" stepKey="setCatalogSettings">
+            <argument name="AmastyEsCatalogSettingsCLI" value="AmastyElasticSearchDefaultValueEntity"/>
+        </actionGroup>
+
+        <magentoCLI command="cache:clean" stepKey="reindex"/>
+        <magentoCLI command="indexer:reindex" stepKey="cleanCache"/>
+
+        <actionGroup ref="StorefrontAmastySimpleSearchActionGroup" stepKey="check1">
+            <argument name="searchTerm" value="simpleRequestUTF81"/>
+        </actionGroup>
+
+        <actionGroup ref="StorefrontAmastySimpleSearchActionGroup" stepKey="check2">
+            <argument name="searchTerm" value="simpleRequestUTF82"/>
+        </actionGroup>
+
+        <actionGroup ref="StorefrontAmastySimpleSearchActionGroup" stepKey="check3">
+            <argument name="searchTerm" value="simpleRequestUTF83"/>
+        </actionGroup>
+
+        <actionGroup ref="StorefrontAmastySimpleSearchActionGroup" stepKey="check4">
+            <argument name="searchTerm" value="simpleRequestUTF84"/>
+        </actionGroup>
+
+        <actionGroup ref="StorefrontAmastySimpleSearchActionGroup" stepKey="check5">
+            <argument name="searchTerm" value="simpleRequestUTF85"/>
+        </actionGroup>
+
+    </test>
+</tests>

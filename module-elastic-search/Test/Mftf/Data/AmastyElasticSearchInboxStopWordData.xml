@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+
+    <entity name="searchWithInboxStopWord" type="searchTerm" extends="searchWithoutStopWord">
+        <data key="term">the Tire-185/65R14 86H</data> <!-- name of productToSearchWithSpecialCharacters -->
+    </entity>
+    <entity name="searchWithInboxStopWordFail" type="searchTerm" extends="searchWithStopWordFail">
+        <data key="term">the Tire-185/65R14 86H</data>
+     </entity>
+</entities>

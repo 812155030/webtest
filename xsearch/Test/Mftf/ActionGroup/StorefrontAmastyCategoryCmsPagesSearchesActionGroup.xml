@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontAmastyCategoryCmsPagesSearchesActionGroup">
+        <arguments>
+            <argument name="cms_page"/>
+            <argument name="category"/>
+        </arguments>
+        <see selector="{{StorefrontSearchPopupSection.categoryHeaderInLeftSide}}" userInput="{{searchesSectionInPopup.categories}}" stepKey="seeCategorySection"/>
+        <see selector="{{StorefrontSearchPopupSection.categoryItemsInLeftSide}}" userInput="{{category.name}}" stepKey="seeCategoryName"/>
+        <see selector="{{StorefrontSearchPopupSection.cmsPageHeaderInLeftSide}}" userInput="{{searchesSectionInPopup.pages}}" stepKey="seeCmsPageSection"/>
+        <see selector="{{StorefrontSearchPopupSection.cmsPagesItemsInLeftSide}}" userInput="{{cms_page.title}}" stepKey="seeCmsPageName"/>
+    </actionGroup>
+</actionGroups>

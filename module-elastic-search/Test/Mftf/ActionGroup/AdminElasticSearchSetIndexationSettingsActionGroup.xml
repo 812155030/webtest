@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminElasticSearchSetIndexationSettingsActionGroup">
+        <arguments>
+            <argument name="AmastyEsIndexationSettingsCLI"/>
+        </arguments>
+        <magentoCLI command="config:set {{ElasticSearchIndexationCLISettingsPaths.inboxStopwords}} {{AmastyEsIndexationSettingsCLI.inboxStopwords}}"
+                    stepKey="configureInboxStopwords"/>
+        <magentoCLI command="config:set {{ElasticSearchIndexationCLISettingsPaths.inboxStopwordsLanguage}} {{AmastyEsIndexationSettingsCLI.inboxStopwordsLanguage}}"
+                    stepKey="configureInboxStopwordsLanguage"/>
+        <magentoCLI command="config:set {{ElasticSearchIndexationCLISettingsPaths.inboxStemming}} {{AmastyEsIndexationSettingsCLI.inboxStemming}}"
+                    stepKey="configureInboxStemming"/>
+        <magentoCLI command="config:set {{ElasticSearchIndexationCLISettingsPaths.inboxStemmingLanguage}} {{AmastyEsIndexationSettingsCLI.inboxStemmingLanguage}}"
+                    stepKey="configureInboxStemmingLanguage"/>
+
+    </actionGroup>
+</actionGroups>

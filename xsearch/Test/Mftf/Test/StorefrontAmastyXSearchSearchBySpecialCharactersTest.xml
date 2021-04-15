@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontAmastyXSearchSearchBySpecialCharactersTest">
+        <annotations>
+            <title value="Check for injection requests"/>
+            <description value="Check for injection requests with special characters "/>
+            <testCaseId value="AS-6"/>
+            <severity value="CRITICAL"/>
+            <group value="Amasty"/>
+            <group value="AdvancedSearch"/>
+            <group value="AmastySmoke"/>
+        </annotations>
+        <!-- Set settings -->
+        <actionGroup ref="AdminAmastyXSearchSetSettingsWithoutRedirectToPDPActionGroup" stepKey="setSettings"/>
+        <!-- Open "Home page" -->
+        <actionGroup ref="StorefrontOpenHomePageActionGroup" stepKey="gotToFirstCmsPage"/>
+        <!-- Check for injection request with special characters ' ( } { ] [ ) ( = ~ ' -->
+        <actionGroup ref="StorefrontXSearchNavigateToSearcResultsPageActionGroup" stepKey="fillInSearchTermWithSpecialCharacters1">
+            <argument name="searchTerm" value="specialCharactersRequest1"/>
+        </actionGroup>
+        <!-- Check for injection request with special characters ' ! @ # $ % ^ & ' -->
+        <actionGroup ref="StorefrontXSearchNavigateToSearcResultsPageActionGroup" stepKey="fillInSearchTermWithSpecialCharacters2">
+            <argument name="searchTerm" value="specialCharactersRequest2"/>
+        </actionGroup>
+        <!-- Check for injection request with special characters ' ` | \ : " ; ' ' -->
+        <actionGroup ref="StorefrontXSearchNavigateToSearcResultsPageActionGroup" stepKey="fillInSearchTermWithSpecialCharacters3">
+            <argument name="searchTerm" value="specialCharactersRequest3"/>
+        </actionGroup>
+        <!-- Check for injection request with special characters ' ? , ⁄ - + * < > ' -->
+        <actionGroup ref="StorefrontXSearchNavigateToSearcResultsPageActionGroup" stepKey="fillInSearchTermWithSpecialCharacters4">
+            <argument name="searchTerm" value="specialCharactersRequest4"/>
+        </actionGroup>
+        <!-- Check for injection request '<script>alert('AmastyInjection1');</script>' -->
+        <actionGroup ref="StorefrontXSearchNavigateToSearcResultsPageActionGroup" stepKey="fillInSearchTermWithInjection1">
+            <argument name="searchTerm" value="xssInjectionRequest1"/>
+        </actionGroup>
+        <dontSeeJsError stepKey="dontSeeJsError1"/>
+        <!-- Check for injection request '><script>alert('AmastyInjection2')</script>' -->
+        <actionGroup ref="StorefrontXSearchNavigateToSearcResultsPageActionGroup" stepKey="fillInSearchTermWithInjection2">
+            <argument name="searchTerm" value="xssInjectionRequest2"/>
+        </actionGroup>
+        <dontSeeJsError stepKey="dontSeeJsError2"/>
+        <!-- Check for injection request ' <sc<script>ript>alert('AmastyInjection3')</sc</script>ript> ' -->
+        <actionGroup ref="StorefrontXSearchNavigateToSearcResultsPageActionGroup" stepKey="fillInSearchTermWithInjection3">
+            <argument name="searchTerm" value="xssInjectionRequest3"/>
+        </actionGroup>
+        <dontSeeJsError stepKey="dontSeeJsError3"/>
+    </test>
+</tests>

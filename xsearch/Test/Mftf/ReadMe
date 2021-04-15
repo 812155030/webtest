@@ -1,0 +1,7 @@
+Current version of tests is for Magento CE 2.3.3 with Amasty Advanced Search 1.13.3. 
+Release version consists of 10 smoke tests.
+In order to receive correct run of tests set setting "Search Engin = MySql".
+The tests are divided into following groups:
+- AdvancedSearch (is used for running of all tests. E.g. vendor/bin/mftf run:group AdvancedSearch -r)
+- AmastySmoke (is used for running of all smoke tests)
+

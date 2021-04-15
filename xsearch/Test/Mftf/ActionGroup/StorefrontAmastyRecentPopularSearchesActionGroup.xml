@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontAmastyRecentPopularSearchesActionGroup">
+        <arguments>
+            <argument name="searchTerm"/>
+            <argument name="product"/>
+        </arguments>
+        <see selector="{{StorefrontSearchPopupSection.popularSearchesHeaderInLeftSide}}" userInput="{{searchesSectionInPopup.popularSearches}}" stepKey="seePopularSearchSection"/>
+        <see selector="{{StorefrontSearchPopupSection.popularSearchItemsInLeftSide}}" userInput="{{product.name}}" stepKey="seePopularSearchQuire"/>
+        <see selector="{{StorefrontSearchPopupSection.resentSearchesHeaderInLeftSide}}" userInput="{{searchesSectionInPopup.recentSearches}}" stepKey="seeRecentSearchSection"/>
+        <see selector="{{StorefrontSearchPopupSection.recentSearchItemsInLeftSide}}" userInput="{{searchTerm.term}}" stepKey="seeRecentSearchQuire"/>
+    </actionGroup>
+</actionGroups>

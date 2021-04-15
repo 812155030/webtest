@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <entity name="productToSearchWithoutSpecialCharacters" type="product">
+        <data key="sku" unique = "suffix">aaaaaa</data>
+        <data key="type_id">simple</data>
+        <data key="attribute_set_id">4</data>
+        <data key="visibility">4</data>
+        <data key="name">aaaaaa</data>
+        <data key="price">1200.00</data>
+        <data key="urlKey" unique="suffix">simple_product</data>
+        <data key="status">1</data>
+        <data key="quantity">100</data>
+        <requiredEntity type="product_extension_attribute">EavStockItem</requiredEntity>
+        <requiredEntity type="custom_attribute_array">ApiProductDescription</requiredEntity>
+        <requiredEntity type="custom_attribute_array">ApiProductShortDescription</requiredEntity>
+    </entity>
+    <entity name="productToSearchWithSpecialCharacters" type="product" extends="productToSearchWithoutSpecialCharacters">
+        <data key="name">Tire-185/65R14 86H</data>
+    </entity>
+    <entity name="productToSearchWithUTF8" type="product" extends="productToSearchWithoutSpecialCharacters">
+        <data key="name">გთხოვთ</data>
+    </entity>
+    <entity name="productToSearchWithSameNameAsCategory" type="product" extends="productToSearchWithoutSpecialCharacters">
+        <data key="name">Simple test</data>
+    </entity>
+    <entity name="simpleProductToSearchWithUniqueNameSku" type="product" extends="productToSearchWithoutSpecialCharacters">
+        <data key="name"> amasty</data>
+    </entity>
+    <entity name="simpleProductToSearchWithUniqueNameSku1" type="product" extends="productToSearchWithoutSpecialCharacters">
+        <data key="name"> amasty1 </data>
+    </entity>
+    <entity name="simpleProductToSearchWithUniqueNameSku2" type="product" extends="productToSearchWithoutSpecialCharacters">
+        <data key="name"> amasty2 </data>
+        <data key="sku">amasty2</data>
+    </entity>
+    <entity name="simpleProductToSearchWithUniqueNameSku3" type="product" extends="productToSearchWithoutSpecialCharacters">
+        <data key="name" unique="suffix"> amasty3 </data>
+    </entity>
+    
+    <entity name="searchAttributeName">
+        <data key="productName">name</data>
+    </entity>
+
+    <entity name="searchTermsForSearchResults">
+        <data key="searchTermSuccsessText">1</data>
+        <data key="searchTermFailText">Your search returned no results.</data>
+    </entity>
+
+    <entity name="simpleRequest1" type="searchTerm">
+        <data key="term">aaaaaa</data>
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+    <entity name="simpleRequest2" type="searchTerm">
+        <data key="term">aaa</data>
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+    <entity name="simpleRequest3" type="searchTerm">
+        <data key="term">aaabaaa</data>
+        <data key="resultText">Your search returned no results.</data>
+        <data key="resultSelector">.message</data>
+    </entity>
+    <entity name="simpleRequest4" type="searchTerm">
+        <data key="term">aaaaaa bbbbbb</data>
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+    <entity name="simpleRequest5" type="searchTerm">
+        <data key="term">aaa-aaa</data>
+        <data key="resultText">Your search returned no results.</data>
+        <data key="resultSelector">.message</data>
+    </entity>
+    <entity name="simpleRequest6" type="searchTerm">
+        <data key="term">Simple test</data>
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+    <entity name="simpleRequest7" type="searchTerm">
+        <data key="term">Simple</data>
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+    <entity name="simpleRequest8" type="searchTerm">
+        <data key="term">amasty</data>
+        <data key="resultText">4</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+    <entity name="simpleRequest9" type="searchTerm">
+        <data key="term">simple</data>
+    </entity>
+    <entity name="specialCharactersRequest1" type="searchTerm">
+        <data key="term"> ( } { ] [ ) ( = ~  </data>
+    </entity>
+    <entity name="specialCharactersRequest2" type="searchTerm" extends="specialCharactersRequest1">
+        <data key="term"> ! @ # $ % ^ &#38; </data>
+        </entity>
+    <entity name="specialCharactersRequest3" type="searchTerm" extends="specialCharactersRequest1">
+        <data key="term"> ` | \ : " ; ' </data>
+    </entity>
+    <entity name="specialCharactersRequest4" type="searchTerm" extends="specialCharactersRequest1">
+        <data key="term"> ? , ⁄ - + * &#62; &#60; </data>
+    </entity>
+     <entity name="xssInjectionRequest1" type="searchTerm" extends="specialCharactersRequest1">
+        <data key="term"> &#60;script&#62; alert('AmastyInjection1'); &#60;/script&#62; </data>
+    </entity>
+    <entity name="xssInjectionRequest2" type="searchTerm" extends="specialCharactersRequest1">
+        <data key="term"> &#62;&#60;script&#62;alert('AmastyInjection2') &#60;/script&#62; </data>
+    </entity>
+    <entity name="xssInjectionRequest3" type="searchTerm" extends="specialCharactersRequest1">
+        <data key="term"> &#60;sc&#60;script&#62;ript&#62;alert('AmastyInjection3')&#60;/sc&#60;/script&#62;ript&#62; </data>
+    </entity>
+
+    <entity name="spellCorrectionRequest1" type="searchTerm">
+        <data key="term">aaaaaa</data>
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+    <entity name="spellCorrectionRequest2" type="searchTerm">
+        <data key="term">aaa</data>
+        <data key="resultText">Your search returned no results.</data>
+        <data key="resultSelector">.message</data>
+    </entity>
+    <entity name="spellCorrectionRequest3" type="searchTerm">
+        <data key="term">aaabaaa</data>
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+    <entity name="spellCorrectionRequest4" type="searchTerm">
+        <data key="term">aaaaaaz bbbbbb</data>
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+    <entity name="spellCorrectionRequest5" type="searchTerm">
+        <data key="term">aaa-aa</data>
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+
+    <entity name="specialCharactersSKUlike1" type="searchTerm">
+        <data key="term">Tire-185/65R14 86H</data>
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+    <entity name="specialCharactersSKUlike2" type="searchTerm">
+        <data key="term">Tire-185/65R14-86H</data>
+        <data key="resultText">Your search returned no results.</data>
+        <data key="resultSelector">.message</data>
+    </entity>
+    <entity name="specialCharactersSKUlike3" type="searchTerm">
+        <data key="term">Tire185/65R14 86H</data>
+        <data key="resultText">Your search returned no results.</data>
+        <data key="resultSelector">.message</data>
+    </entity>
+    <entity name="specialCharactersSKUlike4" type="searchTerm">
+        <data key="term">Tore-185/65R14 86H</data>
+        <data key="resultText">Your search returned no results.</data>
+        <data key="resultSelector">.message</data>
+    </entity>
+    <entity name="specialCharactersSKUlike5" type="searchTerm">
+        <data key="term">Tire-185/65R14 86H 100A</data>
+        <data key="resultText">Your search returned no results.</data>
+        <data key="resultSelector">.message</data>
+    </entity>
+
+    <entity name="simpleRequestUTF81" type="searchTerm">
+        <data key="term">გთხოვთ</data>
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+    <entity name="simpleRequestUTF82" type="searchTerm">
+        <data key="term">თხო</data>
+        <data key="resultText">Your search returned no results.</data>
+        <data key="resultSelector">.message</data>
+    </entity>
+    <entity name="simpleRequestUTF83" type="searchTerm">
+        <data key="term">გთხ.ოვთ</data>
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+    <entity name="simpleRequestUTF84" type="searchTerm">
+        <data key="term">გთხოვთ γνωρίζω</data>
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+    </entity>
+    <entity name="simpleRequestUTF85" type="searchTerm">
+        <data key="term">გთხოოვთ</data>
+        <data key="resultText">Your search returned no results.</data>
+        <data key="resultSelector">.message</data>
+    </entity>
+</entities>
+
+

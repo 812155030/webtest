@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="StorefrontXSearchSearchResultsElementsSection">
+        <!--Search results pop up-->
+        <element name="ProductsSequence" type="block"
+                 selector="//*[@class='amsearch-item product-item'][contains(string(), '{{var1}}')]/following::*[@class='amsearch-item product-item'][contains(string(), '{{var2}}')]/following::*[@class='amsearch-item product-item'][contains(string(), '{{var3}}')]"
+                 parameterized="true"/>
+    </section>
+    <section name="StorefrontXSearchSearchResultsPageElementsSection">
+        <!--Search results pop up-->
+        <element name="ProductsSequence" type="block"
+                 selector="//*[@class='item product product-item'][contains(string(), '{{var1}}')]/following::*[@class='item product product-item'][contains(string(), '{{var2}}')]/following::*[@class='item product product-item'][contains(string(), '{{var3}}')]"
+                 parameterized="true"/>
+    </section>
+    <section name="StorefrontXSearchSearchResultsPageFourElementsSection">
+        <!--Search results pop up-->
+        <element name="ProductsSequence" type="block"
+                 selector="//*[@class='item product product-item'][contains(string(), '{{var1}}')]/following::*[@class='item product product-item'][contains(string(), '{{var2}}')]/following::*[@class='item product product-item'][contains(string(), '{{var3}}')]/following::*[@class='item product product-item'][contains(string(), '{{var4}}')]"
+                 parameterized="true"/>
+    </section>
+</sections>

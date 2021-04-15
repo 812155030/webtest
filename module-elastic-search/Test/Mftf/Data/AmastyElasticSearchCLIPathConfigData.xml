@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <entity name="ElasticSearchConnectionCLISettingsPaths">
+        <data key="engine">amasty_elastic/connection/engine</data>
+        <data key="server_hostname">amasty_elastic/connection/server_hostname</data>
+        <data key="server_port">amasty_elastic/connection/server_port</data>
+        <data key="index_prefix">amasty_elastic/connection/index_prefix</data>
+        <data key="enable_auth">amasty_elastic/connection/enable_auth</data>
+        <data key="server_timeout">amasty_elastic/connection/server_timeout</data>
+        <data key="custom_analyzer">amasty_elastic/connection/custom_analyzer</data>
+    </entity>
+    <entity name="ElasticSearchCatalogCLISettingsPaths">
+        <data key="query_settings">amasty_elastic/catalog/query_settings</data>
+        <data key="long_tail">amasty_elastic/catalog/long_tail</data>
+    </entity>
+    <entity name="ElasticSearchIndexationCLISettingsPaths">
+        <data key="inboxStopwords">amasty_elastic/index/use_language_stopwords</data>
+        <data key="inboxStopwordsLanguage">amasty_elastic/index/stopwords_language</data>
+        <data key="inboxStemming">amasty_elastic/index/use_language_stemmed_words</data>
+        <data key="inboxStemmingLanguage">amasty_elastic/index/stemmed_words_language</data>
+    </entity>
+</entities>

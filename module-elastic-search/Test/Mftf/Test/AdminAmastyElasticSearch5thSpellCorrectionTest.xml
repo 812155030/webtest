@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminAmastyElasticSearch5thSpellCorrectionTest" extends="AdminAmastyElasticSearch7thSpellCorrectionTest">
+        <annotations>
+            <title value="Check Spell Correction without Special Character and match mode = OR"/>
+            <description value="Set up elastic 5 settings and search a product"/>
+            <testCaseId value="AES-6"/>
+            <severity value="MAJOR"/>
+            <group value="Amasty"/>
+            <group value="ElasticSearch"/>
+        </annotations>
+        <actionGroup ref="AdminElasticSearchSetConnectionSettingsWithCLIActionGroup" stepKey="setEsConnectionSettings">
+            <argument name="AmastyEsSettingsCLI" value="AmastyElasticSearch5ConnectionConfigEntityCLI"/>
+        </actionGroup>
+    </test>
+</tests>

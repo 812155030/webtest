@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminAmastyElasticSearchStopWordCreationActionGroup">
+        <arguments>
+            <argument name="stopWord"/>
+        </arguments>
+        <amOnPage url="{{AdminElasticSearchManageStopWordsPage.url}}"
+                  stepKey="goToManageStopWordsPage"/>
+        <waitForElementVisible selector="{{AdminAmastyElasticSearchStopWordsAdditionSection.elasticSearchNewStopWordButton}}"
+                               stepKey="waitForStopWordButton"/>
+        <click selector="{{AdminAmastyElasticSearchStopWordsAdditionSection.elasticSearchNewStopWordButton}}"
+               stepKey="createNewStopWord"/>
+
+        <waitForElementVisible selector="{{AdminElasticSearchStopWordsInformationSection.elasticSearchStopWordsFieldset}}"
+                               stepKey="waitForFieldSet"/>
+        <fillField userInput="{{stopWord.word}}"
+                   selector="{{AdminElasticSearchStopWordsInformationSection.elasticSearchStopWordField}}"
+                   stepKey="fillFieldStopWord"/>
+        <selectOption userInput="{{stopWord.scope}}"
+                      selector="{{AdminElasticSearchStopWordsInformationSection.elasticSearchStoreViewSelect}}"
+                      stepKey="selectStoreView"/>
+        <click selector="#save" stepKey="saveNewStopWord"/>
+        <see selector="{{AdminElasticSearchStopWordsInformationSection.elasticSearchStopWordSaveSuccessMessage}}"
+             userInput="You have saved the Stop Word."
+             stepKey="seeConfigurationSuccessMessage"/>
+        <magentoCLI command="cache:clean" stepKey="cleanCache"/>
+        <magentoCLI command="indexer:reindex" stepKey="reindex"/>
+    </actionGroup>
+</actionGroups>

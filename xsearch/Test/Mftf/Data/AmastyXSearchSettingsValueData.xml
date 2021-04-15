@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <!-- General settings -->
+    <entity name="basicSettingsValues" type="settings">
+        <data key="yes">1</data>
+        <data key="no">0</data>
+    </entity>
+    <entity name="uniqueSettingsValues" type="settings">
+        <data key="minimumNumberOfCharacters">3</data>
+    </entity>
+</entities>

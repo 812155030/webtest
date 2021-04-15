@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <entity name="simpleSynonym" type="synonym">
+        <data key="word">zzzzzz</data>
+        <data key="scope">Default Store View</data>
+    </entity>
+    <entity name="searchBySynonym" type="searchTerm">
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+        <data key="term">zzzzzz</data> 
+    </entity>
+    <entity name="searchBySynonymFail" type="searchTerm" extends="searchBySynonym">
+        <data key="resultText">Your search returned no results.</data>
+        <data key="resultSelector">.message</data>
+    </entity>
+</entities>

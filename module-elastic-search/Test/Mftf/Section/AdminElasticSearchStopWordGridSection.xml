@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="AdminElasticSearchStopWordGridSection">
+        <element name="massActionButton" type="button" selector="(//*[text()='Actions'])[1]"/>
+        <element name="massActionDeleteOption" type="block" selector="(//*[text()='Delete'])[1]"/>
+        <element name="popUpOkButton" type="block" selector="//span[text()='OK']"/>
+        <element name="entryCheckBox" type="checkbox" selector="//*[@id='idscheck{{var1}}']" parameterized="true"/>
+        <element name="stopWordIDValue" type="text" selector="//tr[td/div/text() = '{{stopWord}}']/td[2]" parameterized="true"/>
+    </section>
+</sections>

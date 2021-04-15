@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<pages xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/PageObject.xsd">
+    <page name="StorefrontAmastyElasticSearchResultPage" url="{{var1}}catalogsearch/result/?q={{var2}}" parameterized="true" area="storefront" module="Amasty_ElasticSearch">
+        <section name="StorefrontSearchResultSection"/>
+    </page>
+</pages>

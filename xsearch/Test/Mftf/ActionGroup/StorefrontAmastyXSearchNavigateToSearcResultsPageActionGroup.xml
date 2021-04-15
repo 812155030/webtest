@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontXSearchNavigateToSearcResultsPageActionGroup" extends="StorefrontAmastyOpenSearchPopupActionGroup">
+        <arguments>
+            <argument name="searchTerm"/>
+        </arguments>
+        <click selector="{{StorefrontSearchPopupSection.amsearchLoupe}}" stepKey="clickLupka" after="waitForSearchPopupWouldVisible"/>
+        <waitForPageLoad stepKey="waitForStorefrontPageLoad"/>
+        <seeInCurrentUrl url="{{StorefrontCatalogSearchPage.url}}" stepKey="checkCurrentUrl"/>
+      </actionGroup>
+  </actionGroups>

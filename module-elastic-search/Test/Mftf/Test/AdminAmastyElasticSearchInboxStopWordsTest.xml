@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminAmastyElasticSearchInboxStopWordsTest">
+        <annotations>
+            <title value="Inbox Stopwords"/>
+            <description value="Inbox Stopwords, English, ES 7"/>
+            <testCaseId value="AES-ISW-1"/>
+            <severity value="CRITICAL"/>
+            <group value="Amasty"/>
+            <group value="ElasticSearch"/>
+            <group value="Amasty_Smoke"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="AdminElasticSearchSetConnectionSettingsWithCLIActionGroup" stepKey="setEsConnectionSettings">
+                <argument name="AmastyEsSettingsCLI" value="AmastyElasticSearch7ConnectionConfigEntityCLI"/>
+            </actionGroup>
+            <actionGroup ref="AdminElasticSearchSetCatalogSettingsWithCLIActionGroup" stepKey="setCatalogSettings">
+                <argument name="AmastyEsCatalogSettingsCLI" value="AmastyElasticSearchMatchModeANDlongTailEntity"/>
+            </actionGroup>
+            <actionGroup ref="AdminElasticSearchSetIndexationSettingsActionGroup" stepKey="setIndexationSettings">
+                <argument name="AmastyEsIndexationSettingsCLI" value="AmastyElasticSearchInboxStopwordsEng"/>
+            </actionGroup>
+            <magentoCLI command="cache:clean" stepKey="reindex"/>
+            <magentoCLI command="indexer:reindex" stepKey="cleanCache"/>
+            <createData entity="productToSearchWithSpecialCharacters" stepKey="productCreation" />
+        </before>
+
+        <after>
+            <actionGroup ref="logout" stepKey="logout"/>
+            <deleteData createDataKey="productCreation" stepKey="productDelition"/>
+            <actionGroup ref="AdminElasticSearchSetIndexationSettingsActionGroup" stepKey="setIndexationSettings">
+                <argument name="AmastyEsIndexationSettingsCLI" value="AmastyElasticSearchDefaultValuesEntity"/>
+            </actionGroup>
+        </after>
+
+        <actionGroup ref="StorefrontAmastySimpleSearchActionGroup" stepKey="checkWithoutTheStopWord">
+            <argument name="searchTerm" value="searchWithoutStopWord"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAmastySimpleSearchActionGroup" stepKey="checkWithTheStopWord">
+            <argument name="searchTerm" value="searchWithInboxStopWord"/>
+        </actionGroup>
+        <actionGroup ref="AdminElasticSearchSetIndexationSettingsActionGroup" stepKey="disableInboxStopwords">
+                <argument name="AmastyEsIndexationSettingsCLI" value="AmastyElasticSearchDefaultValuesEntity"/>
+        </actionGroup>
+        <magentoCLI command="cache:clean" stepKey="reindex"/>
+        <magentoCLI command="indexer:reindex" stepKey="cleanCache"/>
+        <actionGroup ref="StorefrontAmastySimpleSearchActionGroup" stepKey="checkWithoutTheStopWordAfterDisabling">
+            <argument name="searchTerm" value="searchWithoutStopWord"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAmastySimpleSearchActionGroup" stepKey="checkWithTheStopWordAfterDisabling">
+            <argument name="searchTerm" value="searchWithInboxStopWordFail"/>
+        </actionGroup>
+
+    </test>
+</tests>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminAmastyElasticSearchSynonymDeletionActionGroup">
+        <arguments>
+            <argument name="synonym"/>
+        </arguments>
+        <amOnPage url="{{AdminElasticSearchManageSynonymPage.url}}"
+                  stepKey="goToManageSynonymPage"/>
+        <waitForElementVisible selector="{{AdminElasticSearchSynonymAdditionSection.elasticSearchNewSynonymButton}}"
+                               stepKey="waitForSynonymButton"/>
+        <grabTextFrom selector="{{AdminElasticSearchSynonymGridSection.stopWordIDValue($$productCreation.name$$,synonym.word)}}"
+                      stepKey="grabID"/>
+        <checkOption selector="{{AdminElasticSearchSynonymGridSection.AdminAmastyElasticSearchSynonymGridSection({$grabID})}}" stepKey="checkCheckbox"/>
+        <click selector="{{AdminElasticSearchSynonymGridSection.massActionButton}}"
+               stepKey="clickMassAction"/>
+        <click selector="{{AdminElasticSearchSynonymGridSection.massActionDeleteOption}}"
+               stepKey="selectDeleteAction"/>
+        <waitForElementVisible selector="{{AdminElasticSearchSynonymGridSection.popUpOkButton}}"
+                               stepKey="waitForPopUp"/>
+        <click selector="{{AdminElasticSearchSynonymGridSection.popUpOkButton}}"
+               stepKey="confirmPopUp"/>
+
+        <magentoCLI command="cache:clean" stepKey="cleanCache"/>
+        <magentoCLI command="indexer:reindex" stepKey="reindex"/>
+    </actionGroup>
+</actionGroups>

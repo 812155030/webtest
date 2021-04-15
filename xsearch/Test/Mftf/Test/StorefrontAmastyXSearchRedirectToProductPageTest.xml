@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontAmastyXSearchRedirectToProductPageTest">
+        <annotations>
+            <title value="Redirect to Product Page if search result have only one product"/>
+            <description value="Redirect to Product Page if search result have only one product"/>
+            <testCaseId value="AS-5"/>
+            <severity value="MAJOR"/>
+            <group value="Amasty"/>
+            <group value="AdvancedSearch"/>
+            <group value="AmastySmoke"/>
+        </annotations>
+        <before>
+            <createData entity="productToSearchWithoutSpecialCharacters" stepKey="productCreation" />
+        </before>
+        <after>
+            <deleteData createDataKey="productCreation" stepKey="productDelition"/>
+        </after>
+        <!-- Set settings -->
+        <actionGroup ref="AdminAmastyXSearchSetSettingsWithRedirectToPDPActionGroup" stepKey="setSettings"/>
+        <!-- Navigate to Home Page -->
+        <actionGroup ref="StorefrontOpenHomePageActionGroup" stepKey="gotToFirstCmsPage"/>
+        <!-- Enter a query into "search" field -> Wait for Loading Pop-up -->
+        <actionGroup ref="StorefrontAmastyOpenSearchPopupActionGroup" stepKey="fillInSearchTerm">
+            <argument name="searchTerm" value="simpleRequest1"/>
+        </actionGroup>
+        <!-- Search query-->
+        <click selector="{{StorefrontSearchPopupSection.amsearchLoupe}}" stepKey="clickLupka"/>
+        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+        <!-- Check redirect to Product Page -->
+        <see selector="{{StorefrontProductInfoMainSection.productName}}" userInput="$productCreation.name$" stepKey="verifyProductPage"/>
+        <!-- Verify redirect to Home Page after click On "Back" Button of browser-->
+        <moveBack stepKey="moveBack"/>
+        <seeInCurrentUrl url="{{StorefrontHomePage.url}}" stepKey="verifyCurrentUrl"/>
+    </test>
+</tests>

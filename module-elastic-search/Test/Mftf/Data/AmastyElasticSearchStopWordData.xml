@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <entity name="simpleStopWord" type="stopWord">
+        <data key="word">theSecond</data>
+        <data key="scope">Default Store View</data>
+    </entity>
+    <entity name="searchWithoutStopWord" type="searchTerm">
+        <data key="resultText">1</data>
+        <data key="resultSelector">#toolbar-amount</data>
+        <data key="term">Tire-185/65R14 86H</data> <!-- name of productToSearchWithSpecialCharacters -->
+    </entity>
+    <entity name="searchWithStopWord" type="searchTerm" extends="searchWithoutStopWord">
+        <data key="term">theSecond Tire-185/65R14 86H</data> <!-- name of productToSearchWithSpecialCharacters -->
+    </entity>
+    <entity name="searchWithStopWordFail" type="searchTerm">
+        <data key="term">theSecond Tire-185/65R14 86H</data>
+        <data key="resultText">Your search returned no results.</data>
+        <data key="resultSelector">.message</data> <!-- name of productToSearchWithSpecialCharacters -->
+     </entity>
+</entities>

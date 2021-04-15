@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <entity name="ElasticSearchAllowSpecialCharactersCLIsettings">
+        <data key="yes">1</data>
+        <data key="no">0</data>
+    </entity>
+
+    <entity name="AmastyElasticSearch7ConnectionConfigEntity" type="AmastyEsSettings">
+        <data key="searchEngine">Amasty Elasticsearch</data>
+        <data key="hostname">elastic70.sty</data>
+        <data key="port">9200</data>
+        <data key="indexPrefix" unique="prefix">magento</data>
+        <data key="HTTPAuth">0</data>
+        <data key="serverTimeout">15</data>
+        <data key="customAnalyzer">disabled</data>
+    </entity>
+    <entity name="AmastyElasticSearch6ConnectionConfigEntity" type="AmastyEsSettings" extends="AmastyElasticSearch7ConnectionConfigEntity">
+        <data key="hostname">elasticsearch.sty</data>
+        <data key="port">9630</data>
+    </entity>
+    <entity name="AmastyElasticSearch5ConnectionConfigEntity" type="AmastyEsSettings" extends="AmastyElasticSearch7ConnectionConfigEntity">
+        <data key="hostname">elasticsearch.sty</data>
+        <data key="port">9560</data>
+    </entity>
+    <entity name="AmastyElasticSearch7ConnectionConfigEntityCLI" type="AmastyEsSettingsCLI" extends="AmastyElasticSearch7ConnectionConfigEntity">
+        <data key="searchEngine">'amasty_elastic'</data>
+        <data key="customAnalyzer">'disabled'</data>
+    </entity>
+    <entity name="AmastyElasticSearch6ConnectionConfigEntityCLI" type="AmastyEsSettingsCLI" extends="AmastyElasticSearch7ConnectionConfigEntity">
+        <data key="searchEngine">'amasty_elastic'</data>
+        <data key="customAnalyzer">'disabled'</data>
+        <data key="hostname">elasticsearch.sty</data>
+        <data key="port">9630</data>
+    </entity>
+    <entity name="AmastyElasticSearch5ConnectionConfigEntityCLI" type="AmastyEsSettingsCLI" extends="AmastyElasticSearch7ConnectionConfigEntity">
+        <data key="searchEngine">'amasty_elastic'</data>
+        <data key="customAnalyzer">'disabled'</data>
+        <data key="hostname">elasticsearch.sty</data>
+        <data key="port">9560</data>
+    </entity>
+
+    <entity name="AmastyElasticSearchDefaultValueEntity" type="AmastyEsCatalogSettingsCLI">
+        <data key="longTail">0</data>
+        <data key="searchQuerySettings">'{"name":{"wildcard":"0","combining":"0","spelling":"0"}}'</data>
+    </entity>
+    <entity name="AmastyElasticSearchCardPlusOREntity" type="AmastyEsCatalogSettingsCLI" extends="AmastyElasticSearchDefaultValueEntity">
+        <data key="searchQuerySettings">'{"name":{"wildcard":"1","combining":"0","spelling":"0"}}'</data>
+    </entity>
+    <entity name="AmastyElasticSearchSpellCorrectionPlusOREntity" type="AmastyEsCatalogSettingsCLI" extends="AmastyElasticSearchDefaultValueEntity">
+        <data key="searchQuerySettings">'{"name":{"wildcard":"","combining":"0","spelling":"1"}}'</data>
+    </entity>
+    <entity name="AmastyElasticSearchMatchModeANDlongTailEntity" type="AmastyEsCatalogSettingsCLI" extends="AmastyElasticSearchDefaultValueEntity">
+        <data key="longTail">1</data>
+        <data key="searchQuerySettings">'{"name":{"wildcard":"0","combining":"1","spelling":"0"}}'</data>
+    </entity>
+
+    <entity name="AmastyElasticSearchDefaultValuesEntity" type="AmastyEsIndexationSettingsCLI">
+        <data key="inboxStopwords">0</data>
+        <data key="inboxStopwordsLanguage">'english'</data>
+        <data key="inboxStemming">0</data>
+        <data key="inboxStemmingLanguage">'english'</data>
+    </entity>
+    <entity name="AmastyElasticSearchInboxStopwordsEng" type="AmastyEsIndexationSettingsCLI" extends="AmastyElasticSearchDefaultValuesEntity">
+        <data key="inboxStopwords">1</data>
+    </entity>
+</entities>

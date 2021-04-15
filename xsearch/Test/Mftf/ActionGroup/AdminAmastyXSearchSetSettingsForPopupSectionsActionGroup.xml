@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminAmastyXSearchSetSettingsForPopupSectionsActionGroup">
+        <magentoCLI command=" config:set {{productsSettings.RedirectToProductPage}} {{basicSettingsValues.no}}" stepKey="disableRedirectToPDP"/>
+        <magentoCLI command=" config:set {{generalSettings.tabsOnSearchResultPage}} {{basicSettingsValues.yes}}" stepKey="enableShowTabsOnSRP"/>
+        <magentoCLI command=" config:set {{popularSearchesSettings.enabledPopularSearchesSection}} {{basicSettingsValues.yes}}" stepKey="enablePopularSearchesTab"/>
+        <magentoCLI command=" config:set {{recentSearchesSettings.enabledRecentSearchesSection}} {{basicSettingsValues.yes}}" stepKey="enableRecentSearchesTab"/>
+        <magentoCLI command=" config:set {{cmsPagesSettings.enabledCMSPagesSection}} {{basicSettingsValues.yes}}" stepKey="enableCmsPageTab"/>
+        <magentoCLI command=" config:set {{categoriesSettings.enabledCategoriesSection}} {{basicSettingsValues.yes}}" stepKey="enableCategoriesTab"/>
+        <magentoCLI command=" config:set {{popularSearchesSettings.showPopularSearchesSectionOnFirstClick}} {{basicSettingsValues.yes}}" stepKey="showPopularSearchesSectionOnFirstClick"/>
+        <magentoCLI command=" config:set {{recentSearchesSettings.showRecentSearchesSectionOnFirstClick}} {{basicSettingsValues.yes}}" stepKey="showRecentSearchesSectionOnFirstClick"/>
+        <magentoCLI command=" config:set {{categoriesSettings.displayFullCategoryPath}} {{basicSettingsValues.yes}}" stepKey="disableFullPathCategory"/>
+
+        <magentoCLI command="indexer:reindex" stepKey="reindex"/>
+        <magentoCLI command="cache:clean" stepKey="cacheClean"/>
+    </actionGroup>
+</actionGroups>

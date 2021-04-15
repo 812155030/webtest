@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<pages xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/PageObject.xsd">
+    <page name="AdminAmastyElasticSearchConfigurationPage" url="admin/system_config/edit/section/amasty_elastic/" area="admin" module="Amasty_ElasticSearch">
+        <section name="AdminAmastyElasticSearchConnectionConfigurationSection"/>
+        <section name="AdminAmastyElasticSearchCatalogConfigurationSection"/>
+        <section name="AdminAmastyElasticSearchIndexationConfigurationSection"/>
+        <section name="AdminAmastyElasticSearchDebugConfigurationSection"/>
+    </page>
+</pages>

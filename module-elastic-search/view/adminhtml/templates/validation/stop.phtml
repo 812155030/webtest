@@ -1,0 +1,21 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+?>
+<script type="text/javascript">
+    require(
+        [
+            'Magento_Ui/js/lib/validation/validator',
+            'jquery',
+            'mage/translate'
+        ], function(validator, $){
+
+            validator.addRule('validate-stop-word', function (value) {
+                return value.match(/^[^\s]+$/g);
+            }, $.mage.__('Stop words should not contain whitespaces.')
+        );
+    });
+</script>

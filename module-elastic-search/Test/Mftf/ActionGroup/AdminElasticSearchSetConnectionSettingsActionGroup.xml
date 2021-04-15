@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminElasticSearchSetConnectionSettingsActionGroup">
+        <arguments>
+            <argument name="AmastyEsSettings"/>
+        </arguments>
+
+        <amOnPage url="{{AdminAmastyElasticSearchConfigurationPage.url}}" stepKey="navigateToConfigurationPage"/>
+        <waitForPageLoad stepKey="waitForConfigurationPage"/>
+        <scrollTo selector="{{AdminAmastyElasticSearchConnectionConfigurationSection.elasticSearchConnectionTab}}"
+                  stepKey="scrollTEoElasticSearchConnectionTab"/>
+        <conditionalClick selector="{{AdminAmastyElasticSearchConnectionConfigurationSection.elasticSearchConnectionTab}}"
+                          dependentSelector="{{AdminAmastyElasticSearchConnectionConfigurationSection.checkIfElasticSearchConnectionTabExpand}}"
+                          visible="true"
+                          stepKey="expandElasticSearchConnectionTab"/>
+        <waitForElementVisible selector="{{AdminAmastyElasticSearchConnectionConfigurationSection.searchEngine}}" stepKey="waitForESDropdownToBeVisible"/>
+
+        <selectOption selector="{{AdminAmastyElasticSearchConnectionConfigurationSection.searchEngine}}"
+                      userInput="{{AmastyEsSettings.searchEngine}}"
+                      stepKey="chooseElasticSearch7"/>
+        <fillField userInput="{{AmastyEsSettings.hostname}}"
+                   selector="{{AdminAmastyElasticSearchConnectionConfigurationSection.elasticsearchServerHostname}}"
+                   stepKey="fillInHostName"/>
+        <fillField userInput="{{AmastyEsSettings.port}}"
+                   selector="{{AdminAmastyElasticSearchConnectionConfigurationSection.elasticsearchServerPort}}"
+                   stepKey="fillInPortNumber"/>
+        <fillField userInput="{{AmastyEsSettings.indexPrefix}}"
+                   selector="{{AdminAmastyElasticSearchConnectionConfigurationSection.elasticsearchIndexPrefix}}"
+                   stepKey="fillInPrefix"/>
+        <selectOption selector="{{AdminAmastyElasticSearchConnectionConfigurationSection.enableElasticsearchHttpAuth}}"
+                      userInput="{{AmastyEsSettings.HTTPAuth}}"
+                      stepKey="setValueToHttpAuthOption"/>
+        <fillField userInput="{{AmastyEsSettings.serverTimeout}}"
+                   selector="{{AdminAmastyElasticSearchConnectionConfigurationSection.elasticsearchServerTimeout}}"
+                   stepKey="fillInServerTimeoutValue"/>
+        <selectOption selector="{{AdminAmastyElasticSearchConnectionConfigurationSection.customAnalyzer}}"
+                      userInput="{{AmastyEsSettings.customAnalyzer}}"
+                      stepKey="choseCustomAnalyzer"/>
+
+        <click selector="{{AdminAmastyElasticSearchConnectionConfigurationSection.testConnectionButton}}" stepKey="clickTestConnectionButton"/>
+        <waitForPageLoad stepKey="waitForConfigurationSectionToLoad"/>
+        <grabTextFrom selector="{{AdminAmastyElasticSearchConnectionConfigurationSection.testConnectionButtonResultMessage}}"
+                      stepKey="grabTestConnectionButtonResultMessage"/>
+        <assertEquals stepKey="assertSuccessMessage" message="failed">
+            <expectedResult type="string">Successful! Test again?</expectedResult>
+            <actualResult type="variable">grabTestConnectionButtonResultMessage</actualResult>
+        </assertEquals>
+        <click selector="{{ContentManagementSection.Save}}" stepKey="saveConfiguration"/>
+        <see selector="{{AdminMessagesSection.success}}" userInput="You saved the configuration." stepKey="seeConfigurationSuccessMessage"/>
+    </actionGroup>
+    <actionGroup name="AdminElasticSearchSetConnectionSettingsWithCLIActionGroup">
+        <arguments>
+            <argument name="AmastyEsSettingsCLI"/>
+        </arguments>
+        <magentoCLI command="config:set {{ElasticSearchConnectionCLISettingsPaths.engine}} {{AmastyEsSettingsCLI.searchEngine}}"
+                    stepKey="setSearchEngine"/>
+        <magentoCLI command="config:set {{ElasticSearchConnectionCLISettingsPaths.server_hostname}} {{AmastyEsSettingsCLI.hostname}}"
+                    stepKey="setSearchServerHostnameValue"/>
+        <magentoCLI command="config:set {{ElasticSearchConnectionCLISettingsPaths.server_port}} {{AmastyEsSettingsCLI.port}}"
+                    stepKey="setSearchServerPortValue"/>
+        <magentoCLI command="config:set {{ElasticSearchConnectionCLISettingsPaths.index_prefix}} {{AmastyEsSettingsCLI.indexPrefix}}"
+                    stepKey="setSearchServerPrefixValue"/>
+        <magentoCLI command="config:set {{ElasticSearchConnectionCLISettingsPaths.enable_auth}} {{AmastyEsSettingsCLI.HTTPAuth}}"
+                    stepKey="setSearchServerHTTPAuthValue"/>
+        <magentoCLI command="config:set {{ElasticSearchConnectionCLISettingsPaths.server_timeout}} {{AmastyEsSettingsCLI.serverTimeout}}"
+                    stepKey="setSearchServerTimeoutValue"/>
+        <magentoCLI command="config:set {{ElasticSearchConnectionCLISettingsPaths.custom_analyzer}} {{AmastyEsSettingsCLI.customAnalyzer}}"
+                    stepKey="setSearchServerAnalyzerValue"/>
+    </actionGroup>
+</actionGroups>

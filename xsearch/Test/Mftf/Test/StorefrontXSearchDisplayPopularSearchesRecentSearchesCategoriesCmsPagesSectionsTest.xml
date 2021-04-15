@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontXSearchDisplayPopularSearchesRecentSearchesCategoriesCmsPagesSectionsTest">
+        <annotations>
+            <title value="Check displaying sections in popup"/>
+            <description value="Check displaying Popular Searches, Recent Searches, Categories and CMS pages in Popup"/>
+            <testCaseId value="AS-8"/>
+            <severity value="CRITICAL"/>
+            <group value="Amasty"/>
+            <group value="AdvancedSearch"/>
+            <group value="AmastySmoke"/>
+        </annotations>
+        <!-- Create sample data -->
+        <before>
+            <createData entity="productToSearchWithSameNameAsCategory" stepKey="productCreation" />
+            <createData entity="_defaultCategory" stepKey="subcategory"/>
+            <createData entity="simpleCmsPage" stepKey="createCmsPage"/>
+        </before>
+        <!-- Delete sample data -->
+        <after>
+            <deleteData createDataKey="productCreation" stepKey="productDelition"/>
+            <deleteData createDataKey="subcategory" stepKey="deleteCategory"/>
+            <deleteData createDataKey="createCmsPage" stepKey="deleteCmsPage" />
+        </after>
+        <!-- Set settings -->
+        <actionGroup ref="AdminAmastyXSearchSetSettingsForPopupSectionsActionGroup" stepKey="setSettings"/>
+        <!-- Open "Home page"-->
+        <actionGroup ref="StorefrontOpenHomePageActionGroup" stepKey="gotToFirstCmsPage"/>
+
+        <actionGroup ref="StorefrontAmastyOpenSearchPopupActionGroup" stepKey="fillInSearchTerm1">
+            <argument name="searchTerm" value="simpleRequest6"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAmastyCategoryCmsPagesSearchesActionGroup" stepKey="checkRecentSearchesPopularSearchesSections">
+            <argument name="category" value="$$subcategory$$"/>
+            <argument name="cms_page" value="$$createCmsPage$$"/>
+        </actionGroup>
+        <!-- Check category section -->
+        <click selector=" {{StorefrontSearchPopupSection.categoryLinkInLeftSide}} " stepKey="clickOnCategoryLink"/>
+        <waitForPageLoad stepKey="waitForCategoryPageLoad"/>
+        <see userInput="$subcategory.name$" stepKey="seeCategoryTitle"/>
+        <!-- Check cms page section -->
+        <actionGroup ref="StorefrontAmastyOpenSearchPopupActionGroup" stepKey="fillInSearchTerm2">
+            <argument name="searchTerm" value="simpleRequest6"/>
+        </actionGroup>
+        <click selector="{{StorefrontSearchPopupSection.cmsPageLinkInLeftSide}}" stepKey="clickOnCmsPageLink"/>
+        <waitForPageLoad stepKey="waitForCmsPageLoad"/>
+        <see userInput="$createCmsPage.title$" stepKey="seeCmsPageTitle"/>
+        <!-- Enter a query into "search" field -> Wait for Loading Pop-up -->
+        <actionGroup ref="StorefrontAmastyOpenSearchPopupActionGroup" stepKey="fillInSearchTerm3">
+            <argument name="searchTerm" value="simpleRequest7"/>
+        </actionGroup>
+        <!-- Check popular search section -->
+        <actionGroup ref="StorefrontAmastyRecentPopularSearchesActionGroup" stepKey="checkPopularSearchesRecentSearchesSections">
+            <argument name="product" value="$$productCreation$$"/>
+            <argument name="searchTerm" value="simpleRequest7"/>
+        </actionGroup>
+        <click selector="{{StorefrontSearchPopupSection.popularSearchesLinkForOneQuery(simpleRequest6.term)}}" stepKey="clickOnPopularSearchesLink"/>
+        <waitForPageLoad stepKey="waitForSearchResultsPageLoad1"/>
+        <seeInTitle userInput="Search results for: '{{simpleRequest6.term}}'" stepKey="seePopularSearchQuery"/>
+        <!-- Check recent search section -->
+        <actionGroup ref="StorefrontAmastyOpenSearchPopupActionGroup" stepKey="fillInSearchTerm4">
+            <argument name="searchTerm" value="simpleRequest7"/>
+        </actionGroup>
+        <click selector="{{StorefrontSearchPopupSection.resentSearchesLinkInLeftSide}}" stepKey="clickOnRecentSearchesLink"/>
+        <waitForPageLoad stepKey="waitForSearchResultsPageLoad2"/>
+        <seeInTitle userInput="Search results for: '{{simpleRequest9.term}}'" stepKey="seeRecentSearchQuery"/>
+    </test>
+</tests>

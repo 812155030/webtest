@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<pages xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/PageObject.xsd">
+    <page name="AdminElasticSearchManageStopWordsPage" url="/amasty_elastic/stopword/" area="admin" module="Amasty_ElasticSearch">
+        <section name="AdminAmastyElasticSearchStopWordsAdditionSection"/>
+        <section name="AdminElasticSearchStopWordGridSection"/>
+    </page>
+</pages>

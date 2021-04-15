@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontAmastyXSearchDisplayAllProductsLinkTest">
+        <annotations>
+            <title value="Display 'All Products' link in popup"/>
+            <description value="Display 'All Products' link with number of search results products in popup"/>
+            <testCaseId value="AS-3"/>
+            <severity value="CRITICAL"/>
+            <group value="Amasty"/>
+            <group value="AdvancedSearch"/>
+            <group value="AmastySmoke"/>
+        </annotations>
+        <!-- Create sample data -->
+        <before>
+            <createData entity="simpleProductToSearchWithUniqueNameSku3" stepKey="productCreation1" />
+            <createData entity="simpleProductToSearchWithUniqueNameSku3" stepKey="productCreation2"/>
+            <createData entity="simpleProductToSearchWithUniqueNameSku3" stepKey="productCreation3"/>
+            <createData entity="simpleProductToSearchWithUniqueNameSku3" stepKey="productCreation4"/>
+        </before>
+        <!-- Delete sample data -->
+       <after>
+            <deleteData createDataKey="productCreation1" stepKey="deleteProduct1"/>
+            <deleteData createDataKey="productCreation2" stepKey="deleteProduct2"/>
+            <deleteData createDataKey="productCreation3" stepKey="deleteProduct3"/>
+            <deleteData createDataKey="productCreation4" stepKey="deleteProduct4"/>
+        </after>
+        <!-- Set settings -->
+        <actionGroup ref="AdminAmastyXSearchSetSettingsWithRedirectToPDPActionGroup" stepKey="setSettings"/>
+        <!-- Open "Home page" -->
+        <actionGroup ref="StorefrontOpenHomePageActionGroup" stepKey="gotToFirstCmsPage"/>
+        <!-- Enter a query into "search" field  -> Wait for Loading Pop-up -->
+        <actionGroup ref="StorefrontAmastyOpenSearchPopupActionGroup" stepKey="fillInSearchTerm">
+            <argument name="searchTerm" value="simpleRequest8"/>
+        </actionGroup>
+        <!-- Verify 'View all' link -> Check the products qty in the link -->
+        <see selector="{{StorefrontSearchPopupSection.amsearchViewAllLink}}"
+             userInput="View All ({{simpleRequest8.resultText}})"
+             stepKey="seeLinkInPopup"/>
+        <!-- Check the products qty on the page  -->
+        <click selector="{{StorefrontSearchPopupSection.amsearchViewAllLink}}" stepKey="clickOnLink"/>
+        <waitForPageLoad stepKey="waitSearchResultPage"/>
+        <see userInput="{{simpleRequest8.resultText}}"
+             selector="{{simpleRequest8.resultSelector}}"
+             stepKey="checkResults"/>
+    </test>
+</tests>

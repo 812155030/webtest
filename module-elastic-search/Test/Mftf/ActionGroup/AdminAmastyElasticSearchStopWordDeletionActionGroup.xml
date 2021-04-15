@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminAmastyElasticSearchStopWordDeletionActionGroup">
+        <arguments>
+            <argument name="stopWord"/>
+        </arguments>
+        <amOnPage url="{{AdminElasticSearchManageStopWordsPage.url}}"
+                  stepKey="goToManageStopWordsPage"/>
+        <waitForElementVisible selector="{{AdminAmastyElasticSearchStopWordsAdditionSection.elasticSearchNewStopWordButton}}"
+                               stepKey="waitForStopWordButton"/>
+        <grabTextFrom selector="{{AdminElasticSearchStopWordGridSection.stopWordIDValue(stopWord.word)}}"
+                      stepKey="grabID"/>
+        <checkOption selector="{{AdminElasticSearchStopWordGridSection.entryCheckBox({$grabID})}}" stepKey="checkCheckbox"/>
+        <click selector="{{AdminElasticSearchStopWordGridSection.massActionButton}}"
+               stepKey="clickMassAction"/>
+        <click selector="{{AdminElasticSearchStopWordGridSection.massActionDeleteOption}}"
+               stepKey="selectDeleteAction"/>
+        <waitForElementVisible selector="{{AdminElasticSearchStopWordGridSection.popUpOkButton}}"
+                               stepKey="waitForPopUp"/>
+        <click selector="{{AdminElasticSearchStopWordGridSection.popUpOkButton}}"
+               stepKey="confirmPopUp"/>
+
+        <magentoCLI command="cache:clean" stepKey="cleanCache"/>
+        <magentoCLI command="indexer:reindex" stepKey="reindex"/>
+    </actionGroup>
+</actionGroups>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontAmastySimpleSearchActionGroup">
+        <arguments>
+            <argument name="searchTerm"/>
+        </arguments>
+
+        <amOnPage url="{{StorefrontHomePage.url}}" stepKey="gotToFirstCmsPage"/>
+        <waitForPageLoad stepKey="waitHomePage"/>
+        <fillField userInput="{{searchTerm.term}}" selector="#search" stepKey="fillInSearchTerm"/>
+        <wait time="4" stepKey="waitForLupkaToChangeStage"/>
+        <click selector=".amsearch-loupe" stepKey="clickLupka"/>
+        <waitForPageLoad stepKey="waitSearchResultPage"/>
+        <see userInput="{{searchTerm.resultText}}"
+             selector="{{searchTerm.resultSelector}}"
+             stepKey="checkResults"/>
+    </actionGroup>
+</actionGroups>

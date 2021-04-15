@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <!-- General settings -->
+    <entity name="generalSettings" type="xsSettings">
+        <data key="minCharacters"> amasty_xsearch/product/limit</data>
+        <data key="enable302Redirect"> amasty_xsearch/general/four_zero_four_redirect </data>
+        <data key="tabsOnSearchResultPage">amasty_xsearch/general/enable_tabs_search_result</data>
+        <data key="enableIndexationForPopup">amasty_xsearch/general/enable_popup_index</data>
+        <data key="enableCustomURLKeyForSearchResultsPage">amasty_xsearch/general/enable_seo_url</data>
+    </entity>
+    <!-- Products settings -->
+    <entity name="productsSettings" type="xsSettings">
+        <data key="enabledProductsSection"> amasty_xsearch/product/enabled </data>
+        <data key="enableAddToCartButton"> amasty_xsearch/product/add_to_cart </data>
+        <data key="RedirectToProductPage"> amasty_xsearch/product/redirect_single_product </data>
+        <data key="ShowOutOfStockProductsLast"> amasty_xsearch/product/out_of_stock_last </data>
+    </entity>
+    <!-- Popular Searches settings -->
+    <entity name="popularSearchesSettings" type="xsSettings">
+        <data key="enabledPopularSearchesSection"> amasty_xsearch/popular_searches/enabled </data>
+        <data key="showPopularSearchesSectionOnFirstClick"> amasty_xsearch/popular_searches/first_click </data>
+    </entity>
+    <!-- Recent Searches settings -->
+    <entity name="recentSearchesSettings" type="xsSettings">
+        <data key="enabledRecentSearchesSection"> amasty_xsearch/recent_searches/enabled </data>
+        <data key="showRecentSearchesSectionOnFirstClick"> amasty_xsearch/recent_searches/first_click </data>
+    </entity>
+    <!-- Categories settings -->
+    <entity name="categoriesSettings" type="xsSettings">
+        <data key="enabledCategoriesSection">amasty_xsearch/category/enabled</data>
+        <data key="displayFullCategoryPath"> amasty_xsearch/category/full_path</data>
+    </entity>
+    <!-- CMS Pages settings -->
+   <entity name="cmsPagesSettings" type="xsSettings">
+        <data key="enabledCMSPagesSection"> amasty_xsearch/page/enabled </data>
+    </entity>
+
+</entities>

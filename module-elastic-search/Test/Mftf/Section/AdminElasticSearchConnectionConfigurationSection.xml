@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_ElasticSearch
+ */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="AdminAmastyElasticSearchConnectionConfigurationSection">
+        <element name="elasticSearchConnectionTab" type="button" selector="#amasty_elastic_connection-head"/>
+        <element name="checkIfElasticSearchConnectionTabExpand" type="button" selector="#amasty_elastic_connection-head:not(.open)"/>
+        <element name="isSearchEngineTabOpen" type="select" selector="#amasty_elastic_connection-head:not(.open)"/>
+        <element name="searchEngine" type="select" selector="#amasty_elastic_connection_engine"/>
+        <element name="elasticsearchServerHostname" type="input" selector="#amasty_elastic_connection_server_hostname"/>
+        <element name="elasticsearchServerPort" type="input" selector="#amasty_elastic_connection_server_port"/>
+        <element name="elasticsearchIndexPrefix" type="input" selector="#amasty_elastic_connection_index_prefix"/>
+        <element name="enableElasticsearchHttpAuth" type="select" selector="#amasty_elastic_connection_enable_auth"/>
+        <element name="elasticsearchServerTimeout" type="input" selector="#amasty_elastic_connection_server_timeout"/>
+        <element name="customAnalyzer" type="select" selector="#amasty_elastic_connection_custom_analyzer"/>
+        <element name="testConnectionButton" type="button" selector="#amasty_elastic_connection_test_connect"/>
+        <element name="testConnectionButtonResultMessage" type="text" selector="#amasty_elastic_connection_test_connect_result"/>
+    </section>
+
+    <section name="AdminAmastyElasticSearchCatalogConfigurationSection">
+        <element name="elasticSearchCatalogTab" type="button" selector="#amasty_elastic_catalog-head"/>
+        <element name="checkIfElasticSearchCatalogTabExpand" type="button" selector="#amasty_elastic_catalog-head:not(.open)"/>
+        <element name="wildcardType" type="select" selector="#amasty_elastic_catalog_wildcard_mode"/>
+        <element name="enableWildcardAfter" type="input" selector="#amasty_elastic_catalog_wildcard_symbols"/>
+        <element name="enableWildcardAfterDefaultSystemValue" type="checkbox" selector="#amasty_elastic_catalog_wildcard_symbols_inherit"/>
+        <element name="enableSpellCorrectionAfter" type="input" selector="#amasty_elastic_catalog_spellcorrection_symbols"/>
+        <element name="enableSpellCorrectionAfterDefaultSystemValue" type="checkbox" selector="#amasty_elastic_catalog_spellcorrection_symbols_inherit"/>
+        <element name="maxNumberOfSearchResults" type="input" selector="#amasty_elastic_catalog_max_items"/>
+        <element name="maxNumberOfSearchResultsDefaultSystemValue" type="checkbox" selector="#amasty_elastic_catalog_max_items_inherit"/>
+        <element name="allowSpecialCharacters" type="select" selector="#amasty_elastic_catalog_long_tail"/>
+        <!--Product name-->
+        <element name="searchQuerrySettingProductNameWildcard"
+                 type="checkbox"
+                 selector="//tr[@id='{{var1}}']//label[@class='admin__actions-switch-label wildcard']"
+                 parameterized="true"/>
+        <element name="nameAttributeWildcardClickableArea"
+                 type="checkbox"
+                 selector="//tr[@id='{{var1}}']//input[@id='groups[catalog][fields][query_settings][value][{{var1}}][wildcard]' and @checked]"
+                 parameterized="true"/>
+        <element name="searchQuerrySettingProductNameSpellCorrection"
+                 type="checkbox"
+                 selector="//tr[@id='{{var1}}']//label[@class='admin__actions-switch-label spelling']"
+                 parameterized="true"/>
+        <element name="nameAttributeNameSpellCorrectionClickableArea"
+                 type="checkbox"
+                 selector="//tr[@id='{{var1}}']//input[@id='groups[catalog][fields][query_settings][value][{{var1}}][spelling]' and @checked]"
+                 parameterized="true"/>
+        <element name="nameMatchModeSelect"
+                 type="select"
+                 selector="//tr[@id='{{var1}}']//select"
+                 parameterized="true"/>
+
+    </section>
+    <!--
+    <section name="AdminAmastyElasticSearchIndexationConfigurationSection">
+    </section>
+
+    <section name="AdminAmastyElasticSearchDebugConfigurationSection">
+    </section>-->
+</sections>

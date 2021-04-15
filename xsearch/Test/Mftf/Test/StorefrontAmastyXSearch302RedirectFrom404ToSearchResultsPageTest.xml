@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+<test name="StorefrontAmastyXSearch302RedirectFrom404ToSearchResultsPageTest">
+    <annotations>
+        <title value="Check 302 redirect"/>
+        <description value="Check redirect to search results page from a broken URL"/>
+        <testCaseId value="AS-1"/>
+        <severity value="MAJOR"/>
+        <group value="Amasty"/>
+        <group value="AdvancedSearch"/>
+        <group value="AmastySmoke"/>
+    </annotations>
+    <!-- Set settings -->
+    <actionGroup ref="AdminAmastyXSearchSetSettingsWithoutRedirectToPDPActionGroup" stepKey="setSettings"/>
+    <!-- Open "Home page"-->
+    <actionGroup ref="StorefrontOpenHomePageActionGroup" stepKey="gotToFirstCmsPage"/>
+    <!-- Grab the hostname -->
+    <executeJS function="return window.location.host" stepKey="grabHostname"/>
+    <!-- Navigate to broken url -->
+    <amOnUrl url="http://{$grabHostname}/{{urlParameter.nameParameter}}" stepKey="goToBrokenUrl"/>
+    <waitForPageLoad stepKey="waitForStorefrontPageLoad"/>
+    <!-- Verify current page and url -->
+    <seeInCurrentUrl url="{{StorefrontCatalogSearchPage.url}}" stepKey="verifyPage"/>
+    <seeInCurrentUrl url="{{StorefrontCatalogSearchPage.url}}?q={{urlParameter.nameParameter}}{{adedUrlParameter.nameParameter}}" stepKey="seeAmnorouteParametrInURL"/>
+</test>
+</tests>
