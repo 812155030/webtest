@@ -2,11 +2,16 @@
     "name": "amasty/xsearch",
     "description": "Search Autocomplete by Amasty",
     "require": {
-        "php": "7.0.2|7.0.4|~7.0.6|^7.1.0",
-        "amasty/base": ">=1.9.10"
+        "php": "^7.1.0",
+        "amasty/base": ">=1.12.5",
+        "magento/module-cms": "*"
+    },
+    "suggest": {
+        "amasty/module-xsearch-mftf-2": "Install xsearch-mftf-2 module to be able to run Advanced Search MFTF tests for Magento 2.3.5+ version",
+        "amasty/module-xsearch-mftf-3": "Install xsearch-mftf-3 module to be able to run Advanced Search MFTF tests for Magento 2.4.0+ version"
     },
     "type": "magento2-module",
-    "version": "1.14.0",
+    "version": "1.17.3",
     "license": [
         "Commercial"
     ],

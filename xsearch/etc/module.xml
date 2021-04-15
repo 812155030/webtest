@@ -2,15 +2,17 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Amasty_Xsearch" setup_version="1.12.2">
+    <module name="Amasty_Xsearch" setup_version="1.12.3">
         <sequence>
             <module name="Magento_Search" />
+            <module name="Magento_Cms" />
+            <module name="Magento_Widget"/>
             <module name="Amasty_Base" />
         </sequence>
     </module>

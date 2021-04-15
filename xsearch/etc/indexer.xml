@@ -2,7 +2,7 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 -->
@@ -12,5 +12,9 @@
         <description translate="true">Rebuild fulltext search index</description>
         <saveHandler class="Amasty\Xsearch\Model\Indexer\Category\IndexHandler" />
         <structure class="Amasty\Xsearch\Model\Indexer\Category\IndexStructure" />
+    </indexer>
+    <indexer id="amasty_elastic_popup_data" view_id="amasty_elastic_popup_data" class="Amasty\Xsearch\Model\Indexer\External">
+        <title translate="true">Amasty: Xsearch - Popup Data</title>
+        <description translate="true">Indexed data for popup</description>
     </indexer>
 </config>

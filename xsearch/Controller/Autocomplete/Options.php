@@ -1,56 +1,66 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
 
 namespace Amasty\Xsearch\Controller\Autocomplete;
 
-use Magento\Framework\App\Action\Context;
+use Amasty\Xsearch\ViewModel\FormMiniData;
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\UrlInterface;
 
-class Options extends \Magento\Framework\App\Action\Action
+class Options implements HttpPostActionInterface
 {
     /**
-     * @var \Magento\Framework\Controller\Result\JsonFactory
+     * @var JsonFactory
      */
     private $resultJsonFactory;
 
     /**
-     * @var \Magento\Framework\View\LayoutFactory
-     */
-    private $layoutFactory;
-
-    /**
-     * @var \Magento\Framework\UrlInterface
+     * @var UrlInterface
      */
     private $urlBuilder;
 
+    /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
+     * @var FormMiniData
+     */
+    private $formMiniData;
+
     public function __construct(
-        Context $context,
-        \Magento\Framework\UrlInterface $urlBuilder,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \Magento\Framework\View\LayoutFactory $layoutFactory
+        RequestInterface $request,
+        UrlInterface $urlBuilder,
+        JsonFactory $resultJsonFactory,
+        FormMiniData $formMiniData
     ) {
-        parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->layoutFactory = $layoutFactory;
         $this->urlBuilder = $urlBuilder;
+        $this->request = $request;
+        $this->formMiniData = $formMiniData;
     }
 
+    /**
+     * @return \Magento\Framework\Controller\ResultInterface
+     */
     public function execute()
     {
-        if (!$this->getRequest()->isAjax()) {
-            $this->getResponse()->setStatusHeader(403, '1.1', 'Forbidden');
-            return null;
+        $resultJson = $this->resultJsonFactory->create();
+
+        if (!$this->request->isAjax()) {
+            $resultJson->setStatusHeader(403, '1.1', 'Forbidden');
+        } else {
+            $resultJson->setData($this->formMiniData->getOptions($this->urlBuilder->getUrl()));
         }
 
-        $layout = $this->layoutFactory->create();
-        $resultJson = $this->resultJsonFactory->create();
-        $productsBlock = $layout->createBlock(\Amasty\Xsearch\Block\Jsinit::class, 'amasty.xsearch.product');
-        $options = $productsBlock->getOptions($this->urlBuilder->getUrl());
-
-        return $resultJson->setData($options);
+        return $resultJson;
     }
 }

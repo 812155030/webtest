@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 ?>
@@ -11,6 +11,7 @@
     $collection = $block->getTabs();
     ?>
     <?php if ($collection): ?>
+        <?php $searchResultHtml = $block->getChildHtml('search.result'); ?>
         <div id="amsearch-result-tabs"
              class="product data items"
              data-mage-init='{"tabs":{"openedState":"active"}}'>
@@ -43,7 +44,7 @@
             <div class="data item content"
                  id="tabs-amasty_search_products_tab"
                  data-role="content">
-                <?= $block->getChildHtml('search.result'); ?>
+                <?= /* @noEscape */ $searchResultHtml ?>
             </div>
             <?php foreach ($collection as $item): ?>
                 <div class="data item content <?= /* @noEscape */ $item['block_name'];?>"

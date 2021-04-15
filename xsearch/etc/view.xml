@@ -2,7 +2,7 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 -->
@@ -11,10 +11,14 @@
     <media>
         <images module="Magento_Catalog">
             <image id="amasty_xsearch_page_list" type="thumbnail">
-                <width>100</width>
-                <height>100</height>
+                <width>320</width>
+                <height>320</height>
             </image>
             <image id="amasty_xsearch_page_list_porto" type="thumbnail">
+                <width>320</width>
+                <height>320</height>
+            </image>
+            <image id="amasty_xsearch_slider_image" type="image">
                 <width>320</width>
                 <height>320</height>
             </image>

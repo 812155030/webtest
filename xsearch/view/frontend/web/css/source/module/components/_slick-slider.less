@@ -1,0 +1,243 @@
+//
+//  Slick slider extend
+//  _____________________________________
+
+//
+//  Imports
+//  -------------------------------------
+
+@import '../_mixins';
+
+//
+//  Variables
+//  -------------------------------------
+
+@amsearch-slider-arrow: #fff url('data:image/svg+xml;base64, PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0uMTg5IDIuMDA5TDcuMTkgOS4wMS4yMzMgMTUuOTY4bDEuMTA4IDEuMTA5IDguMDQ0LTguMDQ0LTguMTEtOC4xMUwuMTg5IDIuMDA4eiIgZmlsbD0iIzU3NTg1NSIvPjwvc3ZnPg==') center no-repeat;
+@amsearch-slider-arrow__size: 30px;
+@amsearch-slider-dots__size: 12px;
+@amsearch-slider-dots__color__active: #000;
+
+@amsearch-additional-block__offset: 15px;
+
+//
+//  Common
+//  -------------------------------------
+
+& when (@media-common = true) {
+    .search-autocomplete .amsearch-slider-wrap:not(:first-child) {
+        margin-top: 55px;
+    }
+
+    .search-autocomplete .amsearch-slider-block {
+        & {
+            margin-top: 15px;
+        }
+
+        .product-item-link {
+            .am-text-clamp();
+            .am-word-break;
+        }
+
+        &.slick-slider {
+            padding: 0;
+        }
+
+        .slick-slide {
+            vertical-align: inherit;
+        }
+    }
+
+    .amsearch-additional-content {
+        & {
+            display: flex;
+            margin: -@amsearch-additional-block__offset 0;
+            max-width: 100%;
+        }
+
+        .amsearch-leftside-sidebar,
+        .amsearch-content-block {
+            padding: @amsearch-additional-block__offset 0;
+        }
+
+        .amsearch-leftside-sidebar {
+            min-width: 30%;
+        }
+
+        .amsearch-content-block {
+            box-sizing: border-box;
+            max-width: 70%;
+            border-left: 1px solid @amxsearch-border__color;
+        }
+    }
+
+    .search-autocomplete .amsearch-slider-block .slick-dots {
+        & {
+            top: 100%;
+            border: none;
+            background: inherit;
+        }
+
+        > li[role='presentation'] {
+            & {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 2px;
+                padding: 0;
+                width: @amsearch-slider-dots__size;
+                height: @amsearch-slider-dots__size;
+                border: none;
+                text-align: inherit;
+                white-space: inherit;
+            }
+
+            &:hover,
+            &.selected {
+                background: inherit;
+            }
+
+            &.slick-active button {
+                border-color: @amsearch-slider-dots__color__active;
+                background: @amsearch-slider-dots__color__active;
+            }
+        }
+
+        > li[role='presentation'] button {
+            & {
+                padding: 3px;
+                width: auto;
+                height: auto;
+                border: 1px solid @amxsearch-border__color;
+                border-radius: 100%;
+                background: #fff;
+            }
+
+            &:before {
+                content: none;
+            }
+        }
+    }
+
+    .search-autocomplete .amsearch-slider-block .slick-arrow {
+        top: 70px;
+        z-index: 2;
+        width: @amsearch-slider-arrow__size;
+        height: @amsearch-slider-arrow__size;
+        border-radius: 0;
+        background: @amsearch-slider-arrow !important; // Slick slider already has an important directive here. Override
+    }
+
+    .search-autocomplete .amsearch-slider-block .amsearch-item.product-item {
+        & {
+            pointer-events: none;
+        }
+
+        &:hover,
+        &.selected {
+            background-color: transparent;
+        }
+
+        .amsearch-autocomplete-image,
+        .information-container {
+            pointer-events: auto;
+        }
+
+        .amsearch-autocomplete-image {
+            width: 100%;
+        }
+
+        .price-box {
+            margin: 10px 0 5px;
+        }
+
+        .actions-secondary {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+        }
+
+        .wishlist.split.button .action.toggle {
+            display: none;
+        }
+
+        .actions-secondary > .action {
+            flex-grow: inherit;
+            margin-right: 5px;
+            line-height: normal;
+        }
+    }
+}
+
+//
+//  Mobile
+//  --------------------------------------------
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .search-autocomplete .amsearch-slider-wrap:not(:first-child) {
+        margin-top: 50px;
+    }
+
+    .amsearch-additional-content {
+        & {
+            flex-direction: column;
+        }
+
+        .amsearch-content-block {
+            padding: 15px;
+            max-width: 100%;
+            border-top: 1px solid @amxsearch-border__color;
+            border-left: none;
+        }
+    }
+
+    .search-autocomplete .amsearch-slider-block .amsearch-item.product-item {
+        .amsearch-autocomplete-image {
+            display: inline-block;
+            margin-right: 10px;
+            max-width: 110px;
+        }
+
+        .information-container {
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .amsearch-wrapper-inner {
+            display: flex;
+            align-items: center;
+            margin: 10px 0 0;
+        }
+
+        .price-box {
+            margin: 0 20px 0 0;
+        }
+
+        .product-item-actions {
+            display: flex;
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__xs) {
+    .search-autocomplete .amsearch-slider-block .amsearch-item.product-item {
+        & {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .amsearch-autocomplete-image,
+        .information-container {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .amsearch-wrapper-inner {
+            flex-direction: column;
+        }
+
+        .price-box {
+            margin: 5px 0 10px;
+        }
+    }
+}

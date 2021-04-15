@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -67,7 +67,9 @@ class Query extends Template
      */
     public function getAnalyticsData()
     {
-        return $this->jsonEncoder->encode($this->queryInfo->getAnalyticsData(Collection::GROUP_BY_MOUNTH));
+        return $this->jsonEncoder->encode(
+            $this->queryInfo->getAnalyticsData(Collection::GROUP_BY_MONTH_PATTERN)
+        );
     }
 
     /**

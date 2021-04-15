@@ -1,18 +1,25 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
 
+declare(strict_types=1);
+
 namespace Amasty\Xsearch\Block\Search;
 
-use Magento\CatalogSearch\Model\ResourceModel\EngineProvider;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\View\Element\Template;
 use Amasty\Xsearch\Controller\RegistryConstants;
-use \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
+use Amasty\Xsearch\Helper\Data;
+use Amasty\Xsearch\Model\Config;
+use Amasty\Xsearch\Model\Search\SearchAdapterResolver;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Registry;
+use Magento\Framework\Stdlib\StringUtils;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
+use Magento\Search\Model\QueryFactory;
 
 abstract class AbstractSearch extends Template
 {
@@ -30,42 +37,43 @@ abstract class AbstractSearch extends Template
     private $query;
 
     /**
-     * @var \Magento\Framework\Registry
+     * @var Registry
      */
     private $coreRegistry;
 
     /**
-     * @var \Amasty\Xsearch\Helper\Data
+     * @var Data
      */
     protected $xSearchHelper;
 
     /**
-     * @var \Magento\Search\Model\QueryFactory
+     * @var QueryFactory
      */
     protected $queryFactory;
 
     /**
-     * @var \Magento\Framework\Stdlib\StringUtils
+     * @var StringUtils
      */
     protected $stringUtils;
 
     /**
-     * @var \Amasty\Xsearch\Helper\Data
+     * @var Config
      */
-    private $helper;
+    protected $configProvider;
 
     /**
-     * @var \Amasty\Xsearch\Model\ResourceModel\Dummy\CollectionFactory
+     * @var SearchAdapterResolver
      */
-    private $dummyCollectionFactory;
+    private $searchAdapterResolver;
 
     public function __construct(
-        Template\Context $context,
-        \Amasty\Xsearch\Helper\Data $xSearchHelper,
-        \Magento\Framework\Stdlib\StringUtils $string,
-        \Magento\Search\Model\QueryFactory $queryFactory,
-        \Magento\Framework\Registry $coreRegistry,
-        \Amasty\Xsearch\Model\ResourceModel\Dummy\CollectionFactory $dummyCollectionFactory,
+        Context $context,
+        Data $xSearchHelper,
+        StringUtils $string,
+        QueryFactory $queryFactory,
+        Registry $coreRegistry,
+        Config $configProvider,
+        SearchAdapterResolver $searchAdapterResolver,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -73,8 +81,9 @@ abstract class AbstractSearch extends Template
         $this->stringUtils = $string;
         $this->queryFactory = $queryFactory;
         $this->coreRegistry = $coreRegistry;
+        $this->configProvider = $configProvider;
+        $this->searchAdapterResolver = $searchAdapterResolver;
         $this->setData('cache_lifetime', self::DEFAULT_CACHE_LIFETIME);
-        $this->dummyCollectionFactory = $dummyCollectionFactory;
     }
 
     /**
@@ -128,7 +137,7 @@ abstract class AbstractSearch extends Template
     /**
      * @return \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection | array
      */
-    protected function getSearchCollection()
+    public function getSearchCollection()
     {
         if ($this->searchCollection === null) {
             try {
@@ -136,37 +145,9 @@ abstract class AbstractSearch extends Template
             } catch (LocalizedException $exception) {
                 $this->searchCollection = [];
             }
-            if ($this->getData('index_mode')) {
-                if (is_array($this->searchCollection)) {
-                    $this->searchCollection = array_slice(
-                        $this->searchCollection,
-                        $this->getLimit() * ($this->getPageNum() - 1),
-                        $this->getLimit()
-                    );
-                } else {
-                    if ($this->getPageNum() > $this->searchCollection->getLastPageNumber()) {
-                        $this->searchCollection = $this->dummyCollectionFactory->create();
-                    } else {
-                        $this->searchCollection->setPageSize($this->getLimit())
-                            ->setCurPage($this->getPageNum());
-                    }
-                }
-            }
         }
 
         return $this->searchCollection;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPageNum()
-    {
-        if ($this->getData('page_num') === null) {
-            $this->setData('page_num', 1);
-        }
-
-        return $this->getData('page_num');
     }
 
     /**
@@ -174,7 +155,14 @@ abstract class AbstractSearch extends Template
      */
     public function getResults()
     {
-        $result = [];
+        $query = $this->getQuery();
+        $result = $query ? $this->searchAdapterResolver->getResults($this->getBlockType(), $query) : null;
+
+        return $result ?: $this->getCollectionData();
+    }
+
+    private function getCollectionData(): array
+    {
         foreach ($this->getSearchCollection() as $index => $item) {
             $data['name'] = $this->getName($item);
             $data['description'] = $this->getDescription($item);
@@ -183,7 +171,7 @@ abstract class AbstractSearch extends Template
             $result[$index] = $data;
         }
 
-        return $result;
+        return $result ?? [];
     }
 
     /**

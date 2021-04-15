@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -12,10 +12,8 @@ use Magento\Framework\DB\Select;
 
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
-    const GROUP_BY_MOUNTH = 'm';
-
-    const GROUP_BY_DAY = 'd';
-
+    const GROUP_BY_MONTH_PATTERN = '%Y%m';
+    const GROUP_BY_DAY_PATTERN = '%Y%m%d';
     const LIMIT_LAST_DATA = 10;
 
     protected function _construct()
@@ -80,7 +78,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     {
         if ($groupBy) {
             $this->getSelect()
-                ->group('DATE_FORMAT(created_at, "%Y%' . $groupBy . '")')
+                ->group(sprintf('DATE_FORMAT(created_at, "%s")', $groupBy))
                 ->columns('created_at')
                 ->order('created_at DESC');
         }

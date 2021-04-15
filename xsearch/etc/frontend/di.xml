@@ -2,7 +2,7 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 -->
@@ -11,10 +11,6 @@
         <arguments>
             <argument name="catalogLayer" xsi:type="object">Magento\Catalog\Model\Layer\Search</argument>
         </arguments>
-    </type>
-
-    <type name="Magento\CatalogSearch\Block\Result">
-        <plugin name="Amasty_Xsearch::result-count" type="Amasty\Xsearch\Plugin\CatalogSearch\Block\Result" />
     </type>
 
     <type name="Magento\Framework\View\Page\Config">
@@ -46,7 +42,14 @@
     </type>
 
     <type name="Magento\Search\Model\Query">
-        <plugin name="Amasty_Xsearch::save_query" type="Amasty\Xsearch\Plugin\Search\Model\Query" sortOrder="1" />
+        <plugin name="Amasty_Xsearch::KeepQueryText"
+                type="Amasty\Xsearch\Plugin\Search\Model\Query\KeepQueryText" sortOrder="1" />
+        <plugin name="Amasty_Xsearch::SaveRestriction"
+                type="Amasty\Xsearch\Plugin\Search\Model\Query\SaveRestriction"/>
+        <plugin name="Amasty_Xsearch::UpdateUserSearch"
+                type="Amasty\Xsearch\Plugin\Search\Model\Query\UpdateUserSearch"/>
+        <plugin name="Amasty_Xsearch::ClearBrowsingHistoryCache"
+                type="Amasty\Xsearch\Plugin\Search\Model\Query\ClearBrowsingHistoryCache"/>
     </type>
 
     <type name="Magento\Framework\App\RouterList">
@@ -61,12 +64,167 @@
         </arguments>
     </type>
 
-    <type name="Magento\Framework\View\Page\Config\Renderer">
-        <plugin name="Amasty_Xsearch::make-css" type="Amasty\Xsearch\Plugin\View\Page\Config\Renderer" />
+    <type name="Amasty\ElasticSearch\Model\Search\GetRequestQuery\SortingProvider">
+        <plugin name="Amasty_Xsearch::apply-relevance-rules-sort"
+                type="Amasty\Xsearch\Plugin\ElasticSearch\Model\Search\GetRequestQuery\SortingProvider\ApplyRelevanceRulesSortingInPopup"
+                sortOrder="5"
+        />
+        <plugin name="Amasty_Xsearch::show-out-of-stock-last"
+                type="Amasty\Xsearch\Plugin\ElasticSearch\Model\Search\GetRequestQuery\SortingProviderPlugin"
+                sortOrder="10"
+        />
     </type>
 
-    <type name="Amasty\ElasticSearch\Model\Search\GetRequestQuery\SortingProvider">
+    <type name="Magento\Elasticsearch\SearchAdapter\Query\Builder\Sort">
         <plugin name="Amasty_Xsearch::show-out-of-stock-last" type="Amasty\Xsearch\Plugin\ElasticSearch\Model\Search\GetRequestQuery\SortingProviderPlugin" />
     </type>
 
+    <type name="Amasty\Xsearch\Block\Search\Product">
+        <arguments>
+            <argument name="urlBuilder" xsi:type="object" shared="true">Magento\Framework\Url</argument>
+        </arguments>
+    </type>
+
+    <type name="Amasty\Xsearch\Model\Analytics\AnalyticsDataCollectionProcessor">
+        <arguments>
+            <argument name="dataCollectors" xsi:type="array">
+                <item name="search_conversion" xsi:type="object">
+                    Amasty\Xsearch\Model\Analytics\DataCollectors\SearchConversionDataCollector
+                </item>
+                <item name="product" xsi:type="object">
+                    Amasty\Xsearch\Model\Analytics\DataCollectors\ProductViewDataCollector
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Amasty\Xsearch\ViewModel\Slider\RecentlyViewed" type="Amasty\Xsearch\ViewModel\Slider">
+        <arguments>
+            <argument name="isCanRender" xsi:type="object">
+                Amasty\Xsearch\Model\Slider\RecentlyViewed\IsCanRender
+            </argument>
+            <argument name="sliderProductsProvider" xsi:type="object">
+                Amasty\Xsearch\Model\Slider\RecentlyViewed\ProductsProvider
+            </argument>
+            <argument name="blockType" xsi:type="string">recently_viewed</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="amXsearchPreloadSidebar"
+                 type="Amasty\Xsearch\ViewModel\ConfigurableBlockRenderer" shared="false">
+        <arguments>
+            <argument name="renderingConfig" xsi:type="array">
+                <item name="recent_searches" xsi:type="array">
+                    <item name="block_name" xsi:type="const">Amasty\Xsearch\Block\Search\Recent::CATEGORY_BLOCK_RECENT
+                    </item>
+                    <item name="can_render_check_configs" xsi:type="array">
+                        <item name="0" xsi:type="const">
+                            Amasty\Xsearch\Model\Config::XML_PATH_TEMPLATE_RECENT_SEARCHES_ENABLED
+                        </item>
+                        <item name="1" xsi:type="const">
+                            Amasty\Xsearch\Model\Config::XML_PATH_RECENT_SEARCHES_FIRST_CLICK
+                        </item>
+                    </item>
+                    <item name="class" xsi:type="string">Amasty\Xsearch\Block\Search\Recent</item>
+                </item>
+                <item name="popular_searches" xsi:type="array">
+                    <item name="block_name" xsi:type="const">
+                        Amasty\Xsearch\Block\Search\Popular::CATEGORY_BLOCK_POPULAR
+                    </item>
+                    <item name="can_render_check_configs" xsi:type="array">
+                        <item name="0" xsi:type="const">
+                            Amasty\Xsearch\Model\Config::XML_PATH_TEMPLATE_POPULAR_SEARCHES_ENABLED
+                        </item>
+                        <item name="1" xsi:type="const">
+                            Amasty\Xsearch\Model\Config::XML_PATH_POPULAR_SEARCHES_FIRST_CLICK
+                        </item>
+                    </item>
+                    <item name="class" xsi:type="string">Amasty\Xsearch\Block\Search\Popular</item>
+                </item>
+                <item name="browsing_history" xsi:type="array">
+                    <item name="block_name" xsi:type="const">
+                        Amasty\Xsearch\Block\Search\BrowsingHistory::BROWSING_HISTORY_BLOCK_TYPE
+                    </item>
+                    <item name="can_render_check_configs" xsi:type="array">
+                        <item name="0" xsi:type="const">
+                            Amasty\Xsearch\Model\Config::XML_PATH_BROWSING_HISTORY_ENABLED
+                        </item>
+                        <item name="1" xsi:type="const">
+                            Amasty\Xsearch\Model\Config::XML_PATH_BROWSING_HISTORY_FIRST_CLICK
+                        </item>
+                    </item>
+                    <item name="class" xsi:type="string">Amasty\Xsearch\Block\Search\BrowsingHistory</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Amasty\Xsearch\ViewModel\Preload\Sidebar">
+        <arguments>
+            <argument name="blocksProvider" xsi:type="object">amXsearchPreloadSidebar</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\CatalogSearch\Block\Result">
+        <plugin name="Amasty_Xsearch::result-count" type="Amasty\Xsearch\Plugin\CatalogSearch\Block\Result" />
+        <plugin name="Amasty_Xsearch::replace-empty-result-block" type="Amasty\Xsearch\Plugin\CatalogSearch\Block\Result\ReplaceEmptyResultBlock" />
+    </type>
+
+    <virtualType name="Amasty\Xsearch\ViewModel\Slider\Bestsellers" type="Amasty\Xsearch\ViewModel\Slider">
+        <arguments>
+            <argument name="isCanRender" xsi:type="object">
+                Amasty\Xsearch\Model\Slider\Bestsellers\IsCanRender
+            </argument>
+            <argument name="sliderProductsProvider" xsi:type="object">
+                Amasty\Xsearch\Model\Slider\Bestsellers\ProductsProvider
+            </argument>
+            <argument name="blockType" xsi:type="string">bestsellers</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Amasty\Xsearch\Block\Search\Bestsellers"
+                 type="Magento\Framework\View\Element\Template">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="view_model" xsi:type="object">Amasty\Xsearch\ViewModel\Slider\Bestsellers</item>
+                <item name="template" xsi:type="string">Amasty_Xsearch::preload/slider.phtml</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Amasty\Xsearch\Block\Search\RecentlyViewed"
+                 type="Magento\Framework\View\Element\Template">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="view_model" xsi:type="object">Amasty\Xsearch\ViewModel\Slider\RecentlyViewed</item>
+                <item name="template" xsi:type="string">Amasty_Xsearch::preload/slider.phtml</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Amasty\Xsearch\ViewModel\Preload\MainPanel"
+                 type="Amasty\Xsearch\ViewModel\ConfigurableBlockRenderer" shared="false">
+        <arguments>
+            <argument name="renderingConfig" xsi:type="array">
+                <item name="bestsellers" xsi:type="array">
+                    <item name="block_name" xsi:type="string">bestsellers</item>
+                    <item name="can_render_check_configs" xsi:type="array">
+                        <item name="0" xsi:type="const">
+                            Amasty\Xsearch\Model\Config::XML_PATH_BESTSELLERS_ENABLED
+                        </item>
+                    </item>
+                    <item name="class" xsi:type="string">Amasty\Xsearch\Block\Search\Bestsellers</item>
+                </item>
+                <item name="recently_viewed" xsi:type="array">
+                    <item name="block_name" xsi:type="string">recently_viewed</item>
+                    <item name="can_render_check_configs" xsi:type="array">
+                        <item name="0" xsi:type="const">
+                            Amasty\Xsearch\Model\Config::XML_PATH_TEMPLATE_RECENT_VIEWED_ENABLED
+                        </item>
+                    </item>
+                    <item name="class" xsi:type="string">Amasty\Xsearch\Block\Search\RecentlyViewed</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
 </config>

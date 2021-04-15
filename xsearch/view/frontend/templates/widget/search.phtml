@@ -1,0 +1,56 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+?>
+<?php
+/** @var $block Amasty\Xsearch\Block\Widget\Search */
+?>
+<div class="block block-search block-xsearch">
+    <div class="block block-title"><strong><?= $block->escapeHtml(__('Search')) ?></strong></div>
+    <div class="block block-content">
+        <form class="form minisearch xsearch-mini-form-widget"
+              action="<?= $block->escapeUrl($block->getHelper()->getResultUrl()) ?>" method="get">
+            <div class="field search">
+                <label class="label" for="search" data-role="minisearch-label">
+                    <span><?= $block->escapeHtml(__('Search')) ?></span>
+                </label>
+                <div class="control">
+                    <input
+                           data-mage-init='{"quickSearch":{
+                                "formSelector":".xsearch-mini-form-widget",
+                                "url":"<?= $block->escapeUrl($block->getHelper()->getSuggestUrl())?>",
+                                "destinationSelector":".xsearch-autocomplete-widget",
+                                "minSearchLength":"<?= $block->escapeHtml($block->getHelper()->getMinQueryLength()) ?>"}
+                           }'
+                           type="text"
+                           name="<?= $block->escapeHtmlAttr($block->getHelper()->getQueryParamName()) ?>"
+                           value="<?= /* @noEscape */ $block->getHelper()->getEscapedQueryText() ?>"
+                           placeholder="<?= $block->escapeHtmlAttr(__('Search entire store here...')) ?>"
+                           class="input-text"
+                           maxlength="<?= $block->escapeHtmlAttr($block->getHelper()->getMaxQueryLength()) ?>"
+                           role="combobox"
+                           aria-haspopup="false"
+                           aria-autocomplete="both"
+                           autocomplete="off"
+                           aria-expanded="false"/>
+                    <div class="search-autocomplete xsearch-autocomplete-widget"></div>
+                    <div class="amasty-xsearch-preload" data-amsearch-js="preload">
+                    </div>
+                    <?= $block->getChildHtml() ?>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit"
+                        title="<?= $block->escapeHtml(__('Search')) ?>"
+                        class="action search"
+                        aria-label="Search"
+                >
+                    <span><?= $block->escapeHtml(__('Search')) ?></span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

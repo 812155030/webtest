@@ -1,13 +1,14 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
 
 namespace Amasty\Xsearch\Controller\Autocomplete;
 
+use Amasty\Xsearch\Block\MultipleWishlist\Behavior;
 use Magento\Catalog\Model\Layer\Resolver;
 use Magento\Framework\App\Action\Context;
 use Magento\Store\Model\StoreManagerInterface;
@@ -73,6 +74,16 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     private $scopeConfig;
 
+    /**
+     * @var \Magento\Framework\Data\Form\FormKey\Validator
+     */
+    private $formKeyValidator;
+
+    /**
+     * @var Behavior
+     */
+    private $behavior;
+
     public function __construct(
         Context $context,
         StoreManagerInterface $storeManager,
@@ -85,7 +96,9 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Framework\Url\DecoderInterface $urlDecoder,
         \Magento\Framework\Url\Helper\Data $urlHelper,
         \Magento\CatalogSearch\Helper\Data $searchHelper,
-        ScopeConfigInterface $scopeConfig
+        ScopeConfigInterface $scopeConfig,
+        \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
+        Behavior $behavior
     ) {
         parent::__construct($context);
         $this->helper = $helper;
@@ -99,11 +112,13 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->layoutFactory = $layoutFactory;
         $this->searchHelper = $searchHelper;
         $this->scopeConfig = $scopeConfig;
+        $this->formKeyValidator = $formKeyValidator;
+        $this->behavior = $behavior;
     }
 
     public function execute()
     {
-        if (!$this->getRequest()->isAjax()) {
+        if (!$this->getRequest()->isAjax() || !$this->formKeyValidator->validate($this->getRequest())) {
             $this->getResponse()->setStatusHeader(403, '1.1', 'Forbidden');
             return null;
         }
@@ -143,6 +158,8 @@ class Index extends \Magento\Framework\App\Action\Action
                 $blocks[$key]['html'] = str_replace($this->urlHelper->getEncodedUrl(), $beforeUrl, $data['html']);
             }
         }
+
+        $blocks['behavior'] = $this->behavior->toHtml();
 
         return $resultJson->setData($blocks);
     }

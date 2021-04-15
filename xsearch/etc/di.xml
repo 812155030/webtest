@@ -2,7 +2,7 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 -->
@@ -10,6 +10,27 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Catalog\Model\Category">
         <plugin name="Amasty_Xsearch::Category" type="Amasty\Xsearch\Plugin\Category"/>
+    </type>
+
+    <type name="Amasty\Xsearch\Model\ResourceModel\UserSearch\Grid\Activity\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="const">Amasty\Xsearch\Model\ResourceModel\UserSearch::MAIN_TABLE</argument>
+        </arguments>
+    </type>
+
+    <type name="Amasty\Xsearch\Model\ResourceModel\UserSearch\Grid\MostWanted\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="const">Amasty\Xsearch\Model\ResourceModel\UserSearch::MAIN_TABLE</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="amsearch_activity_listing_data_source" xsi:type="string">Amasty\Xsearch\Model\ResourceModel\UserSearch\Grid\Activity\Collection</item>
+                <item name="amsearch_wanted_listing_data_source" xsi:type="string">Amasty\Xsearch\Model\ResourceModel\UserSearch\Grid\MostWanted\Collection</item>
+            </argument>
+        </arguments>
     </type>
 
     <type name="Magento\Framework\Search\Adapter\Mysql\Aggregation\DataProviderContainer">
@@ -53,6 +74,7 @@
             </argument>
         </arguments>
     </type>
+
     <type name="Amasty\Xsearch\Block\Search\Recent">
         <arguments>
             <argument name="data" xsi:type="array">
@@ -61,14 +83,22 @@
         </arguments>
     </type>
 
-    <type name="Amasty\ElasticSearch\Model\Indexer\ExternalIndexerProvider">
+    <type name="Amasty\Xsearch\Block\Search\BrowsingHistory">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="collectionFactory" xsi:type="object">Magento\Search\Model\ResourceModel\Query\CollectionFactory</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Amasty\Xsearch\Model\Indexer\ExternalIndexerProvider">
         <arguments>
             <argument name="sources" xsi:type="array">
                 <item name="amasty_xsearch_fulltext" xsi:type="object">Amasty\Xsearch\Model\Indexer\ElasticExternalProvider</item>
             </argument>
         </arguments>
     </type>
-    <type name="Amasty\ElasticSearch\Plugin\Xsearch\Block\Search">
+    <type name="Amasty\Xsearch\Model\Search\SearchAdapterResolver">
         <arguments>
             <argument name="indexedTypes" xsi:type="array">
                 <item name="landing_page" xsi:type="const">Amasty\Xsearch\Block\Search\Landing::CATEGORY_BLOCK_LANDING</item>
@@ -81,15 +111,28 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Amasty\ElasticSearch\Model\Indexer\Structure\EntityBuilder">
+        <arguments>
+            <argument name="entityBuilders" xsi:type="array">
+                <item name="catalogsearch_fulltext" xsi:type="array">
+                    <item name="stock_status" xsi:type="object">Amasty\Xsearch\Model\Indexer\ElasticSearchStockStatusStructureMapper</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
     <type name="Amasty\ElasticSearch\Model\Indexer\Data\DataMapperResolver">
         <arguments>
             <argument name="dataMappers" xsi:type="array">
                 <item name="catalogsearch_fulltext" xsi:type="array">
                     <item name="advanced_search" xsi:type="object">Amasty\Xsearch\Model\Indexer\ElasticSearchProductDataMapper</item>
+                    <item name="stock_status" xsi:type="object">Amasty\Xsearch\Model\Indexer\ElasticSearchStockStatusDataMapper</item>
                 </item>
             </argument>
         </arguments>
     </type>
+
     <type name="Magento\Catalog\Model\Product\Url">
         <arguments>
             <argument name="urlFactory" xsi:type="object">\Amasty\Xsearch\Model\Indexer\UrlFactory</argument>
@@ -102,6 +145,134 @@
     <type name="Amasty\Xsearch\Model\Search\Category\UrlDataProvider">
         <arguments>
             <argument name="urlBuilder" xsi:type="object">Magento\Framework\Url\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Amasty\Xsearch\Block\Search\Product">
+        <arguments>
+            <argument name="urlBuilder" xsi:type="object" shared="false">Magento\Framework\Url</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\CatalogSearch\Model\Indexer\Fulltext\Action\DataProvider">
+        <plugin name="Amasty_Xsearch::FulltextDataProviderFix"
+                type="Amasty\Xsearch\Plugin\CatalogSearch\Model\Indexer\Fulltext\Action\DataProviderPlugin"/>
+    </type>
+
+    <virtualType name="searchStockResolver" type="Amasty\Xsearch\Model\Di\Wrapper">
+        <arguments>
+            <argument name="name" xsi:type="string">Magento\InventorySalesApi\Api\StockResolverInterface</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="searchDefaultStockProvider" type="Amasty\Xsearch\Model\Di\Wrapper">
+        <arguments>
+            <argument name="name" xsi:type="string">Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="searchStockIndexTableNameResolver" type="Amasty\Xsearch\Model\Di\Wrapper">
+        <arguments>
+            <argument name="name" xsi:type="string">Magento\InventoryIndexer\Model\StockIndexTableNameResolverInterface</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Amasty\Xsearch\Model\CatalogSearch\Indexer\Fulltext\DataProvider">
+        <arguments>
+            <argument name="stockResolver" xsi:type="object">searchStockResolver</argument>
+            <argument name="defaultStockProvider" xsi:type="object">searchDefaultStockProvider</argument>
+            <argument name="stockIndexTableNameResolver" xsi:type="object">searchStockIndexTableNameResolver</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Elasticsearch\Elasticsearch5\Model\Adapter\FieldMapper\ProductFieldMapperProxy">
+        <plugin name="Amasty_Xsearch::MagentoElasticStockStatusMapper"
+                type="Amasty\Xsearch\Plugin\Elasticsearch5\Model\Adapter\FieldMapper\ProductFieldMapperProxyPlugin"/>
+    </type>
+    <type name="Magento\Elasticsearch\Model\Adapter\BatchDataMapper\ProductDataMapper">
+        <plugin name="Amasty_Xsearch::MagentoElasticStockStatusMapper"
+                type="Amasty\Xsearch\Plugin\Elasticsearch5\Model\Adapter\BatchDataMapper\ProductDataMapperPlugin"/>
+    </type>
+
+    <type name="Amasty\Xsearch\Block\MultipleWishlist\Behavior">
+        <arguments>
+            <argument name="wrapper" xsi:type="object">multipleWishlistBehavior</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="multipleWishlistBehavior" type="Amasty\Xsearch\Model\Di\Wrapper">
+        <arguments>
+            <argument name="name" xsi:type="string">Magento\MultipleWishlist\Block\Behaviour</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="amastySortingBestsellersDiWrapper" type="Amasty\Xsearch\Model\Di\Wrapper">
+        <arguments>
+            <argument name="name" xsi:type="string">Amasty\Sorting\Model\ResourceModel\Method\Bestselling</argument>
+            <argument name="isShared" xsi:type="boolean">true</argument>
+            <argument name="isProxy" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Amasty\Xsearch\Model\Slider\Bestsellers\ProductsProvider">
+        <arguments>
+            <argument name="sortingBestsellersMethod" xsi:type="object">amastySortingBestsellersDiWrapper</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PageBuilder\Model\WidgetInitializerConfig">
+        <arguments>
+            <argument name="config" xsi:type="array">
+                <item name="products" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Amasty_Xsearch/js/content-type/products/appearance/carousel/widget-override</item>
+                        <item name="appearance" xsi:type="string">carousel</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="\Amasty\Xsearch\Model\Client\Factory">
+        <arguments>
+            <argument name="clientPool" xsi:type="array">
+                <item name="elasticsearch5" xsi:type="string">Magento\Elasticsearch\Elasticsearch5\Model\Client\Elasticsearch</item>
+                <item name="elasticsearch6" xsi:type="string">Magento\Elasticsearch6\Model\Client\Elasticsearch</item>
+                <item name="elasticsearch7" xsi:type="string">Magento\Elasticsearch7\Model\Client\Elasticsearch</item>
+                <item name="amasty_elastic" xsi:type="string">Amasty\ElasticSearch\Model\Client\Elasticsearch</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="amastyCustomerGroupManagementDiWrapper" type="Amasty\Xsearch\Model\Di\Wrapper">
+        <arguments>
+            <argument name="name" xsi:type="string">Magento\SharedCatalog\Model\CustomerGroupManagement</argument>
+            <argument name="isShared" xsi:type="boolean">true</argument>
+            <argument name="isProxy" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="amastySharedCatalogConfigDiWrapper" type="Amasty\Xsearch\Model\Di\Wrapper">
+        <arguments>
+            <argument name="name" xsi:type="string">Magento\SharedCatalog\Model\Config</argument>
+            <argument name="isShared" xsi:type="boolean">true</argument>
+            <argument name="isProxy" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="amastyCompanyContextDiWrapper" type="Amasty\Xsearch\Model\Di\Wrapper">
+        <arguments>
+            <argument name="name" xsi:type="string">Magento\Company\Model\CompanyContext</argument>
+            <argument name="isShared" xsi:type="boolean">true</argument>
+            <argument name="isProxy" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Amasty\Xsearch\Model\SharedCatalog\Resolver">
+        <arguments>
+            <argument name="customerGroupManagement" xsi:type="object">amastyCustomerGroupManagementDiWrapper</argument>
+            <argument name="sharedConfig" xsi:type="object">amastySharedCatalogConfigDiWrapper</argument>
+            <argument name="companyContext" xsi:type="object">amastyCompanyContextDiWrapper</argument>
         </arguments>
     </type>
 </config>

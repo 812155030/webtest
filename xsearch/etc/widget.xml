@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+    <widget class="Amasty\Xsearch\Block\Widget\Search" id="amasty_xsearch">
+        <label>Amasty Search Field</label>
+        <description>Amasty Search Autocomplete Field</description>
+        <containers>
+            <container name="page.top">
+                <template name="default" value="default" />
+            </container>
+            <container name="top.container">
+                <template name="default" value="default" />
+            </container>
+            <container name="columns.top">
+                <template name="default" value="default" />
+            </container>
+            <container name="page.bottom">
+                <template name="default" value="default" />
+            </container>
+            <container name="page.bottom.container">
+                <template name="default" value="default" />
+            </container>
+            <container name="cms_footer_links_container">
+                <template name="default" value="default" />
+            </container>
+            <container name="compare-link-wrapper">
+                <template name="default" value="default" />
+            </container>
+            <container name="content">
+                <template name="default" value="default" />
+            </container>
+            <container name="content.aside">
+                <template name="default" value="default" />
+            </container>
+            <container name="content.bottom">
+                <template name="default" value="default" />
+            </container>
+            <container name="main">
+                <template name="default" value="default" />
+            </container>
+            <container name="content.top">
+                <template name="default" value="default" />
+            </container>
+            <container name="before.body.end">
+                <template name="default" value="default" />
+            </container>
+            <container name="footer">
+                <template name="default" value="default" />
+            </container>
+            <container name="footer-container">
+                <template name="default" value="default" />
+            </container>
+            <container name="header-wrapper">
+                <template name="default" value="default" />
+            </container>
+            <container name="header.container">
+                <template name="default" value="default" />
+            </container>
+            <container name="header.panel">
+                <template name="default" value="default" />
+            </container>
+            <container name="after.body.start">
+                <template name="default" value="default" />
+            </container>
+            <container name="sidebar.additional">
+                <template name="default" value="default" />
+            </container>
+            <container name="sidebar.main">
+                <template name="default" value="default" />
+            </container>
+        </containers>
+    </widget>
+</widgets>

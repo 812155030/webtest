@@ -1,10 +1,12 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
+
+declare(strict_types=1);
 
 namespace Amasty\Xsearch\Model\Indexer;
 
@@ -59,11 +61,9 @@ class ElasticExternalProvider
 
     /**
      * @param int $storeId
-     * @param int $pageNum
-     * @param int $batchSize
      * @return array
      */
-    public function get($storeId, $pageNum, $batchSize)
+    public function get(int $storeId): array
     {
         $this->appEmulation->startEnvironmentEmulation($storeId, \Magento\Framework\App\Area::AREA_FRONTEND, true);
 
@@ -72,8 +72,7 @@ class ElasticExternalProvider
             $block = $source->create();
             /** @var AbstractSearch $block */
             if ($block instanceof AbstractSearch && $this->helper->isIndexEnable($block)) {
-                $block->setLimit($batchSize);
-                $block->setPageNum($pageNum);
+                $block->setLimit(0);
                 $block->setIndexMode(true);
                 $result = $this->setDocument($block, $result);
             }

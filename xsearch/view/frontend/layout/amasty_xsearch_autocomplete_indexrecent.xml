@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd" layout="blank">
+    <update handle="formkey"/>
+    <body>
+        <container name="root">
+            <block name="preload" template="Amasty_Xsearch::preload/preload.phtml">
+                <block name="sidebar" template="Amasty_Xsearch::preload/sidebar.phtml">
+                    <arguments>
+                        <argument name="view_model" xsi:type="object">
+                            Amasty\Xsearch\ViewModel\Preload\Sidebar
+                        </argument>
+                    </arguments>
+                </block>
+
+                <block name="main_panel" template="Amasty_Xsearch::preload/main_panel.phtml">
+                    <arguments>
+                        <argument name="view_model" xsi:type="object">
+                            Amasty\Xsearch\ViewModel\Preload\MainPanel
+                        </argument>
+                    </arguments>
+                </block>
+            </block>
+        </container>
+    </body>
+</page>

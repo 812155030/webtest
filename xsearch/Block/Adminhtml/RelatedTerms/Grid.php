@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -14,9 +14,6 @@ use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Framework\App\ObjectManager;
 
-/**
- * Class Grid
- */
 class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
 {
     /**
@@ -100,9 +97,10 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
         $this->setCollection($collection);
 
         $tableName = $this->getCollection()->getResource()->getTable('amasty_xsearch_related_term');
+        $termId = (int)$this->getTerm()->getId();
         $this->getCollection()->getSelect()->joinLeft(
             ['related_terms' => $tableName],
-            'related_terms.related_term_id = main_table.query_id AND related_terms.term_id = "' .  $this->getTerm()->getId() . '"',
+            "related_terms.related_term_id = main_table.query_id AND related_terms.term_id = {$termId}",
             ['position' => 'related_terms.position']
         )->group('main_table.query_id');
 
@@ -171,7 +169,7 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
     {
         $terms = $this->getRequest()->getPost('selected_terms');
         if ($terms === null) {
-            $terms = $this->getTerm()->getRelatedTerms();
+            $terms = (array)$this->getTerm()->getRelatedTerms();
             return array_keys($terms);
         }
         return $terms;

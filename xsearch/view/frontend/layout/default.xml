@@ -2,17 +2,26 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Amasty_Base/vendor/slick/amslick.min.css"/>
+    </head>
     <body>
         <referenceBlock name="head.additional">
             <block class="Amasty\Xsearch\Block\Head" name="amasty.xsearch.head"  template="Amasty_Xsearch::head.phtml" after="-"/>
         </referenceBlock>
         <referenceBlock name="top.search">
-            <block class="Amasty\Xsearch\Block\Jsinit" name="amasty.xsearch.autocomplete"  template="Amasty_Xsearch::jsinit.phtml" />
+            <block name="amasty.xsearch.autocomplete"  template="Amasty_Xsearch::jsinit.phtml" >
+                <arguments>
+                    <argument name="view_model" xsi:type="object">
+                        Amasty\Xsearch\ViewModel\FormMiniData
+                    </argument>
+                </arguments>
+            </block>
         </referenceBlock>
     </body>
 </page>

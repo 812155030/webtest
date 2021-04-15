@@ -2,7 +2,7 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 -->
@@ -20,6 +20,7 @@
                     <argument name="block" xsi:type="string">amsearch-category-tab</argument>
                     <argument name="class" xsi:type="string">Amasty\Xsearch\Block\Search\Category</argument>
                     <argument name="template" xsi:type="string">Amasty_Xsearch::tab/result.phtml</argument>
+                    <argument name="type" xsi:type="string">category</argument>
                 </action>
 
                 <action method="addTab"
@@ -28,6 +29,7 @@
                     <argument name="block" xsi:type="string">amsearch-cms-pages-tab</argument>
                     <argument name="class" xsi:type="string">Amasty\Xsearch\Block\Search\Page</argument>
                     <argument name="template" xsi:type="string">Amasty_Xsearch::tab/result.phtml</argument>
+                    <argument name="type" xsi:type="string">page</argument>
                 </action>
 
                 <action method="addTab"
@@ -36,6 +38,7 @@
                     <argument name="block" xsi:type="string">amsearch-brands-tab</argument>
                     <argument name="class" xsi:type="string">Amasty\Xsearch\Block\Search\Brand</argument>
                     <argument name="template" xsi:type="string">Amasty_Xsearch::tab/result.phtml</argument>
+                    <argument name="type" xsi:type="string">brand</argument>
                 </action>
 
                 <action method="addTab"
@@ -44,6 +47,7 @@
                     <argument name="block" xsi:type="string">amsearch-landing-pages-tab</argument>
                     <argument name="class" xsi:type="string">Amasty\Xsearch\Block\Search\Landing</argument>
                     <argument name="template" xsi:type="string">Amasty_Xsearch::tab/result.phtml</argument>
+                    <argument name="type" xsi:type="string">landing_page</argument>
                 </action>
 
                 <action method="addTab"
@@ -52,6 +56,7 @@
                     <argument name="block" xsi:type="string">amsearch-blog-tab</argument>
                     <argument name="class" xsi:type="string">Amasty\Xsearch\Block\Search\Blog</argument>
                     <argument name="template" xsi:type="string">Amasty_Xsearch::tab/result.phtml</argument>
+                    <argument name="type" xsi:type="string">blog</argument>
                 </action>
 
                 <action method="addTab"
@@ -60,6 +65,7 @@
                     <argument name="block" xsi:type="string">amsearch-faq-questions-tab</argument>
                     <argument name="class" xsi:type="string">Amasty\Xsearch\Block\Search\Faq</argument>
                     <argument name="template" xsi:type="string">Amasty_Xsearch::tab/result.phtml</argument>
+                    <argument name="type" xsi:type="string">faq</argument>
                 </action>
             </block>
         </referenceContainer>

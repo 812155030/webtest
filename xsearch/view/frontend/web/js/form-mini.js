@@ -1,8 +1,13 @@
 define([
     'jquery',
-    'jquery/ui',
-    'quickSearch-original'
-], function ($) {
+    'underscore',
+    'uiRegistry',
+    'quickSearch-original',
+    'mage/cookies',
+    'pageCache',
+    'Amasty_Base/vendor/slick/slick.min',
+    'catalogAddToCart'
+], function ($, _, uiRegistry) {
     'use strict';
 
     $.widget('mage.amXsearchFormMini', $.mage.quickSearch, {
@@ -11,9 +16,11 @@ define([
         timer: null,
         delay: 500,
         minSizePopup: 700,
+        minLeftSidePopup: 250,
+        slidersBlockSize: 450,
         sizePopupBreakpoint: 550,
         mobileView: 768,
-        windowWidth: $(window).width(),
+        documentWidth: $(document).width(),
         proportionSide: 0.33,
         options: {
             url: null,
@@ -22,69 +29,151 @@ define([
             minChars: 5
         },
         selectors: {
-            loader : '[data-amsearch-js="loader"]'
+            loader: '[data-amsearch-js="loader"]',
+            inputWrapper: '[data-amsearch-js="search-wrapper-input"]',
+            productItem: '[data-amsearch-js="product-item"]',
+            splitWishlistButton: '.split.wishlist [data-toggle="dropdown"]',
+            postNewWishlist: '[data-post-new-wishlist]',
+            pageWrapper: '.page-wrapper',
+            wishlistTemplates: {
+                popup: '#popup-tmpl',
+                splitButton: '#split-btn-tmpl',
+                form: '#form-tmpl-multiple'
+            },
+            searchAutocomplete: '.search-autocomplete',
+            itemContainer: '.amsearch-item-container',
+            form: '.form.minisearch',
+            preloadSection: '[data-amsearch-js="preload"]',
+            productResults: '[data-amsearch-js="products"]',
+            leftSide: '[data-amsearch-js="left-side"]',
+            rightsideContent: '[data-amsearch-js="rightside-content"]',
+            leftsideSidebar: '[data-amsearch-js="leftside-sidebar"]',
+            resultsBlockSlider: '[data-amsearch-js="results"] [data-amsearch-js="slider-block"]',
+            addToCartForm: '[data-amsearch-js="add-to-cart-form"]'
+        },
+        classes: {
+            active: 'active',
+            searchContainer: 'amsearch-form-container',
+            searchContainerResult: '-result',
+            searchContainerHistory: '-history',
+            columns: '-columns',
+            positions: {
+                top: '-top-position',
+                right: '-right-position',
+                bottom: '-bottom-position',
+                left: '-left-position'
+            }
         },
 
         _create: function () {
+            var self = this,
+                timer;
+
+            self.currentView = self.documentWidth >= self.mobileView ? 'desktop' : 'mobile';
+
             if (window.xsearch_options == undefined) {
-                this.updateOptions();
+                self.updateOptions();
             }
-            
-            this.options = $.extend(true, this.options, window.xsearch_options);
-            this.responseList = {
+
+            self.options = $.extend(true, self.options, window.xsearch_options);
+            self.responseList = {
                 indexList: null,
                 selected: null
             };
-            this.autoComplete = $(this.options.destinationSelector);
-            this.searchForm = this.element.parents(this.options.formSelector);
-            this.submitBtn = this.searchForm.find(this.options.submitBtn)[0];
-            this.searchLabel = $(this.options.searchLabel);
-            this.redirectUrl = null;
+            self.searchForm = self.element.parents(self.options.formSelector);
+            self.autoComplete = this.searchForm.find(self.options.destinationSelector);
+            self.submitBtn = self.searchForm.find(self.options.submitBtn)[0];
+            self.searchLabel = this.searchForm.find(self.options.searchLabel);
+            self.redirectUrl = null;
 
-            this.createLoader();
-            this.createCloseIcon();
-            this.createLoupeIcon();
-            this.createSearchWrapper();
-            this.defineHideOrClear();
+            self.createCloseIcon();
+            self.createLoupeIcon();
+            self.createSearchWrapper();
+            self.defineHideOrClear();
+            self.createLoader();
 
-            _.bindAll(this, '_onKeyDown', '_onPropertyChange', '_onSubmit', 'onClick');
-            this.submitBtn.disabled = true;
-            this.element.attr('autocomplete', this.options.autocomplete);
+            window.addEventListener('resize', function () {
+                _.throttle(self.checkCurrentView(), self.delay);
+            }, false);
 
-            var timer;
-            this.element.on('blur', $.proxy(function () {
+            _.bindAll(self, '_onKeyDown', '_onPropertyChange', '_onSubmit', 'onClick');
+            self.submitBtn.disabled = true;
+            self.element.attr('autocomplete', this.options.autocomplete);
+
+            self.element.on('blur', $.proxy(function () {
                 timer = setTimeout($.proxy(function () {
                     this._updateAriaHasPopup(false);
-                }, this), 250);
-            }, this));
+                }, self), 250);
+            }, self));
 
-            this.element.trigger('blur');
-            this.element.on('focus', $.proxy(function () {
+            self.element.trigger('blur');
+            self.element.on('focus', $.proxy(function () {
                 if (timer != null) {
                     clearTimeout(timer);
                 }
 
-                this.searchLabel.addClass('active');
-            }, this));
+                self.searchLabel.addClass('active');
+            }, self));
 
-            this.element.on('keydown', this._onKeyDown);
+            self.element.one('focus', self.setInputPosition());
+
+            self.element.on('keydown', self._onKeyDown);
             var ua = window.navigator.userAgent,
                 msie = ua.indexOf("MSIE ");
 
             if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
-                $(this.element).keyup(this._onPropertyChange);
+                $(self.element).keyup(self._onPropertyChange);
             } else {
-                this.element.on('input propertychange', this._onPropertyChange);
+                self.element.on('input propertychange', self._onPropertyChange);
             }
 
-            this.element.on('click', this.onClick);
-            this.searchForm.on('submit', $.proxy(function (e) {
-                this._onSubmit(e);
-                this._updateAriaHasPopup(false);
-            }, this));
+            self.element.on('click', this.onClick);
+            self.searchForm.on('submit', $.proxy(function (e) {
+                self._onSubmit(e);
+                self._updateAriaHasPopup(false);
+            }, self));
 
-            this.updatePreloadSection();
-            this.fixInputPosition();
+            self.updatePreloadSection();
+
+            self.searchForm.find(this.selectors.searchAutocomplete).attr('tabindex', -1);
+        },
+
+        /**
+         * This function is called after the block was inserted
+         *
+         * @param {jQuery} insertedBlock
+         */
+        popupDataInsertAfter: function(insertedBlock) {
+            insertedBlock.formKey();
+
+            switch (true) {
+                case $.fn.lazyload instanceof Function:
+                    insertedBlock.find('img.lazy, img.lazyload').lazyload({
+                        effect: 'fadeIn'
+                    });
+                    break;
+                case $.fn.Lazy instanceof Function:
+                    insertedBlock.find('img.lazy').Lazy({
+                        effect: 'fadeIn'
+                    });
+                    break;
+            }
+        },
+
+        checkCurrentView: function () {
+            var currentWith = $(document).width(),
+                nextView;
+
+            if (currentWith >= this.mobileView) {
+                nextView = 'desktop';
+            } else {
+                nextView = 'mobile';
+            }
+
+            if (this.currentView !== nextView) {
+                this.currentView = nextView;
+                this.hidePopup();
+            }
         },
 
         updateOptions: function () {
@@ -93,34 +182,62 @@ define([
                 type: 'POST',
                 data: {},
                 async: false,
-                success: function(data) {
+                success: function (data) {
                     window.xsearch_options = JSON.parse(data);
                 }
             });
         },
 
-        fixInputPosition: function () {
-            if (this.element.offset().left
-                && this.element.offset().left < ($(window).width() / 2)
-            ) {
-                $('.amsearch-wrapper-input, .search-autocomplete').addClass('amsearch-left-position');
+        setInputPosition: function () {
+            var positions = this.classes.positions,
+                targets = this.element.closest(this.selectors.form)
+                    .find(this.selectors.inputWrapper + ', ' + this.selectors.searchAutocomplete),
+                elementOffsetLeft = Math.round(this.element.offset().left),
+                elementOffsetTop = Math.round(this.element.offset().top),
+                halfWindowWidth = $(window).width() / 2,
+                windowHeight = document.documentElement.scrollHeight,
+                autocompletePopupMaxHeight = window.innerHeight * 0.8; // autocomplete popup max height inherited with the window height
+
+            // set left or right position based on the half of window width
+            if (elementOffsetLeft && elementOffsetLeft < halfWindowWidth) {
+                targets.removeClass(positions.right).addClass(positions.left);
+            } else if (elementOffsetLeft && elementOffsetLeft > halfWindowWidth) {
+                targets.removeClass(positions.left).addClass(positions.right);
+            }
+
+            // set top or bottom autocomplete popup position based on the document height minus max popup height
+            if (elementOffsetTop > (windowHeight - autocompletePopupMaxHeight)) {
+                targets.removeClass(positions.bottom).addClass(positions.top);
+            } else if (elementOffsetTop < (windowHeight - autocompletePopupMaxHeight)) {
+                targets.removeClass(positions.top).addClass(positions.bottom);
             }
         },
 
         updatePreloadSection: function () {
-            var $preload = $('[data-amsearch-js="preload"]'),
-                self = this;
-            if ($preload && $preload.html) {
-                $.get(
-                    self.options.url.slice(0, -1) + 'recent',
-                    {uenc: self.options.currentUrlEncoded},
-                    $.proxy(function (data) {
-                        if (data && data.html) {
-                            $preload.html(data.html);
-                        }
-                    }, this)
-                );
-            }
+            var preloadBlock = this.searchForm.find(this.selectors.preloadSection);
+
+            $.ajax({
+                url: this.options.url.slice(0, -1) + 'recent',
+                data: {uenc: this.options.currentUrlEncoded},
+                dataType: "html",
+                success: function (html) {
+                    var preloadBody = $(html),
+                        preloadBlocks = preloadBody.children();
+
+                    preloadBlocks = preloadBlocks.filter(function (index, element) {
+                        var preloadSections = $(element).children(),
+                            sectionsContent = preloadSections.html();
+
+                        return preloadSections.length !== 0 && sectionsContent && sectionsContent.trim() !== '';
+                    });
+
+                    if (preloadBlocks.length !== 0) {
+                        preloadBody.html(preloadBlocks);
+                        preloadBody.formKey();
+                        preloadBlock.html(preloadBody);
+                    }
+                }.bind(this)
+            });
         },
 
         onClick: function () {
@@ -128,7 +245,7 @@ define([
                 return false;//fix for IE(IE trigger input event when placeholder changed)
             }
 
-            var preload = $('[data-amsearch-js="preload"]');
+            var preload = this.searchForm.find('[data-amsearch-js="preload"]');
             if (preload && preload.length > 0) {
                 this.showPopup(preload.html());
             } else {
@@ -158,32 +275,55 @@ define([
             }
         },
 
+        _onKeyDown: function (e) {
+            var keyCode = e.keyCode || e.which;
+
+            switch (keyCode) {
+                case $.ui.keyCode.ESCAPE:
+                    this._resetResponseList(true);
+                    this.autoComplete.hide();
+                    break;
+
+                case $.ui.keyCode.ENTER:
+                    this.searchForm.trigger('submit');
+                    e.preventDefault();
+                    break;
+
+                case $.ui.keyCode.DOWN:
+                    if (this.responseList.indexList) {
+                        this.searchForm.find(this.selectors.searchAutocomplete).focus();
+                    }
+
+                    break;
+                default:
+                    return true;
+            }
+        },
+
         showPopup: function (data) {
-            var self = this,
-                searchField = this.element,
-                dropdown = $('<div class="amsearch-results" data-amsearch-js="results"></div>'),
+            var dropdown = $('<div class="amsearch-results" data-amsearch-js="results"></div>'),
                 searchResults = $('<div class="amsearch-leftside" data-amsearch-js="left-side"></div>'),
-                sideProportion = this.proportionSide,
-                productResults = '[data-amsearch-js="products"]',
                 leftSide = '[data-amsearch-js="left-side"]',
-                leftSideWidth,
-                productsWidth,
                 defaultSearchBlock = this.searchForm.width(),
-                inputWrapper = '[data-amsearch-js="search-wrapper-input"]',
+                currentWidth = $(document).width(),
                 popularSearch = '[data-search-block-type="popular_searches"]',
                 recentSearch = '[data-search-block-type="recent_searches"]',
                 closeLoupeIcons = '[data-amsearch-js = "close"], [data-amsearch-js="loupe"]';
 
             dropdown.append(searchResults);
 
-            this.searchForm.addClass('amsearch-form-container');
+            this.searchForm.removeClass(this.classes.searchContainerResult + ' ' + this.classes.searchContainerHistory);
+            this.searchForm.addClass(this.classes.searchContainer);
+
             if ($.type(data) == 'string') {
                 searchResults.append(data);
+                this.searchForm.addClass(this.classes.searchContainerHistory);
             } else {
+                this.searchForm.addClass(this.classes.searchContainerResult);
                 for (var i in data) {
                     if (data[i].type === 'product'
                         && this.options.width >= this.sizePopupBreakpoint
-                        && this.windowWidth >= this.mobileView
+                        && currentWidth >= this.mobileView
                     ) {
                         dropdown.append(data[i].html);
                     } else {
@@ -193,47 +333,20 @@ define([
             }
 
             this.changePopupFlow();
-
-            this.responseList.indexList = this.autoComplete.html(dropdown)
+            this.responseList.indexList = this.autoComplete.empty().append(dropdown)
                 .addClass('amsearch-clone-position')
                 .show()
                 .find(this.options.responseFieldElements + ':visible');
 
             this.autoComplete.trigger('contentUpdated');
-            $(popularSearch).parent('.amsearch-item-container').addClass('popular_searches');
-            $(recentSearch).parent('.amsearch-item-container').addClass('recent_searches');
-
-            if (this.options.width >= this.sizePopupBreakpoint) {
-                leftSideWidth = $(productResults).length ? this.options.width * sideProportion : searchField.outerWidth();
-                productsWidth = this.options.width ? this.options.width * (1 - sideProportion) : searchField.outerWidth();
-                $(productResults).addClass('-columns');
-            } else {
-                leftSideWidth = $(productResults).length ? this.options.width : searchField.outerWidth();
-            }
-
-            $(closeLoupeIcons).appendTo($(inputWrapper)).show();
-
-            if (this.windowWidth >= this.mobileView) {
-                $(inputWrapper).css('width', '100%');
-                this.searchForm.find('.search-autocomplete').css('width', defaultSearchBlock);
-            }
-
+            this.searchForm.find(popularSearch).parent(this.selectors.itemContainer).addClass('popular_searches');
+            this.searchForm.find(recentSearch).parent(this.selectors.itemContainer).addClass('recent_searches');
+            this.resizePopup();
+            this.searchForm.find(closeLoupeIcons).appendTo(this.searchForm.find(this.selectors.inputWrapper)).show();
             this.searchForm.addClass('-opened').find('.input-text').attr('placeholder', $.mage.__('Enter Keyword or Item'));
-            this.searchForm.keydown(function(eventObject){
-                if (eventObject.which == 27) {
-                    self.hidePopup();
-                }
-            });
 
-            $(leftSide).css('width', leftSideWidth);
-            $(productResults).css('width', productsWidth);
-
-            if (!$(leftSide).children().length) {
-                $(leftSide).hide();
-            }
-
-            if(!$(leftSide).children('.amsearch-item-container').length) {
-                $(productResults).css('width', '100%');
+            if (!this.searchForm.find(leftSide).children().length) {
+                this.searchForm.find(leftSide).hide();
             }
 
             this._resetResponseList(false);
@@ -241,6 +354,8 @@ define([
 
             if (this.responseList.indexList.length) {
                 this._updateAriaHasPopup(true);
+                this.initSlickSlider($(this.selectors.resultsBlockSlider, this.searchForm));
+                $(this.selectors.addToCartForm, this.searchForm).catalogAddToCart();
             } else {
                 this._updateAriaHasPopup(false);
             }
@@ -248,6 +363,7 @@ define([
             this.responseList.indexList
                 .on('click', function (e) {
                     var $target = $(e.target);
+
                     if ($target.hasClass('amasty-xsearch-block-header')) {
                         return false;
                     }
@@ -275,7 +391,93 @@ define([
                     this.element.attr('aria-activedescendant', $(e.target).attr('id'));
                 }.bind(this));
 
+            if (data !== undefined) {
+                this.popupDataInsertAfter(dropdown);
+            }
+
             return defaultSearchBlock;
+        },
+
+        /**
+         * @param {Object} element - DOM jQuery element
+         * @param {Object} options - slick slider options
+         * @public
+         * @returns {void}
+         */
+        initSlickSlider: function (element, options) {
+            var defaultOptions = {
+                    slidesToShow: 3,
+                    slidesToScroll: 1,
+                    infinite: false,
+                    dots: true,
+                    arrows: true,
+                    responsive: [
+                        {
+                            breakpoint: this.mobileView,
+                            settings: {
+                                slidesToShow: 1,
+                                arrows: false
+                            }
+                        }
+                    ]
+                };
+
+            element.slick(_.extend(defaultOptions, options));
+        },
+
+        resizePopup: function () {
+            var searchField = this.element,
+                sideProportion = this.proportionSide,
+                productResults = '[data-amsearch-js="products"]',
+                productResultsBlock = this.searchForm.find(this.selectors.productResults),
+                leftSideBlock = this.searchForm.find(this.selectors.leftSide),
+                leftSideWidth,
+                productsWidth,
+                calculatedSizePopup,
+                defaultSearchBlock = this.searchForm.width(),
+                currentWidth = $(document).width(),
+                rightsideContentBlock = this.searchForm.find(this.selectors.rightsideContent),
+                leftsideSidebarBlock = this.searchForm.find(this.selectors.leftsideSidebar),
+                searchAutocompleteBlock = this.searchForm.find(this.selectors.searchAutocomplete),
+                inputWrapperBlock = this.searchForm.find(this.selectors.inputWrapper);
+
+            calculatedSizePopup = leftsideSidebarBlock.length ? this.minSizePopup : this.slidersBlockSize;
+
+            if (this.options.width >= this.sizePopupBreakpoint) {
+                leftSideWidth = $(productResults).length ? this.options.width * sideProportion : searchField.outerWidth();
+                productsWidth = this.options.width ? this.options.width * (1 - sideProportion) : searchField.outerWidth();
+                productResultsBlock.addClass(this.classes.columns);
+            } else {
+                leftSideWidth = productResultsBlock.length ? this.options.width : searchField.outerWidth();
+            }
+
+            if (!this.options.isProductBlockEnabled) {
+                leftSideWidth = this.options.width;
+            }
+
+            if (currentWidth >= this.mobileView) {
+                inputWrapperBlock.css('width', '100%');
+                searchAutocompleteBlock.css('width', defaultSearchBlock);
+            }
+
+            if (productResultsBlock.length) {
+                leftSideBlock.css('width', leftSideWidth);
+                productResultsBlock.css('width', productsWidth);
+            } else if (rightsideContentBlock.length) {
+                inputWrapperBlock.css('width', (this.options.isDynamicWidth && currentWidth >= this.mobileView)
+                    ? calculatedSizePopup : '100%');
+                searchAutocompleteBlock.css('width', currentWidth >= this.mobileView ? calculatedSizePopup : 'auto');
+                leftSideBlock.css('width', calculatedSizePopup);
+                rightsideContentBlock.css(leftsideSidebarBlock.length ? 'width' : 'max-width',
+                    leftsideSidebarBlock.length ? this.minSizePopup - this.minLeftSidePopup : '100%');
+                leftsideSidebarBlock.css('width', this.minLeftSidePopup);
+            } else {
+                leftSideBlock.css('width', leftSideWidth);
+            }
+
+            if (!leftSideBlock.children(this.selectors.itemContainer).length) {
+                productResultsBlock.css('width', '100%');
+            }
         },
 
         changePopupFlow: function () {
@@ -288,7 +490,7 @@ define([
 
         hidePopup: function () {
             var defaultSearchBlock = this.showPopup(),
-                inputWrapper = '[data-amsearch-js="search-wrapper-input"]';
+                currentWidth = $(document).width();
 
             this.autoComplete.hide();
 
@@ -296,14 +498,14 @@ define([
                 this.searchLabel.removeClass('active');
             }
 
-            $('[data-amsearch-js="close"], [data-amsearch-js="loupe"]').hide();
+            this.searchForm.find('[data-amsearch-js="close"], [data-amsearch-js="loupe"]').hide();
             this.searchForm.find('.input-text').attr('placeholder', $.mage.__('Search entire store here...'));
             this.searchForm.removeClass('-opened');
-            this.searchForm.removeClass('amsearch-form-container');
+            this.searchForm.removeClass(this.classes.searchContainer);
 
-            if (this.windowWidth >= this.mobileView) {
-                $(inputWrapper).css('width', '100%');
-                this.searchForm.find('.search-autocomplete').css('width', defaultSearchBlock);
+            if (currentWidth >= this.mobileView) {
+                $(this.selectors.inputWrapper).css('width', '100%');
+                this.searchForm.find(this.selectors.searchAutocomplete).css('width', defaultSearchBlock);
             }
         },
 
@@ -326,17 +528,17 @@ define([
 
         getEmptyRequest: function () {
             var defaultSearchBlock = this.showPopup(),
-                inputWrapper = '[data-amsearch-js="search-wrapper-input"]',
+                currentWidth = $(document).width(),
                 closeLoupeIcons = '[data-amsearch-js = "close"], [data-amsearch-js="loupe"]';
 
-            $(closeLoupeIcons).appendTo($(inputWrapper)).show();
+            this.searchForm.find(closeLoupeIcons).appendTo(this.searchForm.find(this.selectors.inputWrapper)).show();
 
-            if (this.windowWidth >= this.mobileView) {
-                this.searchForm.find('.search-autocomplete').css('width', defaultSearchBlock);
-                $(inputWrapper).css('width', '100%');
+            if (currentWidth >= this.mobileView) {
+                this.searchForm.find(this.selectors.searchAutocomplete).css('width', defaultSearchBlock);
+                $(this.selectors.inputWrapper).css('width', '100%');
             }
 
-            this.searchForm.addClass('amsearch-form-container');
+            this.searchForm.addClass(this.classes.searchContainer);
             this.searchForm.addClass('-opened').find('.input-text').attr('placeholder', $.mage.__('Enter Keyword or Item'));
             this.defineExistencePopup();
         },
@@ -344,8 +546,8 @@ define([
         defineExistencePopup: function () {
             var leftSide = '[data-amsearch-js="left-side"]';
 
-            if (!$(leftSide).children().length) {
-                this.searchForm.find('.search-autocomplete').hide();
+            if (!this.searchForm.find(leftSide).children().length) {
+                this.searchForm.find(this.selectors.searchAutocomplete).hide();
             }
         },
 
@@ -363,8 +565,7 @@ define([
         _onPropertyChangeCallBack: function () {
             var self = this,
                 minChars = this.options.minChars ? this.options.minChars : this.options.minSearchLength,
-                searchField = this.element,
-                inputWrapper = '[data-amsearch-js="search-wrapper-input"]',
+                popupWidth = $(document).width() >= self.mobileView ? self.options.width : 'auto',
                 value = this.element.val().trim();
 
             // check if value is empty
@@ -378,24 +579,32 @@ define([
 
                 this.ajaxRequest = $.get(
                     self.options.url,
-                    {q: value, uenc: self.options.currentUrlEncoded},
+                    {q: value, uenc: self.options.currentUrlEncoded, form_key: $.mage.cookies.get('form_key')},
                     $.proxy(function (data) {
                         this.showPopup(data);
                         this.hideLoader();
-                        if (self.windowWidth >= self.mobileView) {
-                            if (self.options.isDynamicWidth == 1) {
-                                $(inputWrapper).css('width', self.options.width);
-                            }
-                            this.searchForm.find('.search-autocomplete').css('width', self.options.width);
+
+                        if (self.options.isDynamicWidth == 1) {
+                            $(this.selectors.inputWrapper).css('width', popupWidth);
                         }
 
-                        this.outputNotFound();
+                        this.searchForm.find(this.selectors.searchAutocomplete).css('width', popupWidth);
+
+                        if (this.options.isProductBlockEnabled) {
+                            this.outputNotFound();
+                        }
 
                         if (data.redirect_url) {
                             this.redirectUrl = data.redirect_url;
                         } else {
                             this.redirectUrl = null;
                         }
+
+                        if (!data.redirect_url && data.behavior) {
+                            this.updateMultipleWishlist(data.behavior);
+                            this.resetWishlistDropdown();
+                        }
+
                         this.queryString = '';
                     }, this)
                 );
@@ -408,16 +617,43 @@ define([
             }
         },
 
+        updateMultipleWishlist: function (data) {
+            var selectors = this.selectors;
+
+            $(selectors.wishlistTemplates.popup).remove();
+            $(selectors.wishlistTemplates.splitButton).remove();
+            $(selectors.wishlistTemplates.form).replaceWith(data);
+            $('body').off('click', selectors.postNewWishlist);
+            uiRegistry.remove('multipleWishlist');
+            $(selectors.pageWrapper).trigger('contentUpdated');
+        },
+
+        resetWishlistDropdown: function () {
+            var self = this;
+
+            $(this.selectors.productItem).mouseleave(function () {
+                if ($(self.selectors.splitWishlistButton, $(this)).hasClass(self.classes.active)) {
+                    $(self.selectors.splitWishlistButton, $(this)).dropdown().reset();
+                }
+            });
+        },
+
         defineHideOrClear: function () {
             var self = this,
                 mmItem = $('.ammenu-item');
 
             /* Mega Menu Hide Search Popop */
             if (mmItem.length) {
-                mmItem.on('mouseover', function(){
+                mmItem.on('mouseover', function () {
                     self.hidePopup();
                 });
             }
+
+            this.searchForm.keydown(function (eventObject) {
+                if (eventObject.which == 27) {
+                    self.hidePopup();
+                }
+            });
 
             $('body').on('click', function (e) {
                 var target = $(e.target);
@@ -433,7 +669,7 @@ define([
                     return false;
                 }
 
-                if (!target.is('#search, #search_autocomplete *')) {
+                if (!target.is('#search, #search_autocomplete *, .xsearch-mini-form-widget *')) {
                     if (self.ajaxRequest) {
                         self.ajaxRequest.abort();
                     }
@@ -448,7 +684,7 @@ define([
                 class: 'amsearch-wrapper-input',
                 'data-amsearch-js': 'search-wrapper-input'
             }).appendTo($(this.searchForm.find('.control')));
-            $(this.searchForm.find('.input-text')).appendTo('[data-amsearch-js="search-wrapper-input"]');
+            $(this.searchForm.find('.input-text')).appendTo($(this.searchForm.find('[data-amsearch-js="search-wrapper-input"]')));
         },
 
         createCloseIcon: function () {
@@ -472,17 +708,18 @@ define([
             var loader = $('<div/>', {
                 'data-amsearch-js': "loader",
                 class: 'amasty-xsearch-loader amasty-xsearch-hide'
-            }).appendTo(this.searchForm.find('.control'));
+            }).appendTo(this.searchForm.find(this.selectors.inputWrapper));
         },
 
         showLoader: function () {
-            var $loader = $(this.selectors.loader);
+            var $loader = this.searchForm.find(this.selectors.loader);
             $loader.removeClass('amasty-xsearch-hide');
-            $(this.submitBtn).addClass('amasty-xsearch-hide');
+            this.searchForm.find(this.submitBtn).addClass('amasty-xsearch-hide');
         },
 
         hideLoader: function () {
             var $loader = $(this.selectors.loader);
+
             $loader.addClass('amasty-xsearch-hide');
             $(this.submitBtn).removeClass('amasty-xsearch-hide');
         }

@@ -1,50 +1,55 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
 
 namespace Amasty\Xsearch\Controller\Autocomplete;
 
-use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\View\DesignLoader;
 
-class Indexrecent extends \Magento\Framework\App\Action\Action
+class Indexrecent implements HttpGetActionInterface
 {
     /**
-     * @var \Magento\Framework\Controller\Result\JsonFactory
+     * @var ResultFactory
      */
-    private $resultJsonFactory;
+    private $resultFactory;
 
     /**
-     * @var \Magento\Framework\View\LayoutFactory
+     * @var RequestInterface
      */
-    private $layoutFactory;
+    private $request;
 
     /**
-     * IndexRecent constructor.
-     * @param Context $context
-     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
-     * @param \Magento\Framework\View\LayoutFactory $layoutFactory
+     * @var DesignLoader
      */
+    private $designLoader;
+
     public function __construct(
-        Context $context,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \Magento\Framework\View\LayoutFactory $layoutFactory
+        ResultFactory $resultFactory,
+        RequestInterface $request,
+        DesignLoader $designLoader
     ) {
-        parent::__construct($context);
-        $this->layoutFactory = $layoutFactory;
-        $this->resultJsonFactory = $resultJsonFactory;
+        $this->resultFactory = $resultFactory;
+        $this->request = $request;
+        $this->designLoader = $designLoader;
     }
 
-    public function execute()
+    public function execute(): ?ResultInterface
     {
-        $layout = $this->layoutFactory->create();
-        $resultJson = $this->resultJsonFactory->create();
+        $this->designLoader->load();
+        $result = $this->resultFactory->create(ResultFactory::TYPE_LAYOUT);
 
-        return $resultJson->setData([
-            'html' => $layout->createBlock(\Amasty\Xsearch\Block\Jsinit::class)->getPreload()
-        ]);
+        if (!$this->request->isAjax()) {
+            $result->setStatusHeader(403, '1.1', 'Forbidden');
+        }
+
+        return $result;
     }
 }

@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+-->
+
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="amasty_xsearch_related_term" resource="default" engine="innodb" comment="Related Terms Linking Table">
+        <column xsi:type="int" name="term_id" padding="10" unsigned="true" nullable="false" identity="false" default="0"
+                comment="Term ID"/>
+        <column xsi:type="int" name="related_term_id" padding="10" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Related Term ID"/>
+        <column xsi:type="int" name="position" padding="10" unsigned="false" nullable="false" identity="false"
+                default="0" comment="Position"/>
+
+        <constraint xsi:type="unique" referenceId="AMASTY_XSRCH_RELATED_TERM_TERM_ID_RELATED_TERM_ID_POSITION">
+            <column name="term_id"/>
+            <column name="related_term_id"/>
+            <column name="position"/>
+        </constraint>
+        <constraint xsi:type="foreign"
+                    referenceId="AMASTY_XSEARCH_RELATED_TERM_TERM_ID_SEARCH_QUERY_QUERY_ID"
+                    table="amasty_xsearch_related_term"
+                    column="term_id"
+                    referenceTable="search_query"
+                    referenceColumn="query_id"
+                    onDelete="CASCADE"
+        />
+
+        <index referenceId="AMASTY_XSEARCH_RELATED_TERM_TERM_ID" indexType="btree">
+            <column name="term_id"/>
+        </index>
+    </table>
+
+    <table name="amasty_xsearch_users_search" resource="default" engine="innodb" comment="Amasty Xsearch User Searches">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true"
+                comment="Search ID"/>
+        <column xsi:type="varchar" name="user_key" nullable="false" comment="User" length="255"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="int" name="query_id" padding="10" unsigned="false" nullable="false" identity="false"
+                default="0" comment="Query Id"/>
+        <column xsi:type="smallint" name="product_click" padding="10" unsigned="false" nullable="true" identity="false"
+                comment="Click On Product"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+
+        <index referenceId="AMASTY_XSEARCH_USERS_SEARCH_USER_KEY" indexType="btree">
+            <column name="user_key"/>
+        </index>
+
+        <index referenceId="AMASTY_XSEARCH_USERS_SEARCH_USER_KEY_CREATED_AT" indexType="btree">
+            <column name="user_key"/>
+            <column name="created_at"/>
+        </index>
+
+        <index referenceId="AMASTY_XSEARCH_USERS_SEARCH_USER_KEY_QRY_ID" indexType="btree">
+            <column name="query_id"/>
+            <column name="user_key"/>
+        </index>
+
+        <index referenceId="AMASTY_XSEARCH_USERS_SEARCH_QUERY_ID" indexType="btree">
+            <column name="query_id"/>
+        </index>
+    </table>
+
+
+    <table name="amasty_xsearch_frontend_product_actions" resource="default" engine="innodb" comment="Amasty Xsearch Action Log">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true"
+                comment="Action Log Id"/>
+        <column xsi:type="tinyint" name="type_id" nullable="false" unsigned="true" padding="10" comment="Action Type ID"/>
+        <column xsi:type="varchar" name="customer_identifier" nullable="false" length="255" comment="Customer Identifier"/>
+        <column xsi:type="timestamp" name="happened_at" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="smallint" name="store_id" nullable="false" unsigned="true" padding="5" comment="Action Store ID"/>
+        <column xsi:type="int" name="product_id" nullable="false" unsigned="true" padding="10" comment="Product ID"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+
+        <index referenceId="AMASTY_XSEARCH_FRONTEND_PRODUCT_ACTIONS_TYPE_ID_STORE_ID_CUSTOMER_ID" indexType="btree">
+            <column name="type_id"/>
+            <column name="store_id"/>
+            <column name="customer_identifier"/>
+        </index>
+
+        <index referenceId="AMASTY_XSEARCH_FRONTEND_PRODUCT_ACTIONS_HAPPENED_AT" indexType="btree">
+            <column name="happened_at"/>
+        </index>
+
+        <constraint xsi:type="unique" referenceId="AMASTY_XSEARCH_FRONTEND_PRODUCT_ACTIONS_UNIQUE_INDEX">
+            <column name="type_id"/>
+            <column name="store_id"/>
+            <column name="customer_identifier"/>
+            <column name="product_id"/>
+        </constraint>
+
+        <constraint xsi:type="foreign"
+                    referenceId="AMASTY_XSEARCH_FRONTEND_PRODUCT_ACTIONS_PRODUCT_ENTITY"
+                    table="amasty_xsearch_frontend_product_actions"
+                    column="product_id"
+                    referenceTable="catalog_product_entity"
+                    referenceColumn="entity_id"
+                    onDelete="CASCADE"
+        />
+
+        <constraint xsi:type="foreign"
+                    referenceId="AMASTY_XSEARCH_FRONTEND_PRODUCT_ACTIONS_STORE_ENTITY"
+                    table="amasty_xsearch_frontend_product_actions"
+                    column="store_id"
+                    referenceTable="store"
+                    referenceColumn="store_id"
+                    onDelete="CASCADE"
+        />
+    </table>
+</schema>

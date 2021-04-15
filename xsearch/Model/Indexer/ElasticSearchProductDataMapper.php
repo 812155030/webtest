@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -95,7 +95,7 @@ class ElasticSearchProductDataMapper
                 ->setLimit(0)
                 ->setIndexedIds($batchedProductIds)
                 ->getResults();
-            $data = array_merge($data, $result);
+            $data = array_replace($data, $result);
         }
 
          return $data;

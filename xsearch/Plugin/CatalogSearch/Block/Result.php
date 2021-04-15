@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -16,11 +16,6 @@ class Result
     private $helper;
 
     /**
-     * @var \Magento\Framework\App\Response\RedirectInterface
-     */
-    private $redirect;
-
-    /**
      * @var \Magento\Framework\App\Response\Http
      */
     private $response;
@@ -28,16 +23,13 @@ class Result
     /**
      * CatalogSearch\Block\Result constructor.
      * @param \Amasty\Xsearch\Helper\Data $helper
-     * @param \Magento\Framework\App\Response\RedirectInterface $redirect
      * @param \Magento\Framework\App\Response\Http $response
      */
     public function __construct(
         \Amasty\Xsearch\Helper\Data $helper,
-        \Magento\Framework\App\Response\RedirectInterface $redirect,
         \Magento\Framework\App\Response\Http $response
     ) {
         $this->helper = $helper;
-        $this->redirect = $redirect;
         $this->response = $response;
     }
 
@@ -53,7 +45,7 @@ class Result
             && $result == 1
         ) {
             $redirectUrl = $subject->getListBlock()->getLoadedProductCollection()->getFirstItem()->getProductUrl();
-            $this->redirect->redirect($this->response, $redirectUrl);
+            $this->response->setRedirect($redirectUrl);
         }
 
         return $result;

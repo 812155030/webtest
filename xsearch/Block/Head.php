@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -69,59 +69,38 @@ class Head extends Template
         return str_replace(['dev-', '-develop'], '', $this->magentoVersion->get());
     }
 
-    /**
-     * @return string
-     */
-    public function getLayoutEnabled()
+    public function getLayoutEnabled(): bool
     {
-        return $this->helper->getModuleConfig(self::XML_PATH_LAYOUT_ENABLED);
+        return (bool)$this->helper->getModuleConfig(self::XML_PATH_LAYOUT_ENABLED);
     }
 
-    /**
-     * @return string
-     */
-    public function getLayoutBorder()
+    public function getLayoutBorder(): string
     {
-        return $this->helper->getModuleConfig(self::XML_PATH_LAYOUT_BORDER);
+        return (string)$this->helper->getModuleConfig(self::XML_PATH_LAYOUT_BORDER);
     }
 
-    /**
-     * @return string
-     */
-    public function getLayoutHover()
+    public function getLayoutHover(): string
     {
-        return $this->helper->getModuleConfig(self::XML_PATH_LAYOUT_HOVER);
+        return (string)$this->helper->getModuleConfig(self::XML_PATH_LAYOUT_HOVER);
     }
 
-    /**
-     * @return string
-     */
-    public function getLayoutHighlight()
+    public function getLayoutHighlight(): string
     {
-        return $this->helper->getModuleConfig(self::XML_PATH_LAYOUT_HIGHLIGHT);
+        return (string)$this->helper->getModuleConfig(self::XML_PATH_LAYOUT_HIGHLIGHT);
     }
 
-    /**
-     * @return string
-     */
-    public function getLayoutBackground()
+    public function getLayoutBackground(): string
     {
-        return $this->helper->getModuleConfig(self::XML_PATH_LAYOUT_BACKGROUND);
+        return (string)$this->helper->getModuleConfig(self::XML_PATH_LAYOUT_BACKGROUND);
     }
 
-    /**
-     * @return string
-     */
-    public function getLayoutText()
+    public function getLayoutText(): string
     {
-        return $this->helper->getModuleConfig(self::XML_PATH_LAYOUT_TEXT);
+        return (string)$this->helper->getModuleConfig(self::XML_PATH_LAYOUT_TEXT);
     }
 
-    /**
-     * @return string
-     */
-    public function getLayoutHoverText()
+    public function getLayoutHoverText(): string
     {
-        return $this->helper->getModuleConfig(self::XML_PATH_LAYOUT_HOVER_TEXT);
+        return (string)$this->helper->getModuleConfig(self::XML_PATH_LAYOUT_HOVER_TEXT);
     }
 }

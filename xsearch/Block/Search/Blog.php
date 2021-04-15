@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -43,8 +43,9 @@ class Blog extends AbstractSearch
     protected function generateCollection()
     {
         $collection = parent::generateCollection();
+
         foreach ($this->getPostsCollection() as $item) {
-            $item->setUrl($item->getPostUrl());
+            $item->setUrl($item->getUrl());
             $this->addToBlogCollection($item, $collection);
         }
 
@@ -54,7 +55,7 @@ class Blog extends AbstractSearch
         }
 
         foreach ($this->getTagsCollection() as $item) {
-            $item->setUrl($item->getTagUrl());
+            $item->setUrl($item->getUrl());
             $this->addToBlogCollection($item, $collection);
         }
 
@@ -80,9 +81,8 @@ class Blog extends AbstractSearch
         if ($this->postsSearchCollection === null) {
             $this->postsSearchCollection = $this->getData('postsCollectionFactory')->create()
                 ->addSearchFilter($this->getQuery()->getQueryText())
-                ->addStores()
-                ->addFieldToFilter('status', 2)
-                ->setPageSize($this->getLimit());
+                ->addStoreFilter($this->_storeManager->getStore()->getId())
+                ->addFieldToFilter('status', 2);
         }
 
         return $this->postsSearchCollection;
@@ -96,9 +96,8 @@ class Blog extends AbstractSearch
         if ($this->categoriesSearchCollection === null) {
             $this->categoriesSearchCollection = $this->getData('categoriesCollectionFactory')->create()
                 ->addSearchFilter($this->getQuery()->getQueryText())
-                ->addStores()
-                ->addFieldToFilter('status', 1)
-                ->setPageSize($this->getLimit());
+                ->addStoreWithDefault($this->_storeManager->getStore()->getId())
+                ->addStatusFilter(1);
         }
 
         return $this->categoriesSearchCollection;
@@ -112,7 +111,7 @@ class Blog extends AbstractSearch
         if ($this->tagsSearchCollection === null) {
             $this->tagsSearchCollection = $this->getData('tagsCollectionFactory')->create()
                 ->addSearchFilter($this->getQuery()->getQueryText())
-                ->setPageSize($this->getLimit());
+                ->addStoreWithDefault($this->_storeManager->getStore()->getId());
         }
 
         return $this->tagsSearchCollection;

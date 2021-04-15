@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -274,6 +274,7 @@ class Full
 
             foreach ($attributes as $attribute) {
                 $attribute->setEntity($entity);
+                $attribute->setIsSearchable(true);
             }
 
             $this->searchableAttributes = $attributes;

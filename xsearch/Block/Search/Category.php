@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -52,11 +52,24 @@ class Category extends AbstractSearch
     public function getResults()
     {
         $result = parent::getResults();
+
+        return $this->isNeedUpdate($result) ? $this->updateData($result) : $result;
+    }
+
+    private function isNeedUpdate(array $results): bool
+    {
+        $item = array_shift($results);
+
+        return is_array($item) && !isset($item['full_path']);
+    }
+
+    private function updateData(array $results): array
+    {
         foreach ($this->getSearchCollection() as $index => $item) {
             $result[$index]['full_path'] = $this->renderFullCategoryPath($item);
         }
 
-        return $result;
+        return $results;
     }
 
     /**

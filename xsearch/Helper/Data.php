@@ -1,25 +1,27 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
 
 namespace Amasty\Xsearch\Helper;
 
+use Amasty\Xsearch\Block\Search\Blog;
+use Amasty\Xsearch\Block\Search\Brand;
+use Amasty\Xsearch\Block\Search\BrowsingHistory;
 use Amasty\Xsearch\Block\Search\Category;
+use Amasty\Xsearch\Block\Search\Faq;
+use Amasty\Xsearch\Block\Search\Landing;
 use Amasty\Xsearch\Block\Search\Page;
 use Amasty\Xsearch\Block\Search\Popular;
 use Amasty\Xsearch\Block\Search\Product;
 use Amasty\Xsearch\Block\Search\Recent;
-use Amasty\Xsearch\Block\Search\Landing;
-use Amasty\Xsearch\Block\Search\Brand;
-use Amasty\Xsearch\Block\Search\Blog;
-use Amasty\Xsearch\Block\Search\Faq;
+use Amasty\Xsearch\Model\Config;
 use Magento\CatalogSearch\Model\ResourceModel\EngineProvider;
-use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\Search\Adapter\Mysql\Query\Builder\Match as QueryMatchBuilder;
+use Magento\Store\Model\ScopeInterface;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -27,17 +29,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_TEMPLATE_CATEGORY_POSITION = 'category/position';
     const XML_PATH_TEMPLATE_PRODUCT_POSITION = 'product/position';
     const XML_PATH_TEMPLATE_PAGE_POSITION = 'page/position';
-    const XML_PATH_TEMPLATE_POPULAR_SEARCHES_POSITION = 'popular_searches/position';
-    const XML_PATH_TEMPLATE_RECENT_SEARCHES_POSITION = 'recent_searches/position';
     const XML_PATH_TEMPLATE_LANDING_POSITION = 'landing_page/position';
     const XML_PATH_TEMPLATE_BRAND_POSITION = 'brand/position';
     const XML_PATH_TEMPLATE_BLOG_POSITION = 'blog/position';
+    const XML_PATH_TEMPLATE_FAQ_POSITION = 'faq/position';
 
     const XML_PATH_TEMPLATE_CATEGORY_ENABLED = 'category/enabled';
     const XML_PATH_TEMPLATE_PRODUCT_ENABLED = 'product/enabled';
     const XML_PATH_TEMPLATE_PAGE_ENABLED = 'page/enabled';
-    const XML_PATH_TEMPLATE_POPULAR_SEARCHES_ENABLED = 'popular_searches/enabled';
-    const XML_PATH_TEMPLATE_RECENT_SEARCHES_ENABLED = 'recent_searches/enabled';
     const XML_PATH_TEMPLATE_LANDING_ENABLED = 'landing_page/enabled';
     const XML_PATH_TEMPLATE_BRAND_ENABLED = 'brand/enabled';
     const XML_PATH_TEMPLATE_BLOG_ENABLED = 'blog/enabled';
@@ -73,13 +72,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private $sessionFactory;
 
+    /**
+     * @var Config
+     */
+    private $moduleConfigProvider;
+
     public function __construct(
         \Magento\Catalog\Model\Config $configAttribute,
         \Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection $collection,
         \Magento\Search\Helper\Data $searchHelper,
         \Magento\Framework\Filter\StripTags $stripTags,
         \Magento\Framework\App\Helper\Context $context,
-        \Magento\Customer\Model\SessionFactory $sessionFactory
+        \Magento\Customer\Model\SessionFactory $sessionFactory,
+        Config $moduleConfigProvider
     ) {
         parent::__construct($context);
         $this->configAttribute = $configAttribute;
@@ -87,6 +92,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->searchHelper = $searchHelper;
         $this->stripTags = $stripTags;
         $this->sessionFactory = $sessionFactory;
+        $this->moduleConfigProvider = $moduleConfigProvider;
     }
 
     /**
@@ -129,6 +135,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * @param string $tabType
+     * @return string
+     */
+    public function getTabTitle(string $tabType)
+    {
+        return (string)$this->getModuleConfig($tabType . '/title');
+    }
+
+    /**
      * @param $position
      * @param $block
      * @param $result
@@ -157,9 +172,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $result = [];
 
-        if ($this->getModuleConfig(self::XML_PATH_TEMPLATE_POPULAR_SEARCHES_ENABLED)) {
+        if ($this->moduleConfigProvider->isPopularSearchesEnabled()) {
             $this->_pushItem(
-                self::XML_PATH_TEMPLATE_POPULAR_SEARCHES_POSITION,
+                Config::XML_PATH_TEMPLATE_POPULAR_SEARCHES_POSITION,
                 $layout->createBlock(Popular::class, 'amasty.xsearch.search.popular'),
                 $result
             );
@@ -192,9 +207,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             );
         }
 
-        if ($this->getModuleConfig(self::XML_PATH_TEMPLATE_RECENT_SEARCHES_ENABLED)) {
+        if ($this->moduleConfigProvider->isRecentSearchesEnabled()) {
             $this->_pushItem(
-                self::XML_PATH_TEMPLATE_RECENT_SEARCHES_POSITION,
+                Config::XML_PATH_TEMPLATE_RECENT_SEARCHES_POSITION,
                 $layout->createBlock(Recent::class, 'amasty.xsearch.search.recent'),
                 $result
             );
@@ -234,8 +249,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             && $this->_moduleManager->isEnabled('Amasty_Faq')
         ) {
             $this->_pushItem(
-                self::XML_PATH_TEMPLATE_BLOG_POSITION,
+                self::XML_PATH_TEMPLATE_FAQ_POSITION,
                 $layout->createBlock(Faq::class, 'amasty.xsearch.faq.page'),
+                $result
+            );
+        }
+
+        if ($this->moduleConfigProvider->isBrowsingHistoryEnabled()) {
+            $this->_pushItem(
+                Config::XML_PATH_BROWSING_HISTORY_POSITION,
+                $layout->createBlock(BrowsingHistory::class, 'amasty.xsearch.browsing.history'),
                 $result
             );
         }
@@ -311,6 +334,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $queryText = $query->getQueryText();
 
         if (strpos($engine, 'mysql') !== false) {
+            //@phpstan-ignore-next-line
             $replaceSymbols = str_split(QueryMatchBuilder::SPECIAL_CHARACTERS, 1);
             $queryText = trim(str_replace($replaceSymbols, ' ', $queryText));
             $query->setQueryText($queryText);

@@ -1,0 +1,26 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
+ * @package Amasty_Xsearch
+ */
+?>
+<?php
+/**
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Amasty\Xsearch\ViewModel\ConfigurableBlockRenderer $viewModel
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+$blocks = $block->getViewModel()->getBlocks();
+?>
+
+<?php if ($blocks): ?>
+<div class="amsearch-content-block" data-amsearch-js="rightside-content">
+<?php endif; ?>
+    <?php foreach ($blocks as $block): ?>
+        <?= $block->toHtml() ?>
+    <?php endforeach; ?>
+<?php if ($blocks): ?>
+</div>
+<?php endif; ?>

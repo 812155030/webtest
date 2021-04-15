@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -27,11 +27,13 @@ class QueryInfo extends \Magento\Framework\Model\AbstractModel
     private $dateFormat;
 
     /**
+     * @param $timePeriod
+     * @param bool $isNeedLimit
      * @return array
      */
     public function getAnalyticsData($timePeriod, $isNeedLimit = true)
     {
-        $isMonthPeriod = $timePeriod == Collection::GROUP_BY_MOUNTH;
+        $isMonthPeriod = $timePeriod == Collection::GROUP_BY_MONTH_PATTERN;
         $this->dateFormat = $isMonthPeriod ? 'F Y' : 'd F Y';
         if ($isMonthPeriod) {
             $this->limit = self::MONTHS;

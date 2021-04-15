@@ -1,0 +1,55 @@
+{
+    "amasty_xsearch_related_term": {
+        "column": {
+            "term_id": true,
+            "related_term_id": true,
+            "position": true
+        },
+        "index": {
+            "AMASTY_XSEARCH_RELATED_TERM_TERM_ID": true
+        },
+        "constraint": {
+            "AMASTY_XSEARCH_RELATED_TERM_TERM_ID_RELATED_TERM_ID_POSITION": true,
+            "AMASTY_XSEARCH_RELATED_TERM_TERM_ID_SEARCH_QUERY_QUERY_ID": true
+        }
+    },
+    "amasty_xsearch_users_search": {
+        "column": {
+            "id": true,
+            "user_key": true,
+            "created_at": true,
+            "query_id": true,
+            "product_click": true
+        },
+        "index": {
+            "AMASTY_XSEARCH_USERS_SEARCH_USER_KEY": true,
+            "AMASTY_XSEARCH_USERS_SEARCH_USER_KEY_CREATED_AT": true,
+            "AMASTY_XSEARCH_USERS_SEARCH_USER_KEY_QRY_ID": true,
+            "AMASTY_XSEARCH_USERS_SEARCH_QUERY_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+
+    "amasty_xsearch_frontend_product_actions": {
+        "column": {
+            "id": true,
+            "type_id": true,
+            "customer_id": true,
+            "happened_at": true,
+            "store_id": true,
+            "product_id": true
+        },
+        "index": {
+            "AMASTY_XSEARCH_FRONTEND_PRODUCT_ACTIONS_INDEX": true,
+            "AMASTY_XSEARCH_FRONTEND_PRODUCT_ACTIONS_HAPPENED_AT": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "AMASTY_XSEARCH_FRONTEND_PRODUCT_ACTIONS_UNIQUE_INDEX": true,
+            "AMASTY_XSEARCH_FRONTEND_PRODUCT_ACTIONS_PRODUCT_ENTITY": true,
+            "AMASTY_XSEARCH_FRONTEND_PRODUCT_ACTIONS_STORE_ENTITY": true
+        }
+    }
+}

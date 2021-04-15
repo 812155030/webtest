@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -45,7 +45,7 @@ class QueryList extends Template
     public function getLastSearches()
     {
         $data = array_slice(
-            $this->queryInfo->getAnalyticsData(Collection::GROUP_BY_DAY),
+            $this->queryInfo->getAnalyticsData(Collection::GROUP_BY_DAY_PATTERN),
             0,
             Collection::LIMIT_LAST_DATA
         );

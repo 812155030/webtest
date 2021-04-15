@@ -1,40 +1,40 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 ?>
 <?php /** @var \Amasty\Xsearch\Block\Head $block */
-if ($block->getLayoutEnabled()) :?>
+if ($block->getLayoutEnabled()):?>
     <style>
         .amsearch-products .amsearch-highlight {
-            background-color: #<?= $block->getLayoutHighlight()?> !important;
+            background-color: #<?= $block->escapeCss($block->getLayoutHighlight()) ?> !important;
         }
 
         .search-autocomplete {
-            border: 1px solid #<?= $block->getLayoutBorder()?> !important;
+            border: 1px solid #<?= $block->escapeCss($block->getLayoutBorder()) ?> !important;
         }
 
         .amsearch-results {
-            background-color: #<?= $block->getLayoutBackground()?> !important;
+            background-color: #<?= $block->escapeCss($block->getLayoutBackground()) ?> !important;
         }
 
         .amsearch-products {
-            background-color: #<?= $block->getLayoutBackground()?> !important;
+            background-color: #<?= $block->escapeCss($block->getLayoutBackground()) ?> !important;
         }
 
         .amsearch-item .item-name,
         .amsearch-item .product-item-link {
-            color: #<?= $block->getLayoutText()?> !important;
+            color: #<?= $block->escapeCss($block->getLayoutText()) ?> !important;
         }
 
         .amsearch-item .item-name:hover {
-            color: #<?= $block->getLayoutHoverText()?> !important;
+            color: #<?= $block->escapeCss($block->getLayoutHoverText()) ?> !important;
         }
 
         .amsearch-wrapper-content > .amsearch-item:hover {
-            background-color: #<?= $block->getLayoutHover()?> !important;
+            background-color: #<?= $block->escapeCss($block->getLayoutHover()) ?> !important;
         }
     </style>
 <?php endif;?>
@@ -43,9 +43,7 @@ if ($block->getLayoutEnabled()) :?>
         map: {
             '*': {
                 'quickSearch-original' : '<?= $block->escapeHtml($block->getOriginalFilePath())?>',
-                'quickSearch' : 'Amasty_Xsearch/js/form-mini',
-                'Magento_Search/js/form-mini' : 'Amasty_Xsearch/js/form-mini',
-                'Magento_Search/form-mini' : 'Amasty_Xsearch/js/form-mini',
+                'quickSearch' : 'Amasty_Xsearch/js/form-mini'
             }
         }
     });

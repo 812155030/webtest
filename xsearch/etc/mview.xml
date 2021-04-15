@@ -2,7 +2,7 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 -->
@@ -17,4 +17,5 @@
             <table name="catalog_category_entity_datetime" entity_column="entity_id" />
         </subscriptions>
     </view>
+    <view id="amasty_elastic_popup_data" class="Magento\Framework\Indexer\Action\Dummy" group="indexer" />
 </config>

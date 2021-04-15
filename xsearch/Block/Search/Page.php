@@ -1,12 +1,15 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
 
 namespace Amasty\Xsearch\Block\Search;
+
+use Magento\Cms\Api\Data\PageInterface;
+use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
 class Page extends AbstractSearch
 {
@@ -25,11 +28,23 @@ class Page extends AbstractSearch
      */
     protected function generateCollection()
     {
-        return parent::generateCollection()
-            ->addSearchFilter($this->getQuery()->getQueryText())
-            ->addStoreFilter($this->_storeManager->getStore())
-            ->addFieldToFilter('is_active', 1)
-            ->setPageSize($this->getLimit());
+        $collection = parent::generateCollection();
+        $collection->addSearchFilter($this->getQuery()->getQueryText());
+        $collection->addStoreFilter($this->_storeManager->getStore());
+        $collection->addFieldToFilter(PageInterface::IS_ACTIVE, 1);
+        $collection->setPageSize($this->getLimit());
+        $this->addExcludePagesCondition($collection);
+
+        return $collection;
+    }
+
+    private function addExcludePagesCondition(AbstractCollection $collection): void
+    {
+        $excludedIdentifiers = $this->configProvider->getExcludedCmsPagesIdentifiers();
+
+        if (!empty($excludedIdentifiers)) {
+            $collection->addFieldToFilter(PageInterface::IDENTIFIER, ['nin' => $excludedIdentifiers]);
+        }
     }
 
     /**
@@ -41,7 +56,9 @@ class Page extends AbstractSearch
     }
 
     /**
-     * @inheritdoc
+     * @param \Magento\Framework\DataObject $page
+     * @return string
+     * phpcs:disable Magento2.Functions.DiscouragedFunction
      */
     public function getDescription(\Magento\Framework\DataObject $page)
     {
@@ -58,6 +75,7 @@ class Page extends AbstractSearch
         $descStripped = $this->stripTags(html_entity_decode($content), null, true);
         $this->replaceVariables($descStripped);
 
+        //phpcs:enable Magento2.Functions.DiscouragedFunction
         return $this->getHighlightText($descStripped);
     }
 }

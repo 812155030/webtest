@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -20,7 +20,7 @@ class Preview
      *
      * @return bool
      */
-    public function aroundIsPreviewMode(StagePreview $subject, \Closure $proceed)
+    public function aroundIsPreviewMode($subject, \Closure $proceed)
     {
         try {
             return $proceed();

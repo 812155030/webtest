@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -46,7 +46,7 @@ class Index
     /**
      * @param $subject
      * @param \Closure $proceed
-     * @return mixed
+     * @return mixed|void
      */
     public function aroundExecute(
         $subject,

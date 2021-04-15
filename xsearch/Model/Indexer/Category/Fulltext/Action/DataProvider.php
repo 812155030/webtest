@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -9,6 +9,7 @@
 namespace Amasty\Xsearch\Model\Indexer\Category\Fulltext\Action;
 
 use Magento\Framework\App\ResourceConnection;
+use Magento\CatalogSearch\Model\ResourceModel\EngineProvider;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -51,7 +52,7 @@ class DataProvider
     private $storeManager;
 
     /**
-     * @var \Amasty\Xsearch\Model\ResourceModel\Engine
+     * @var \Magento\CatalogSearch\Model\ResourceModel\EngineInterface
      */
     private $engine;
 
@@ -77,8 +78,8 @@ class DataProvider
 
     public function __construct(
         ResourceConnection $resource,
+        EngineProvider $engineProvider,
         \Magento\Eav\Model\Config $eavConfig,
-        \Amasty\Xsearch\Model\ResourceModel\EngineFactory $engineFactory,
         \Magento\Framework\Event\ManagerInterface $eventManager,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\EntityManager\MetadataPool $metadataPool
@@ -88,7 +89,7 @@ class DataProvider
         $this->eavConfig = $eavConfig;
         $this->eventManager = $eventManager;
         $this->storeManager = $storeManager;
-        $this->engine = $engineFactory->create();
+        $this->engine = $engineProvider->get();
         $this->metadataPool = $metadataPool;
     }
 

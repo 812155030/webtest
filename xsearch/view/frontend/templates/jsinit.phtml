@@ -1,25 +1,35 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 ?>
 <?php
-/** @var \Amasty\Xsearch\Block\Jsinit $block */
+/**
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Amasty\Xsearch\ViewModel\FormMiniData $viewModel
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+$viewModel = $block->getViewModel();
 ?>
+
 <script>
     require([
         'Amasty_Xsearch/js/form-mini',
-        'Amasty_Xsearch/js/searchClick'
     ], function (autoComplete, searchClick) {
         'use strict';
-        window.xsearch_options = <?= /* @noEscape */ $block->getOptions() ?>;
-        searchClick.init('<?= $block->escapeUrl($block->getUrl('amasty_xsearch/product/click'));?>');
+        window.xsearch_options = <?= /* @noEscape */ $viewModel->getOptions() ?>;
     })
 </script>
-<?php if ($block->isShowRecentPreload() || $block->isShowPopularPreload()): ?>
-    <div id="amasty-xsearch-preload" class="amasty-xsearch-preload" data-amsearch-js="preload">
-        <?= /* @noEscape */ $block->getPreload();?>
-    </div>
-<?php endif;?>
+
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "amastyXsearchAnalyticsCollector": {}
+        }
+    }
+</script>
+
+<div id="amasty-xsearch-preload" class="amasty-xsearch-preload" data-amsearch-js="preload"></div>

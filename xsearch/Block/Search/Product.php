@@ -1,22 +1,23 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
 
+declare(strict_types=1);
+
 namespace Amasty\Xsearch\Block\Search;
 
+use Amasty\Xsearch\Controller\RegistryConstants;
+use Amasty\Xsearch\Model\Search\SearchAdapterResolver;
+use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Block\Product\ListProduct;
 use Magento\Catalog\Block\Product\ReviewRendererInterface;
 use Magento\Catalog\Model\Product as ProductModel;
-use Magento\Framework\DB\Select;
-use Magento\Catalog\Api\CategoryRepositoryInterface;
-use Magento\Framework\App\Response\RedirectInterface;
-use Amasty\Xsearch\Controller\RegistryConstants;
 use Magento\Framework\App\Action\Action;
-use Magento\Framework\Search\Adapter\Mysql\TemporaryStorage;
+use Magento\Framework\App\Response\RedirectInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -31,7 +32,6 @@ class Product extends ListProduct
     const XML_PATH_TEMPLATE_DESC_LENGTH = 'product/desc_length';
     const XML_PATH_TEMPLATE_REVIEWS = 'product/reviews';
     const XML_PATH_TEMPLATE_ADD_TO_CART = 'product/add_to_cart';
-    const XML_PATH_TEMPLATE_OUT_OF_STOCK_LAST = 'product/out_of_stock_last';
 
     const SMARTWAVE_PORTO_CODE = 'Smartwave/porto';
 
@@ -43,7 +43,7 @@ class Product extends ListProduct
      * @var \Magento\Framework\Stdlib\StringUtils
      */
     private $string;
-    
+
     /**
      * @var \Magento\Framework\Data\Form\FormKey
      */
@@ -99,6 +99,11 @@ class Product extends ListProduct
      */
     private $design;
 
+    /**
+     * @var SearchAdapterResolver
+     */
+    private $searchAdapterResolver;
+
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
         \Magento\Framework\Data\Helper\PostHelper $postDataHelper,
@@ -114,6 +119,8 @@ class Product extends ListProduct
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory,
         \Magento\Wishlist\Helper\Data $wishlistHelper,
         \Magento\Framework\View\DesignInterface $design,
+        \Magento\Framework\Url $urlBuilder,
+        SearchAdapterResolver $searchAdapterResolver,
         array $data = []
     ) {
         parent::__construct(
@@ -134,7 +141,9 @@ class Product extends ListProduct
         $this->collectionFactory = $collectionFactory;
         $this->wishlistHelper = $wishlistHelper;
         $this->design = $design;
+        $this->_urlBuilder = $urlBuilder;
         $this->setData('cache_lifetime', AbstractSearch::DEFAULT_CACHE_LIFETIME);
+        $this->searchAdapterResolver = $searchAdapterResolver;
     }
 
     /**
@@ -307,27 +316,40 @@ class Product extends ListProduct
      */
     public function getResults()
     {
-        $results = [];
+        $query = $this->getQuery();
+        $result = $query ? $this->searchAdapterResolver->getResults($this->getBlockType(), $query) : null;
+
+        return $result ?: $this->getCollectionData();
+    }
+
+    private function getCollectionData(): array
+    {
         $imageId = $this->getImageId();
+        $this->setNumResults($this->getLoadedProductCollection()->getSize());
+
         foreach ($this->getLoadedProductCollection() as $product) {
             $data['img'] = $this->encodeMediaUrl(
                 $this->getImage($product, $imageId)->toHtml()
             );
+            $data['image_url'] = $this->getImage($product, $imageId)->getImageUrl();
             $data['url'] = $this->getRelativeLink($product->getProductUrl());
             $data['name'] = $this->getName($product);
             $data['description'] = $this->getDescription($product);
             $data['price'] = $this->getProductPrice($product);
+            $data['min_price'] = $product->getData('min_price');
+            $data['final_price'] = $product->getData('final_price');
             $data['is_salable'] = $product->isSaleable();
             $data['product_data'] = [
                 'entity_id' => (string)$product->getId(),
                 'request_path' => (string)$product->getRequestPath()
-                ];
+            ];
             $data['reviews'] = $this->getReviewsSummaryHtml($product, ReviewRendererInterface::SHORT_VIEW);
+            $data['rating_summary'] = $product->getData('rating_summary');
+            $data['cart_post_params'] = $this->getAddToCartPostParams($product);
             $results[$product->getId()] = $data;
         }
 
-        $this->setNumResults($this->getLoadedProductCollection()->getSize());
-        return $results;
+        return $results ?? [];
     }
 
     /**
@@ -373,10 +395,7 @@ class Product extends ListProduct
         return $this->mediaUrl;
     }
 
-    /**
-     * @return string
-     */
-    public function getFormKey()
+    public function getFormKey(): string
     {
         return $this->formKey->getFormKey();
     }
@@ -490,12 +509,13 @@ class Product extends ListProduct
 
     /**
      * @param ProductModel $product
-     * @return string
+     * @return array
      */
     public function getAddToCartPostParams(ProductModel $product)
     {
         $result = parent::getAddToCartPostParams($product);
         $result['data']['return_url'] =  $this->redirector->getRefererUrl();
+
         return $result;
     }
 
@@ -538,30 +558,7 @@ class Product extends ListProduct
      */
     public function getAddToCart()
     {
-        return (bool)$this->xSearchHelper->getModuleConfig(self::XML_PATH_TEMPLATE_ADD_TO_CART) == '1'? 1 : 0;
-    }
-
-    /**
-     * @param array $products
-     * @return array
-     */
-    public function sortProducts($products)
-    {
-        $isShowLast = (bool)$this->xSearchHelper
-            ->getModuleConfig(self::XML_PATH_TEMPLATE_OUT_OF_STOCK_LAST);
-        if ($isShowLast) {
-            $outOfStockProducts = [];
-            foreach ($products as $key => $product) {
-                if (!$product['is_salable']) {
-                    $outOfStockProducts[] = $product;
-                    unset($products[$key]);
-                }
-            }
-
-            $products = array_merge($products, $outOfStockProducts);
-        }
-
-        return $products;
+        return (bool)$this->xSearchHelper->getModuleConfig(self::XML_PATH_TEMPLATE_ADD_TO_CART) == '1' ? 1 : 0;
     }
 
     /**

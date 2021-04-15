@@ -2,7 +2,7 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 -->
@@ -17,7 +17,7 @@
     </argument>
     <dataSource name="amsearch_wanted_listing_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
-            <argument name="class" xsi:type="string">Amasty\Xsearch\Ui\DataProvider\Listing\Wanted\DataProvider</argument>
+            <argument name="class" xsi:type="string">Amasty\Xsearch\Ui\DataProvider\MostWanted</argument>
             <argument name="name" xsi:type="string">amsearch_wanted_listing_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">query_text</argument>
             <argument name="requestFieldName" xsi:type="string">query_text</argument>
@@ -58,6 +58,7 @@
                 <item name="config" xsi:type="array">
                     <item name="label" xsi:type="string" translate="true">Search Query</item>
                     <item name="sortOrder" xsi:type="number">20</item>
+                    <item name="filter" xsi:type="string">text</item>
                 </item>
             </argument>
         </column>
@@ -66,22 +67,25 @@
                 <item name="config" xsi:type="array">
                     <item name="label" xsi:type="string" translate="true">Total Searches</item>
                     <item name="sortOrder" xsi:type="number">30</item>
+                    <item name="filter" xsi:type="string">textRange</item>
                 </item>
             </argument>
         </column>
-        <column name="user_key">
+        <column name="users_amount">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="label" xsi:type="string" translate="true">Users</item>
                     <item name="sortOrder" xsi:type="number">40</item>
+                    <item name="filter" xsi:type="string">textRange</item>
                 </item>
             </argument>
         </column>
-        <column name="product_click">
+        <column name="engagement">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="label" xsi:type="string" translate="true">Engagement, %</item>
                     <item name="sortOrder" xsi:type="number">50</item>
+                    <item name="filter" xsi:type="string">textRange</item>
                 </item>
             </argument>
         </column>

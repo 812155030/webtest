@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 
@@ -32,14 +32,21 @@ class Weight extends \Magento\Framework\App\Config\Value
     private $attributeResource;
 
     /**
+     * @var \Amasty\Base\Model\Serializer
+     */
+    private $serializer;
+
+    /**
      * Weight constructor.
      * @param \Magento\Catalog\Api\ProductAttributeRepositoryInterface $attributeRepository
-     * @param \Magento\Framework\Model\Context $context
      * @param \Amasty\Xsearch\Helper\Data $xSearchHelper
+     * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $config
      * @param \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList
      * @param \Magento\Framework\Math\Random $mathRandom
+     * @param \Magento\Catalog\Model\ResourceModel\Attribute $attributeResource
+     * @param \Amasty\Base\Model\Serializer $serializer
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
      * @param array $data
@@ -53,6 +60,7 @@ class Weight extends \Magento\Framework\App\Config\Value
         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
         \Magento\Framework\Math\Random $mathRandom,
         \Magento\Catalog\Model\ResourceModel\Attribute $attributeResource,
+        \Amasty\Base\Model\Serializer $serializer,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
@@ -61,6 +69,7 @@ class Weight extends \Magento\Framework\App\Config\Value
         $this->attributeRepository = $attributeRepository;
         $this->xSearchHelper = $xSearchHelper;
         $this->attributeResource = $attributeResource;
+        $this->serializer = $serializer;
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
     }
 
@@ -72,25 +81,28 @@ class Weight extends \Magento\Framework\App\Config\Value
     public function beforeSave()
     {
         $value = $this->getValue();
-        if (!$value) {
-            return $this;
-        }
-
         $result = [];
-        foreach ($value as $data) {
-            if (!$data
-                || !is_array($data)
-                || !(isset($data['weight']) && isset($data['attributes_weight']))
-            ) {
-                continue;
-            }
 
-            $result[$data['attributes_weight']] = $data['weight'];
-            $this->setWeightAndSearchable($data['attributes_weight'], $data['weight']);
+        if (is_array($value)) {
+            foreach ($value as $data) {
+                if (!$data
+                    || !is_array($data)
+                    || !(isset($data['weight']) && isset($data['attributes_weight']))
+                ) {
+                    continue;
+                }
+
+                $result[$data['attributes_weight']] = $data['weight'];
+            }
+        } else {
+            $result = $this->serializer->unserialize($value);
         }
 
-        $this->deactivateSearchable($value);
-        $this->setValue(serialize($result));
+        if ($result && is_array($result)) {
+            $this->setWeightAndSearchable($result);
+            $this->deactivateSearchable($result);
+            $this->setValue($this->serializer->serialize($result));
+        }
 
         return $this;
     }
@@ -143,40 +155,35 @@ class Weight extends \Magento\Framework\App\Config\Value
         return $values;
     }
 
-    /**
-     * @param $attributeCode
-     * @param $weight
-     */
-    private function setWeightAndSearchable($attributeCode, $weight)
+    private function setWeightAndSearchable(array $result): void
     {
-        $attribute = $this->attributeRepository->get($attributeCode);
-        $attribute->setSearchWeight($weight);
-        $attribute->setIsSearchable(true);
+        foreach ($result as $attributeCode => $weight) {
+            $attribute = $this->attributeRepository->get($attributeCode);
+            $attribute->setSearchWeight($weight);
+            $attribute->setIsSearchable(true);
 
-        /* saving with resource model, because magento repository on version less 2.1.8 break attribute options*/
-        $this->attributeResource->save($attribute);
+            /* saving with resource model, because magento repository on version less 2.1.8 break attribute options*/
+            $this->attributeResource->save($attribute);
+        }
     }
 
     /**
      * Set in the attribute is_searchable in false
-     * @param $values
+     * @param array $values
+     * @return void
      */
-    private function deactivateSearchable($values)
+    private function deactivateSearchable(array $values): void
     {
-        if (!$values) {
-            return;
-        }
-
         $productAttributes = $this->xSearchHelper->getProductAttributes('is_searchable');
+
         if (!$productAttributes) {
             return;
         }
 
         $productAttributes = array_flip($productAttributes);
-        foreach ($values as $value) {
-            if ($value) {
-                unset($productAttributes[$value['attributes_weight']]);
-            }
+
+        foreach ($values as $attributeCode => $weight) {
+            unset($productAttributes[$attributeCode]);
         }
 
         foreach ($productAttributes as $attribute => $value) {

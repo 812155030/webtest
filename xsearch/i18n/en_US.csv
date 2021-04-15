@@ -8,22 +8,27 @@ Hits,Hits
 Position,Position
 Status,Status
 "Not Installed","Not Installed"
+"Increase the convenience of searching for products by customers with the help of various sorting options provided by Improved Sorting plugin.","Increase the convenience of searching for products by customers with the help of various sorting options provided by Improved Sorting plugin."
+"Amasty Sorting Not Installed","Amasty Sorting Not Installed"
 "Allows to search by blog pages created with Amasty Blog extension.","Allows to search by blog pages created with Amasty Blog extension."
-"For Amasty Improved Layered Navigation and Amasty Shop by Brand.","For Amasty Improved Layered Navigation and Amasty Shop by Brand."
 "Please update Amasty Base module. Re-upload it and replace all the files.","Please update Amasty Base module. Re-upload it and replace all the files."
 "Related search terms","Related search terms"
 "Undefined collection factory","Undefined collection factory"
 "Recent Activity","Recent Activity"
 "Search Analytics","Search Analytics"
 "Most Wanted Search Terms","Most Wanted Search Terms"
-No,No
-Yes,Yes
-"Not installed","Not installed"
+"Elasticsearch engine returned an error response. ","Elasticsearch engine returned an error response. "
+"'item id: %1. Error type: ""%2"", reason ""%3""%4.' .","'item id: %1. Error type: ""%2"", reason ""%3""%4.' ."
+"Provided argument is not in PSR-0 or underscore notation.","Provided argument is not in PSR-0 or underscore notation."
+"Show Before Recently Viewed","Show Before Recently Viewed"
+"Show After Recently Viewed","Show After Recently Viewed"
 "Dynamic (based on popup width)","Dynamic (based on popup width)"
 Default,Default
+No,No
 "No, Disabled","No, Disabled"
 "Yes, Show Always","Yes, Show Always"
 "Yes, Show Only when search returns 0 results","Yes, Show Only when search returns 0 results"
+"User Search was not found","User Search was not found"
 "Recent Activity (Search Volume)","Recent Activity (Search Volume)"
 "Total Searches","Total Searches"
 "Unique Searches","Unique Searches"
@@ -40,11 +45,13 @@ Engagement,Engagement
 "View All","View All"
 "Your search returned no results.","Your search returned no results."
 Products,Products
-"Enter Keyword or Item","Enter Keyword or Item"
+Search,Search
 "Search entire store here...","Search entire store here..."
+"Field must have valid hex color code.","Field must have valid hex color code."
+"The argument must be a function","The argument must be a function"
+"Enter Keyword or Item","Enter Keyword or Item"
 "Your search returned no products.","Your search returned no products."
 "Clear Field","Clear Field"
-Search,Search
 "Advanced Search","Advanced Search"
 "Most Wanted","Most Wanted"
 Information,Information
@@ -66,6 +73,7 @@ General,General
 "Set Yes to speed up autocomplete popup performance. Please note, the reindex will take longer. This feature comes with Amasty Elastic Search extension only.","Set Yes to speed up autocomplete popup performance. Please note, the reindex will take longer. This feature comes with Amasty Elastic Search extension only."
 "Show Related Search Queries in Search Results","Show Related Search Queries in Search Results"
 "Show Related Search Queries Result Numbers","Show Related Search Queries Result Numbers"
+"Replace Empty Search Result Message with CMS Block","Replace Empty Search Result Message with CMS Block"
 "Search Attributes","Search Attributes"
 Enabled,Enabled
 Title,Title
@@ -79,9 +87,12 @@ Title,Title
 "When there is only one product in result","When there is only one product in result"
 "Show ""Out of Stock"" Products Last","Show ""Out of Stock"" Products Last"
 "Push ""Out of Stock"" products to the end of the search query list. Show products which are available for purchase first.","Push ""Out of Stock"" products to the end of the search query list. Show products which are available for purchase first."
+"Apply Relevance Rules to Autocomplete Popup Results","Apply Relevance Rules to Autocomplete Popup Results"
+"If enabled, applicable relevance rules (created in Elastic Search module) will impact not only the search results page, but the search popup as well.","If enabled, applicable relevance rules (created in Elastic Search module) will impact not only the search results page, but the search popup as well."
 "Popular Searches","Popular Searches"
 "Show on First Click","Show on First Click"
 "Recent Searches","Recent Searches"
+"Browsing History","Browsing History"
 Blog,Blog
 "Content Heading Length","Content Heading Length"
 "Content Length","Content Length"
@@ -91,6 +102,9 @@ Categories,Categories
 "Description Length","Description Length"
 "Display Full Category Path","Display Full Category Path"
 "CMS Pages","CMS Pages"
+"Excluded Pages","Excluded Pages"
+"Recently Viewed","Recently Viewed"
+Bestsellers,Bestsellers
 "Landing Pages","Landing Pages"
 "Allows to search by landing pages created with Amasty Landing Pages extension.","Allows to search by landing pages created with Amasty Landing Pages extension."
 "FAQ Question","FAQ Question"
@@ -104,6 +118,8 @@ Text,Text
 "Hover Text","Hover Text"
 "Amasty: Advanced Search  - Categories","Amasty: Advanced Search  - Categories"
 "Rebuild fulltext search index","Rebuild fulltext search index"
+"Amasty: Xsearch - Popup Data","Amasty: Xsearch - Popup Data"
+"Indexed data for popup","Indexed data for popup"
 "Engagement, %","Engagement, %"
 "Date and Time","Date and Time"
 "Faq Questions","Faq Questions"

@@ -2,20 +2,22 @@
 <!--
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2020 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2021 Amasty (https://www.amasty.com)
  * @package Amasty_Xsearch
  */
 -->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <amasty_xsearch>
             <general>
                 <popup_width>900</popup_width>
                 <dynamic_search_width>1</dynamic_search_width>
                 <min_chars>3</min_chars>
-                <four_zero_four_redirect>1</four_zero_four_redirect>
+                <four_zero_four_redirect>0</four_zero_four_redirect>
                 <enable_seo_url>0</enable_seo_url>
                 <seo_key>search</seo_key>
+                <empty_result_block>0</empty_result_block>
             </general>
             <recent_searches>
                 <enabled>1</enabled>
@@ -31,6 +33,13 @@
                 <position>2</position>
                 <limit>4</limit>
             </popular_searches>
+            <browsing_history>
+                <enabled>1</enabled>
+                <first_click>1</first_click>
+                <title>Browsing History</title>
+                <position>6</position>
+                <limit>4</limit>
+            </browsing_history>
             <category>
                 <enabled>1</enabled>
                 <title>Categories</title>
@@ -58,6 +67,7 @@
                 <add_to_cart>1</add_to_cart>
                 <redirect_single_product>1</redirect_single_product>
                 <out_of_stock_last>0</out_of_stock_last>
+                <apply_relevance_rules_in_popup>0</apply_relevance_rules_in_popup>
             </product>
             <landing_page>
                 <title>Landing Pages</title>
@@ -75,6 +85,18 @@
                 <title>FAQ and Product Questions</title>
                 <limit>4</limit>
             </faq>
+            <recently_viewed>
+                <enabled>0</enabled>
+                <title>Recently Viewed</title>
+                <position>1</position>
+                <limit>10</limit>
+            </recently_viewed>
+            <bestsellers>
+                <enabled>0</enabled>
+                <title>Bestsellers</title>
+                <position>1</position>
+                <limit>10</limit>
+            </bestsellers>
             <layout>
                 <enabled>0</enabled>
                 <border>000000</border>
